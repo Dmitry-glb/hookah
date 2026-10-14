@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setRating(5);
     initRealBackgroundAudio();
     setCoalPlacement('3 в колодке');
-    updateDatalists(); // Подгрузка истории чаш и табаков в подсказки
+    updateDatalists();
 });
 
 // Генерация фонового аудио для обмана блокировки iOS
@@ -44,14 +44,16 @@ function initRealBackgroundAudio() {
     }
     const blob = new Blob([buffer], { type: 'audio/wav' });
     const audioEl = document.getElementById('bg-audio');
-    audioEl.src = URL.createObjectURL(blob);
-    audioEl.volume = 0.01;
+    if (audioEl) {
+        audioEl.src = URL.createObjectURL(blob);
+        audioEl.volume = 0.01;
+    }
 }
 
 async function startKeepAliveAudio(titleText) {
     const audioEl = document.getElementById('bg-audio');
     try {
-        await audioEl.play();
+        if (audioEl) await audioEl.play();
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: titleText || 'DimHookah Активен 🔥',
@@ -59,11 +61,12 @@ async function startKeepAliveAudio(titleText) {
                 album: 'Сессия кальяна'
             });
         }
-    } catch (e) { }
+    } catch (e) {}
 }
 
 function stopKeepAliveAudio() {
-    document.getElementById('bg-audio').pause();
+    const audioEl = document.getElementById('bg-audio');
+    if (audioEl) audioEl.pause();
 }
 
 function initAudio() {
@@ -79,14 +82,14 @@ function playBellSound() {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(1046.50, now); // Высокая нота До (C6)
+        osc.frequency.setValueAtTime(1046.50, now);
         gain.gain.setValueAtTime(0.5, now);
         gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.5);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start(now);
         osc.stop(now + 1.5);
-    } catch (e) { }
+    } catch (e) {}
 }
 
 function formatTime(seconds) {
@@ -97,7 +100,33 @@ function formatTime(seconds) {
     return (isNegative ? '-' : '') + `${mins}:${secs}`;
 }
 
-// Переключение режимов Соло / Микс
+// Заполняем списки автодополнения
+function updateDatalists() {
+    const history = JSON.parse(localStorage.getItem('hookah_sessions') || '[]');
+    const bowlsSet = new Set();
+    const brandsSet = new Set();
+    const flavorsSet = new Set();
+
+    history.forEach(s => {
+        if (s.bowl) bowlsSet.add(s.bowl);
+        if (s.mix) {
+            s.mix.forEach(m => {
+                if (m.name) brandsSet.add(m.name);
+                if (m.brand) brandsSet.add(m.brand);
+                if (m.flavor) flavorsSet.add(m.flavor);
+            });
+        }
+    });
+
+    const bowlsEl = document.getElementById('bowls-list');
+    const brandsEl = document.getElementById('brands-list');
+    const flavorsEl = document.getElementById('flavors-list');
+
+    if (bowlsEl) bowlsEl.innerHTML = Array.from(bowlsSet).map(b => `<option value="${b}">`).join('');
+    if (brandsEl) brandsEl.innerHTML = Array.from(brandsSet).map(b => `<option value="${b}">`).join('');
+    if (flavorsEl) flavorsEl.innerHTML = Array.from(flavorsSet).map(f => `<option value="${f}">`).join('');
+}
+
 // Переключение режимов Соло / Микс
 function toggleMixMode() {
     isMixMode = !isMixMode;
@@ -139,50 +168,24 @@ function addMixRow(brand = '', flavor = '', weight = '') {
 function setCoalPlacement(type) {
     currentCoalPlacement = type;
     document.querySelectorAll('.coal-chip').forEach(el => el.classList.remove('active'));
-    if (type === '3 в колодке') document.getElementById('chip-3').classList.add('active');
-    if (type === '2 + 1') document.getElementById('chip-21').classList.add('active');
-    if (type === 'Пирамидка') document.getElementById('chip-pyr').classList.add('active');
+    if (type === '3 в колодке') document.getElementById('chip-3')?.classList.add('active');
+    if (type === '2 + 1') document.getElementById('chip-21')?.classList.add('active');
+    if (type === 'Пирамидка') document.getElementById('chip-pyr')?.classList.add('active');
 }
 
-// Заполняем списки автодополнения (история чаш, брендов и вкусов)
-function updateDatalists() {
-    const history = JSON.parse(localStorage.getItem('hookah_sessions') || '[]');
-    const bowlsSet = new Set();
-    const brandsSet = new Set();
-    const flavorsSet = new Set();
-
-    history.forEach(s => {
-        if (s.bowl) bowlsSet.add(s.bowl);
-        if (s.mix) {
-            s.mix.forEach(m => {
-                if (m.brand) brandsSet.add(m.brand);
-                if (m.flavor) flavorsSet.add(m.flavor);
-            });
-        }
-    });
-
-    const bowlsEl = document.getElementById('bowls-list');
-    const brandsEl = document.getElementById('brands-list');
-    const flavorsEl = document.getElementById('flavors-list');
-
-    if (bowlsEl) bowlsEl.innerHTML = Array.from(bowlsSet).map(b => `<option value="${b}">`).join('');
-    if (brandsEl) brandsEl.innerHTML = Array.from(brandsSet).map(b => `<option value="${b}">`).join('');
-    if (flavorsEl) flavorsEl.innerHTML = Array.from(flavorsSet).map(f => `<option value="${f}">`).join('');
-}
-
-// ШАГ 1: Запуск прогрева чаши (Автоматический старт фонового плеера iOS)
+// Запуск прогрева чаши
 async function startWarmupSession() {
     initAudio();
     await startKeepAliveAudio('⏳ Идет прогрев чаши...');
 
     if ('wakeLock' in navigator) {
-        try { await navigator.wakeLock.request('screen'); } catch (e) { }
+        try { await navigator.wakeLock.request('screen'); } catch (e) {}
     }
 
     const mins = parseInt(document.getElementById('warmup-min').value) || 0;
     const secs = parseInt(document.getElementById('warmup-sec').value) || 0;
     warmupTargetSec = (mins * 60) + secs;
-    if (warmupTargetSec <= 0) warmupTargetSec = 300; // По умолчанию 5 минут, если пустой ввод
+    if (warmupTargetSec <= 0) warmupTargetSec = 300;
 
     document.getElementById('status-title').innerText = '⏳ Прогрев чаши';
     document.getElementById('setup-form').classList.add('hidden');
@@ -199,7 +202,7 @@ async function startWarmupSession() {
 function updateWarmupTimer() {
     const elapsed = Math.floor((Date.now() - stepStartTime) / 1000);
     const remaining = warmupTargetSec - elapsed;
-
+    
     document.getElementById('timer').innerText = formatTime(elapsed);
     document.getElementById('warmup-countdown').innerText = formatTime(remaining);
 
@@ -215,10 +218,9 @@ function updateWarmupTimer() {
     }
 }
 
-// ШАГ 2: Переход к покуру
+// Переход к покуру
 function startSmokingFromWarmup() {
     initAudio();
-    // Если время ушло в минус, реальное время прогрева увеличивается на перепрогрев
     const elapsed = Math.floor((Date.now() - stepStartTime) / 1000);
     actualWarmupDuration = elapsed;
 
@@ -237,7 +239,7 @@ function startSmokingFromWarmup() {
     }, 1000);
 }
 
-// ШАГ 3: Завершение покура
+// Завершение покура
 function finishSmokingSession() {
     smokeDuration = Math.floor((Date.now() - stepStartTime) / 1000);
     clearInterval(timerInterval);
@@ -299,7 +301,7 @@ function saveSession() {
 
     resetForm();
     renderData();
-    updateDatalists(); // Обновляем подсказки новыми данными
+    updateDatalists();
 }
 
 function resetForm() {
@@ -309,7 +311,8 @@ function resetForm() {
     document.getElementById('rating-form').classList.add('hidden');
     document.getElementById('bowl').value = '';
     document.getElementById('comment').value = '';
-    document.getElementById('solo-tobacco-name').value = '';
+    document.getElementById('solo-tobacco-brand').value = '';
+    document.getElementById('solo-tobacco-flavor').value = '';
     document.getElementById('solo-tobacco-weight').value = '';
 }
 
@@ -325,22 +328,29 @@ function deleteSession(id) {
 function renderData() {
     const history = JSON.parse(localStorage.getItem('hookah_sessions') || '[]');
     const tbody = document.getElementById('history-body');
+    if (!tbody) return;
     tbody.innerHTML = '';
     const tobaccoStats = {};
 
     history.forEach(s => {
         const tr = document.createElement('tr');
-        // Формируем текст микса из бренда и вкуса
-        const mixStr = s.mix.map(m => `<span class="badge">${m.brand ? m.brand + ' ' : ''}${m.flavor ? m.flavor : ''} (${m.weight}г)</span>`).join(' ');
-        const commentHtml = s.comment ? `<div style="color:var(--text-secondary); margin-top:4px; font-size:0.85em; font-style:italic;">💬 ${s.comment}</div>` : '';
+        
+        // Поддержка старого и нового формата миксов для истории
+        const mixStr = (s.mix || []).map(m => {
+            const b = m.brand || m.name || '';
+            const f = m.flavor || '';
+            return `<span class="badge">${b} ${f} (${m.weight}г)</span>`;
+        }).join(' ');
 
+        const commentHtml = s.comment ? `<div style="color:var(--text-secondary); margin-top:4px; font-size:0.85em; font-style:italic;">💬 ${s.comment}</div>` : '';
+        
         tr.innerHTML = `
             <td><b>${s.date}</b><br><span style="color:#ffb340; font-weight:700;">★ ${s.rating}</span></td>
             <td><b>${s.bowl}</b><br><span style="color:var(--text-secondary); font-size:0.82em;">🔥 ${s.placement || '3 в колодке'}</span></td>
             <td><div>${mixStr}</div>${commentHtml}</td>
             <td style="font-size:0.82em; white-space:nowrap;">
                 🔥 ${formatTime(s.actualWarmupDuration || 0)}<br>
-                💨 <b>${formatTime(s.smokeDuration)}</b>
+                💨 <b>${formatTime(s.smokeDuration || 0)}</b>
             </td>
             <td style="white-space: nowrap;">
                 <button class="btn btn-edit" onclick="openFullEditModal(${s.id})">✏️</button>
@@ -349,18 +359,22 @@ function renderData() {
         `;
         tbody.appendChild(tr);
 
-        s.mix.forEach(m => {
-            const key = m.name.toLowerCase();
-            if (!tobaccoStats[key]) {
-                tobaccoStats[key] = { name: m.name, count: 0, totalRating: 0, totalWeight: 0 };
+        (s.mix || []).forEach(m => {
+            const tobName = (m.brand || m.name || '') + ' ' + (m.flavor || '');
+            const key = tobName.trim().toLowerCase();
+            if (key) {
+                if (!tobaccoStats[key]) {
+                    tobaccoStats[key] = { name: tobName.trim(), count: 0, totalRating: 0, totalWeight: 0 };
+                }
+                tobaccoStats[key].count += 1;
+                tobaccoStats[key].totalRating += s.rating;
+                tobaccoStats[key].totalWeight += (m.weight || 0);
             }
-            tobaccoStats[key].count += 1;
-            tobaccoStats[key].totalRating += s.rating;
-            tobaccoStats[key].totalWeight += m.weight;
         });
     });
 
     const analyticsDiv = document.getElementById('analytics-content');
+    if (!analyticsDiv) return;
     const sortedTobaccos = Object.values(tobaccoStats).sort((a, b) => (b.totalRating / b.count) - (a.totalRating / a.count));
 
     if (sortedTobaccos.length === 0) {
@@ -435,7 +449,7 @@ async function exportToNotes() {
 
     let text = "💨 ИСТОРИЯ ПОКУРОВ DIMHOOKAH\n\n";
     history.forEach((s, index) => {
-        const mixStr = s.mix.map(m => `${m.name} (${m.weight}г)`).join(', ');
+        const mixStr = (s.mix || []).map(m => `${m.brand || ''} ${m.flavor || ''} (${m.weight}г)`).join(', ');
         text += `${index + 1}. Дата: ${s.date} | Чаша: ${s.bowl}\n`;
         text += `   Микс: ${mixStr}\n`;
         text += `   Расстановка: ${s.placement || '3 в колодке'}\n`;
@@ -445,7 +459,7 @@ async function exportToNotes() {
     });
 
     if (navigator.share) {
-        try { await navigator.share({ title: 'История покуров', text: text }); } catch (e) { }
+        try { await navigator.share({ title: 'История покуров', text: text }); } catch (e) {}
     } else {
         navigator.clipboard.writeText(text);
         alert('История скопирована в буфер обмена!');
@@ -458,7 +472,7 @@ function exportToCSV() {
 
     let csv = '\uFEFFДата;Чаша;Расстановка;Микс;Время прогрева (сек);Время покура (сек);Оценка;Комментарий\n';
     history.forEach(s => {
-        const mixStr = s.mix.map(m => `${m.name} (${m.weight}г)`).join(' + ');
+        const mixStr = (s.mix || []).map(m => `${m.brand || ''} ${m.flavor || ''} (${m.weight}г)`).join(' + ');
         csv += `"${s.date}";"${s.bowl}";"${s.placement || ''}";"${mixStr}";"${s.actualWarmupDuration || 0}";"${s.smokeDuration}";"${s.rating}";"${s.comment || ''}"\n`;
     });
 
@@ -477,7 +491,7 @@ function importFromCSV(event) {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = function(e) {
         const text = e.target.result;
         const lines = text.split('\n');
         if (lines.length < 2) { alert('Файл пустой.'); return; }
@@ -513,13 +527,13 @@ function importFromCSV(event) {
                 mixRaw.split('+').forEach(part => {
                     const match = part.trim().match(/(.*?)\s*\((\d+)[гg]\)/i);
                     if (match) {
-                        mix.push({ name: match[1].trim(), weight: parseFloat(match[2]) || 0 });
+                        mix.push({ brand: match[1].trim(), flavor: '', weight: parseFloat(match[2]) || 0 });
                     } else if (part.trim()) {
-                        mix.push({ name: part.trim(), weight: 0 });
+                        mix.push({ brand: part.trim(), flavor: '', weight: 0 });
                     }
                 });
 
-                if (mix.length === 0) mix.push({ name: 'Без названия', weight: 0 });
+                if (mix.length === 0) mix.push({ brand: 'Без названия', flavor: '', weight: 0 });
 
                 history.push({
                     id: Date.now() + i,
@@ -538,6 +552,7 @@ function importFromCSV(event) {
 
         localStorage.setItem('hookah_sessions', JSON.stringify(history));
         renderData();
+        updateDatalists();
         alert(`Импортировано сессий: ${importedCount}`);
         event.target.value = '';
     };

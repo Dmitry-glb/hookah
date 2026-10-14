@@ -2,158 +2,292 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Кальян">
     <title>Трекер кальянных сессий</title>
     <style>
+        /* Стиль Liquid Glass iOS 27 */
         :root {
-            --bg: #121212;
-            --surface: #1e1e1e;
-            --primary: #ff6b00;
-            --danger: #e53935;
-            --success: #43a047;
-            --text: #e0e0e0;
-            --text-secondary: #888;
-            --border: #333;
+            --glass-bg: rgba(30, 30, 35, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-highlight: rgba(255, 255, 255, 0.25);
+            --primary: #ff7b00;
+            --primary-glow: rgba(255, 123, 0, 0.4);
+            --danger: #ff3b30;
+            --success: #34c759;
+            --text: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.55);
+            --safe-top: env(safe-area-inset-top, 20px);
+            --safe-bottom: env(safe-area-inset-bottom, 20px);
         }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background: radial-gradient(circle at 0% 0%, #2c1a30, transparent 40%),
+                        radial-gradient(circle at 100% 100%, #161e36, transparent 50%),
+                        #08080c;
+            background-attachment: fixed;
             color: var(--text);
+            margin: 0;
+            padding: calc(var(--safe-top) + 15px) 15px calc(var(--safe-bottom) + 15px);
+            max-width: 600px;
             margin: 0 auto;
-            padding: 15px;
-            max-width: 800px;
             -webkit-tap-highlight-color: transparent;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
-        h1, h2, h3 { margin-top: 0; }
-        .card {
-            background-color: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 16px;
-            margin-bottom: 16px;
+
+        h1, h2, h3 { 
+            font-weight: 800; 
+            letter-spacing: -0.5px;
+            margin-top: 0;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
+
+        /* Эффект жидкого стекла */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(28px) saturate(210%);
+            -webkit-backdrop-filter: blur(28px) saturate(210%);
+            border: 1px solid var(--glass-border);
+            border-top-color: rgba(255, 255, 255, 0.25);
+            border-left-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35),
+                        inset 0 1.5px 0 rgba(255, 255, 255, 0.25),
+                        inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 18px;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 50%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.04), transparent);
+            pointer-events: none;
+        }
+
         .timer-display {
-            font-size: 3em;
-            font-weight: bold;
+            font-size: 3.5em;
+            font-weight: 900;
             text-align: center;
             margin: 10px 0;
             font-variant-numeric: tabular-nums;
-            color: var(--primary);
+            background: linear-gradient(135deg, #fff, #ff7b00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(255, 123, 0, 0.35));
         }
+
         .coal-timer-box {
-            background-color: #262626;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 15px;
             margin-bottom: 15px;
             text-align: center;
         }
+
         .coal-timer-display {
-            font-size: 2em;
-            font-weight: bold;
+            font-size: 2.2em;
+            font-weight: 800;
             font-variant-numeric: tabular-nums;
             margin: 5px 0;
-            color: var(--text);
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
+
         .alarm-active {
-            border-color: var(--danger);
-            background-color: rgba(229, 57, 53, 0.15);
-            animation: pulse 1s infinite;
+            border-color: rgba(255, 59, 48, 0.6);
+            background: rgba(255, 59, 48, 0.12);
+            animation: pulse-border 1.5s infinite alternate;
         }
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
+
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 5px rgba(255, 59, 48, 0.2); }
+            100% { box-shadow: 0 0 20px rgba(255, 59, 48, 0.6); }
         }
+
+        /* Кнопки Liquid iOS */
         .btn {
-            background-color: var(--primary);
+            background: linear-gradient(180deg, rgba(255,123,0,1) 0%, rgba(255,85,0,1) 100%);
             color: #fff;
-            border: none;
-            padding: 14px 20px;
-            border-radius: 8px;
-            font-size: 1em;
-            font-weight: bold;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-top-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 15px var(--primary-glow),
+                        inset 0 1.5px 0 rgba(255,255,255,0.3);
+            padding: 16px;
+            border-radius: 14px;
+            font-size: 1.05em;
+            font-weight: 700;
             cursor: pointer;
             width: 100%;
             margin-bottom: 10px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(5px);
         }
-        .btn-secondary { background-color: #383838; }
-        .btn-success { background-color: var(--success); }
+
+        .btn:active {
+            transform: scale(0.97);
+            filter: brightness(0.9);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1),
+                        0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .btn-success {
+            background: linear-gradient(180deg, #34c759 0%, #28a745 100%);
+            box-shadow: 0 4px 15px rgba(52, 199, 89, 0.35), inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+
         .btn-danger {
-            background-color: var(--danger);
+            background: linear-gradient(180deg, #ff453a 0%, #dd2c00 100%);
+            box-shadow: 0 4px 10px rgba(255, 59, 48, 0.3);
             width: auto;
-            padding: 8px 12px;
+            padding: 10px 14px;
             font-size: 0.85em;
             margin-bottom: 0;
+            border-radius: 10px;
         }
-        .form-group { margin-bottom: 14px; }
+
+        .form-group { margin-bottom: 15px; }
+        
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             color: var(--text-secondary);
-            font-size: 0.9em;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
+
+        /* Стеклянные поля ввода */
         input, select, textarea {
             width: 100%;
-            padding: 12px;
-            background-color: var(--bg);
-            border: 1px solid var(--border);
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom-color: rgba(255, 255, 255, 0.03);
             color: var(--text);
-            border-radius: 6px;
+            border-radius: 12px;
             box-sizing: border-box;
-            font-size: 16px; /* Предотвращает авто-зум на iOS */
+            font-size: 16px; /* Предотвращает зум на iOS */
+            outline: none;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
         }
+
+        input:focus, textarea:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 123, 0, 0.5);
+            box-shadow: 0 0 10px rgba(255, 123, 0, 0.15), inset 0 1px 3px rgba(0,0,0,0.2);
+        }
+
         .mix-row {
             display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: 10px;
+            margin-bottom: 10px;
             align-items: center;
         }
         .mix-row input:first-child { flex: 3; }
-        .mix-row input:nth-child(2) { flex: 1; }
+        .mix-row input:nth-child(2) { flex: 1.2; }
+
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0 8px;
             margin-top: 10px;
-            font-size: 0.85em;
+            font-size: 0.88em;
         }
+
         th, td {
-            border-bottom: 1px solid var(--border);
-            padding: 8px 6px;
+            padding: 12px 10px;
             text-align: left;
+            vertical-align: middle;
         }
-        th { color: var(--text-secondary); }
+        
+        tr {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+        }
+
+        th { 
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding-bottom: 0px;
+            text-transform: uppercase;
+            font-size: 0.75em;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            border-top: 1px solid rgba(255,255,255,0.04);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        td:first-child { 
+            border-left: 1px solid rgba(255,255,255,0.04);
+            border-top-left-radius: 12px; 
+            border-bottom-left-radius: 12px; 
+        }
+        td:last-child { 
+            border-right: 1px solid rgba(255,255,255,0.04);
+            border-top-right-radius: 12px; 
+            border-bottom-right-radius: 12px; 
+        }
+
         .hidden { display: none; }
+        
         .stars {
             display: flex;
             gap: 12px;
-            font-size: 2.2em;
+            font-size: 2.5em;
             justify-content: center;
             margin: 15px 0;
             cursor: pointer;
         }
-        .star { color: #444; }
-        .star.active { color: var(--primary); }
+        .star { 
+            color: rgba(255, 255, 255, 0.15); 
+            transition: transform 0.15s ease, color 0.15s ease;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .star.active { 
+            color: var(--primary); 
+            filter: drop-shadow(0 0 6px var(--primary-glow));
+            transform: scale(1.15);
+        }
+
         .badge {
-            background: #333;
-            padding: 3px 6px;
-            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255,255,255,0.06);
+            padding: 4px 8px;
+            border-radius: 6px;
             font-size: 0.85em;
             display: inline-block;
             margin: 2px 0;
+            color: #ffffff;
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
 
-    <h2>Трекер покуров</h2>
+    <h2 style="font-size: 1.8em; margin-bottom: 15px; text-align: center;">💨 Трекер покуров</h2>
 
     <!-- Блок управления сессией -->
-    <div class="card" id="session-card">
-        <h3 id="status-title">Новая сессия</h3>
+    <div class="glass-panel" id="session-card">
+        <h3 id="status-title" style="color: var(--text-secondary); text-align: center; font-size: 1em; text-transform: uppercase; margin-bottom: 5px;">Новая сессия</h3>
         <div class="timer-display" id="timer">00:00</div>
         
         <button class="btn" id="btn-coals" onclick="startCoals()">1. Поставить угли (Старт)</button>
@@ -170,19 +304,19 @@
                     <input type="number" id="coals-count" value="3">
                 </div>
                 <div class="form-group" style="flex: 1;">
-                    <label>Таймер углей (мин)</label>
+                    <label>Таймер (мин)</label>
                     <input type="number" id="coal-timer-input" value="25">
                 </div>
             </div>
             <div class="form-group">
-                <label>Состав микса (Табак и граммы)</label>
+                <label>Микс (Табаки и граммы)</label>
                 <div id="mix-container">
                     <div class="mix-row">
                         <input type="text" class="tobacco-name" placeholder="Darkside Supernova">
                         <input type="number" class="tobacco-weight" placeholder="Гр">
                     </div>
                 </div>
-                <button type="button" class="btn btn-secondary" onclick="addMixRow()">+ Добавить табак</button>
+                <button type="button" class="btn btn-secondary" onclick="addMixRow()" style="padding: 10px; font-size:0.9em; margin-top: 5px;">+ Добавить табак</button>
             </div>
             <button class="btn" id="btn-smoke" onclick="startSmoking()">2. Угли готовы — Начать покур</button>
         </div>
@@ -192,11 +326,11 @@
             <div class="coal-timer-box" id="coal-box">
                 <div style="font-size: 0.85em; color: var(--text-secondary);">До смены / стряхивания углей:</div>
                 <div class="coal-timer-display" id="coal-countdown">25:00</div>
-                <div style="font-size: 0.8em; color: var(--text-secondary); margin-bottom: 8px;">
+                <div style="font-size: 0.85em; color: var(--text-secondary); margin-bottom: 10px;">
                     Смен угля за сессию: <b id="coal-changes-count">0</b>
                 </div>
-                <button class="btn btn-success" style="margin-bottom:0; padding: 10px;" onclick="resetCoalTimer()">
-                    🔄 Сменил / Стряхнул угли (Сбросить таймер)
+                <button class="btn btn-success" style="margin-bottom:0; padding: 12px; font-size: 0.9em;" onclick="resetCoalTimer()">
+                    🔄 Сменил / Стряхнул угли
                 </button>
             </div>
             <button class="btn" id="btn-finish" onclick="finishSmoking()">3. Завершить покур</button>
@@ -204,7 +338,7 @@
 
         <!-- Форма оценки -->
         <div id="rating-form" class="hidden">
-            <h3>Оцените сессию</h3>
+            <h3 style="text-align: center; margin-bottom: 5px;">Оцените сессию</h3>
             <div class="stars" id="stars">
                 <span class="star" onclick="setRating(1)">★</span>
                 <span class="star" onclick="setRating(2)">★</span>
@@ -221,23 +355,22 @@
     </div>
 
     <!-- Аналитика -->
-    <div class="card">
-        <h3>Рейтинг табаков</h3>
-        <div id="analytics-content">Нет данных</div>
+    <div class="glass-panel">
+        <h3>🏆 Рейтинг табаков</h3>
+        <div id="analytics-content" style="overflow-x: auto;">Нет данных</div>
     </div>
 
     <!-- История -->
-    <div class="card">
-        <h3>История покуров</h3>
+    <div class="glass-panel">
+        <h3>📅 История покуров</h3>
         <div style="overflow-x: auto;">
             <table>
                 <thead>
                     <tr>
-                        <th>Дата</th>
-                        <th>Сетап</th>
-                        <th>Микс</th>
-                        <th>Время</th>
-                        <th>Оценка</th>
+                        <th style="width: 20%;">Дата</th>
+                        <th style="width: 25%;">Сетап</th>
+                        <th style="width: 35%;">Микс</th>
+                        <th style="width: 15%;">Время</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -263,7 +396,6 @@
             setRating(5);
         });
 
-        // Звуковой сигнал через Web Audio API (работает без внешних файлов)
         function initAudio() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -278,7 +410,7 @@
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(880, audioCtx.currentTime); // Нота Ля
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime);
                 gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.8);
                 
@@ -310,9 +442,8 @@
             container.appendChild(row);
         }
 
-        // 1. Старт углей
         function startCoals() {
-            initAudio(); // Разблокировка звука на iOS при первом клике
+            initAudio();
             document.getElementById('status-title').innerText = 'Разогрев углей и забивка...';
             document.getElementById('btn-coals').classList.add('hidden');
             document.getElementById('setup-form').classList.remove('hidden');
@@ -325,7 +456,6 @@
             }, 1000);
         }
 
-        // 2. Старт покура и таймера смены углей
         function startSmoking() {
             initAudio();
             coalDuration = Math.floor((Date.now() - startTime) / 1000);
@@ -348,11 +478,9 @@
 
         function updateSmokingTimers() {
             const now = Date.now();
-            // Общий таймер покура
             const elapsedSmoke = Math.floor((now - startTime) / 1000);
             document.getElementById('timer').innerText = formatTime(elapsedSmoke);
 
-            // Обратный отсчет углей
             const elapsedCoal = Math.floor((now - coalStartTime) / 1000);
             const remainingCoal = (coalIntervalMinutes * 60) - elapsedCoal;
             document.getElementById('coal-countdown').innerText = formatTime(remainingCoal);
@@ -360,7 +488,6 @@
             const coalBox = document.getElementById('coal-box');
             if (remainingCoal <= 0) {
                 coalBox.classList.add('alarm-active');
-                // Звуковой сигнал каждые 5 секунд при просрочке
                 if (!alarmTriggered || Math.abs(remainingCoal) % 5 === 0) {
                     playBeep();
                     alarmTriggered = true;
@@ -370,7 +497,6 @@
             }
         }
 
-        // Сброс таймера углей
         function resetCoalTimer() {
             coalStartTime = Date.now();
             coalChanges++;
@@ -380,7 +506,6 @@
             updateSmokingTimers();
         }
 
-        // 3. Финиш покура
         function finishSmoking() {
             smokeDuration = Math.floor((Date.now() - startTime) / 1000);
             clearInterval(timerInterval);
@@ -399,7 +524,6 @@
             });
         }
 
-        // 4. Сохранение
         function saveSession() {
             const bowl = document.getElementById('bowl').value.trim() || 'Не указана';
             const coals = parseInt(document.getElementById('coals-count').value) || 0;
@@ -419,7 +543,7 @@
 
             const session = {
                 id: Date.now(),
-                date: new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }),
+                date: new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' }),
                 bowl,
                 coals,
                 coalChanges,
@@ -454,10 +578,12 @@
         }
 
         function deleteSession(id) {
-            let history = JSON.parse(localStorage.getItem('hookah_sessions') || '[]');
-            history = history.filter(s => s.id !== id);
-            localStorage.setItem('hookah_sessions', JSON.stringify(history));
-            renderData();
+            if (confirm("Вы действительно хотите удалить эту сессию?")) {
+                let history = JSON.parse(localStorage.getItem('hookah_sessions') || '[]');
+                history = history.filter(s => s.id !== id);
+                localStorage.setItem('hookah_sessions', JSON.stringify(history));
+                renderData();
+            }
         }
 
         function renderData() {
@@ -469,15 +595,14 @@
 
             history.forEach(s => {
                 const tr = document.createElement('tr');
-                const mixStr = s.mix.map(m => `<span class="badge">${m.name} (${m.weight}г)</span>`).join('<br>');
-                const commentHtml = s.comment ? `<br><small style="color:var(--text-secondary)">💬 ${s.comment}</small>` : '';
+                const mixStr = s.mix.map(m => `<span class="badge">${m.name} (${m.weight}г)</span>`).join(' ');
+                const commentHtml = s.comment ? `<div style="color:var(--text-secondary); margin-top:5px; font-size:0.9em; font-style:italic;">💬 ${s.comment}</div>` : '';
                 
                 tr.innerHTML = `
-                    <td>${s.date}</td>
-                    <td><b>${s.bowl}</b><br><small>Старт: ${s.coals} угл.<br>Смен: ${s.coalChanges || 0}</small></td>
-                    <td>${mixStr}${commentHtml}</td>
-                    <td>🔥 ${formatTime(s.coalDuration)}<br>💨 <b>${formatTime(s.smokeDuration)}</b></td>
-                    <td style="color: var(--primary); font-weight: bold;">★${s.rating}</td>
+                    <td><b>${s.date}</b></td>
+                    <td><span style="color:#ffffff; font-weight:600;">${s.bowl}</span><br><span style="color:var(--text-secondary); font-size:0.85em;">🔥 ${s.coals} уг. / 🔄 ${s.coalChanges || 0}</span></td>
+                    <td><div>${mixStr}</div>${commentHtml}</td>
+                    <td>⌛ ${formatTime(s.coalDuration)}<br>💨 <b>${formatTime(s.smokeDuration)}</b><br><span style="color:var(--primary); font-weight:700;">★ ${s.rating}</span></td>
                     <td><button class="btn btn-danger" onclick="deleteSession(${s.id})">✕</button></td>
                 `;
                 tbody.appendChild(tr);
@@ -497,11 +622,11 @@
             const sortedTobaccos = Object.values(tobaccoStats).sort((a, b) => (b.totalRating / b.count) - (a.totalRating / a.count));
 
             if (sortedTobaccos.length === 0) {
-                analyticsDiv.innerHTML = '<p style="color: var(--text-secondary); margin:0;">Пока нет сохраненных сессий.</p>';
+                analyticsDiv.innerHTML = '<p style="color: var(--text-secondary); margin:0; font-size:0.9em;">Пока нет сохраненных сессий.</p>';
                 return;
             }
 
-            let html = '<table><thead><tr><th>Табак</th><th>Оценка</th><th>Сессий</th><th>Вес</th></tr></thead><tbody>';
+            let html = '<table><thead><tr><th>Табак</th><th style="width: 25%;">Рейтинг</th><th style="width: 20%;">Покуров</th><th style="width: 20%;">Вес</th></tr></thead><tbody>';
             sortedTobaccos.forEach(t => {
                 const avg = (t.totalRating / t.count).toFixed(1);
                 html += `

@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setRating(5);
     initRealBackgroundAudio();
     setCoalPlacement('3 в колодке');
+    updateDatalists(); // Подгрузка истории чаш и табаков в подсказки
 });
 
 // Генерация фонового аудио для обмана блокировки iOS
@@ -58,7 +59,7 @@ async function startKeepAliveAudio(titleText) {
                 album: 'Сессия кальяна'
             });
         }
-    } catch (e) {}
+    } catch (e) { }
 }
 
 function stopKeepAliveAudio() {
@@ -85,7 +86,7 @@ function playBellSound() {
         gain.connect(audioCtx.destination);
         osc.start(now);
         osc.stop(now + 1.5);
-    } catch (e) {}
+    } catch (e) { }
 }
 
 function formatTime(seconds) {
@@ -96,6 +97,7 @@ function formatTime(seconds) {
     return (isNegative ? '-' : '') + `${mins}:${secs}`;
 }
 
+// Переключение режимов Соло / Микс
 // Переключение режимов Соло / Микс
 function toggleMixMode() {
     isMixMode = !isMixMode;
@@ -121,13 +123,14 @@ function toggleMixMode() {
     }
 }
 
-function addMixRow(name = '', weight = '') {
+function addMixRow(brand = '', flavor = '', weight = '') {
     const container = document.getElementById('mix-container');
     const row = document.createElement('div');
     row.className = 'mix-row';
     row.innerHTML = `
-        <input type="text" class="tobacco-name" placeholder="Бренд и вкус" value="${name}">
-        <input type="number" class="tobacco-weight" placeholder="Гр" value="${weight}">
+        <input type="text" class="tobacco-brand" placeholder="Бренд" list="brands-list" value="${brand}" style="flex: 1.5;">
+        <input type="text" class="tobacco-flavor" placeholder="Вкус" list="flavors-list" value="${flavor}" style="flex: 1.8;">
+        <input type="number" class="tobacco-weight" placeholder="Гр" value="${weight}" style="flex: 0.9;">
         <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">✕</button>
     `;
     container.appendChild(row);
@@ -141,16 +144,45 @@ function setCoalPlacement(type) {
     if (type === 'Пирамидка') document.getElementById('chip-pyr').classList.add('active');
 }
 
+// Заполняем списки автодополнения (история чаш, брендов и вкусов)
+function updateDatalists() {
+    const history = JSON.parse(localStorage.getItem('hookah_sessions') || '[]');
+    const bowlsSet = new Set();
+    const brandsSet = new Set();
+    const flavorsSet = new Set();
+
+    history.forEach(s => {
+        if (s.bowl) bowlsSet.add(s.bowl);
+        if (s.mix) {
+            s.mix.forEach(m => {
+                if (m.brand) brandsSet.add(m.brand);
+                if (m.flavor) flavorsSet.add(m.flavor);
+            });
+        }
+    });
+
+    const bowlsEl = document.getElementById('bowls-list');
+    const brandsEl = document.getElementById('brands-list');
+    const flavorsEl = document.getElementById('flavors-list');
+
+    if (bowlsEl) bowlsEl.innerHTML = Array.from(bowlsSet).map(b => `<option value="${b}">`).join('');
+    if (brandsEl) brandsEl.innerHTML = Array.from(brandsSet).map(b => `<option value="${b}">`).join('');
+    if (flavorsEl) flavorsEl.innerHTML = Array.from(flavorsSet).map(f => `<option value="${f}">`).join('');
+}
+
 // ШАГ 1: Запуск прогрева чаши (Автоматический старт фонового плеера iOS)
 async function startWarmupSession() {
     initAudio();
     await startKeepAliveAudio('⏳ Идет прогрев чаши...');
 
     if ('wakeLock' in navigator) {
-        try { await navigator.wakeLock.request('screen'); } catch (e) {}
+        try { await navigator.wakeLock.request('screen'); } catch (e) { }
     }
 
-    warmupTargetSec = parseInt(document.getElementById('warmup-select').value) || 300;
+    const mins = parseInt(document.getElementById('warmup-min').value) || 0;
+    const secs = parseInt(document.getElementById('warmup-sec').value) || 0;
+    warmupTargetSec = (mins * 60) + secs;
+    if (warmupTargetSec <= 0) warmupTargetSec = 300; // По умолчанию 5 минут, если пустой ввод
 
     document.getElementById('status-title').innerText = '⏳ Прогрев чаши';
     document.getElementById('setup-form').classList.add('hidden');
@@ -167,7 +199,7 @@ async function startWarmupSession() {
 function updateWarmupTimer() {
     const elapsed = Math.floor((Date.now() - stepStartTime) / 1000);
     const remaining = warmupTargetSec - elapsed;
-    
+
     document.getElementById('timer').innerText = formatTime(elapsed);
     document.getElementById('warmup-countdown').innerText = formatTime(remaining);
 
@@ -231,20 +263,23 @@ function saveSession() {
     const mix = [];
 
     if (isMixMode) {
-        const names = document.querySelectorAll('.tobacco-name');
+        const brands = document.querySelectorAll('.tobacco-brand');
+        const flavors = document.querySelectorAll('.tobacco-flavor');
         const weights = document.querySelectorAll('.tobacco-weight');
-        for (let i = 0; i < names.length; i++) {
-            const name = names[i].value.trim();
+        for (let i = 0; i < brands.length; i++) {
+            const brand = brands[i].value.trim();
+            const flavor = flavors[i].value.trim();
             const weight = parseFloat(weights[i].value) || 0;
-            if (name) mix.push({ name, weight });
+            if (brand || flavor) mix.push({ brand, flavor, weight });
         }
     } else {
-        const name = document.getElementById('solo-tobacco-name').value.trim();
+        const brand = document.getElementById('solo-tobacco-brand').value.trim();
+        const flavor = document.getElementById('solo-tobacco-flavor').value.trim();
         const weight = parseFloat(document.getElementById('solo-tobacco-weight').value) || 0;
-        if (name) mix.push({ name, weight });
+        if (brand || flavor) mix.push({ brand, flavor, weight });
     }
 
-    if (mix.length === 0) mix.push({ name: 'Без названия (Соло)', weight: 0 });
+    if (mix.length === 0) mix.push({ brand: 'Без названия', flavor: '', weight: 0 });
 
     const session = {
         id: Date.now(),
@@ -264,6 +299,7 @@ function saveSession() {
 
     resetForm();
     renderData();
+    updateDatalists(); // Обновляем подсказки новыми данными
 }
 
 function resetForm() {
@@ -294,15 +330,16 @@ function renderData() {
 
     history.forEach(s => {
         const tr = document.createElement('tr');
-        const mixStr = s.mix.map(m => `<span class="badge">${m.name} (${m.weight}г)</span>`).join(' ');
+        // Формируем текст микса из бренда и вкуса
+        const mixStr = s.mix.map(m => `<span class="badge">${m.brand ? m.brand + ' ' : ''}${m.flavor ? m.flavor : ''} (${m.weight}г)</span>`).join(' ');
         const commentHtml = s.comment ? `<div style="color:var(--text-secondary); margin-top:4px; font-size:0.85em; font-style:italic;">💬 ${s.comment}</div>` : '';
-        
+
         tr.innerHTML = `
             <td><b>${s.date}</b><br><span style="color:#ffb340; font-weight:700;">★ ${s.rating}</span></td>
             <td><b>${s.bowl}</b><br><span style="color:var(--text-secondary); font-size:0.82em;">🔥 ${s.placement || '3 в колодке'}</span></td>
             <td><div>${mixStr}</div>${commentHtml}</td>
             <td style="font-size:0.82em; white-space:nowrap;">
-                Грев: ${formatTime(s.actualWarmupDuration || 0)}<br>
+                🔥 ${formatTime(s.actualWarmupDuration || 0)}<br>
                 💨 <b>${formatTime(s.smokeDuration)}</b>
             </td>
             <td style="white-space: nowrap;">
@@ -408,7 +445,7 @@ async function exportToNotes() {
     });
 
     if (navigator.share) {
-        try { await navigator.share({ title: 'История покуров', text: text }); } catch (e) {}
+        try { await navigator.share({ title: 'История покуров', text: text }); } catch (e) { }
     } else {
         navigator.clipboard.writeText(text);
         alert('История скопирована в буфер обмена!');
@@ -440,7 +477,7 @@ function importFromCSV(event) {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         const text = e.target.result;
         const lines = text.split('\n');
         if (lines.length < 2) { alert('Файл пустой.'); return; }

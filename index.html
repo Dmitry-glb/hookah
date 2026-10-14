@@ -9,8 +9,8 @@
     <title>Трекер кальянных сессий</title>
     <style>
         :root {
-            --glass-bg: rgba(30, 30, 35, 0.42);
-            --glass-border: rgba(255, 255, 255, 0.14);
+            --glass-bg: rgba(30, 30, 35, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.15);
             --primary: #ff7b00;
             --primary-glow: rgba(255, 123, 0, 0.45);
             --info: #0a84ff;
@@ -37,11 +37,7 @@
             box-sizing: border-box;
         }
 
-        h1, h2, h3 {
-            font-weight: 800;
-            letter-spacing: -0.4px;
-            margin-top: 0;
-        }
+        h1, h2, h3 { font-weight: 800; letter-spacing: -0.4px; margin-top: 0; }
 
         .glass-panel {
             background: var(--glass-bg);
@@ -49,8 +45,7 @@
             -webkit-backdrop-filter: blur(28px) saturate(210%);
             border: 1px solid var(--glass-border);
             border-top-color: rgba(255, 255, 255, 0.28);
-            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4),
-                        inset 0 1.5px 0 rgba(255, 255, 255, 0.22);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4), inset 0 1.5px 0 rgba(255, 255, 255, 0.22);
             border-radius: 22px;
             padding: 18px;
             margin-bottom: 16px;
@@ -151,6 +146,19 @@
             border-radius: 10px;
         }
 
+        .ios-timer-btn {
+            background: rgba(10, 132, 255, 0.18);
+            border: 1px solid rgba(10, 132, 255, 0.45);
+            color: #64b5f6;
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+
         .form-group { margin-bottom: 14px; }
         label {
             display: block;
@@ -174,28 +182,14 @@
             outline: none;
         }
 
-        .time-inputs {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
+        .time-inputs { display: flex; gap: 6px; align-items: center; }
         .time-inputs input { text-align: center; padding: 10px 6px; }
 
-        .mix-row {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
-            align-items: center;
-        }
+        .mix-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
         .mix-row input:first-child { flex: 3; }
         .mix-row input:nth-child(2) { flex: 1.1; }
 
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 8px;
-            font-size: 0.85em;
-        }
+        table { width: 100%; border-collapse: separate; border-spacing: 0 8px; font-size: 0.85em; }
         th, td { padding: 10px 8px; text-align: left; vertical-align: middle; }
         tr { background: rgba(255, 255, 255, 0.04); }
         th { color: var(--text-secondary); font-size: 0.75em; text-transform: uppercase; }
@@ -204,14 +198,7 @@
 
         .hidden { display: none !important; }
 
-        .stars {
-            display: flex;
-            gap: 12px;
-            font-size: 2.4em;
-            justify-content: center;
-            margin: 12px 0;
-            cursor: pointer;
-        }
+        .stars { display: flex; gap: 12px; font-size: 2.4em; justify-content: center; margin: 12px 0; cursor: pointer; }
         .star { color: rgba(255, 255, 255, 0.15); }
         .star.active { color: var(--primary); filter: drop-shadow(0 0 8px var(--primary-glow)); }
 
@@ -227,9 +214,12 @@
 </head>
 <body>
 
+    <!-- Скрытый реальный аудио-плеер для удержания фонового режима iOS -->
+    <audio id="bg-audio" loop playsinline></audio>
+
     <div class="status-bar">
         <h2 style="margin:0; font-size: 1.4em;">💨 Hookah Liquid</h2>
-        <button class="pill-btn" id="btn-notify" onclick="enablePermissions()">🔔 Вкл. Push и Фон</button>
+        <button class="pill-btn" id="btn-notify" onclick="enablePermissions()">🔔 Активировать Фон iOS</button>
     </div>
 
     <div class="glass-panel">
@@ -238,7 +228,7 @@
         
         <button class="btn" id="btn-coals" onclick="startCoals()">1. Поставить угли (Старт)</button>
         
-        <!-- Настройка сессии во время розжига углей -->
+        <!-- Настройка сессии -->
         <div id="setup-form" class="hidden">
             <div class="form-group">
                 <label>Чаша и количество углей</label>
@@ -286,7 +276,9 @@
             <div class="sub-timer-box" id="warmup-box">
                 <div style="font-size: 0.85em; color: var(--text-secondary);">Осталось греть чашу:</div>
                 <div class="sub-timer-display" id="warmup-countdown">05:00</div>
-                <div style="font-size: 0.78em; color: var(--text-secondary);">Не блокируй экран или нажми кнопку «Вкл. Push и Фон» сверху</div>
+                <button class="ios-timer-btn" onclick="triggerNativeTimer(warmupTargetSec)">
+                    ⏰ Продублировать в системный таймер iPhone (100% надежно)
+                </button>
             </div>
             <button class="btn" onclick="startSmoking()">3. Чаша прогрета — Начать покур!</button>
         </div>
@@ -301,6 +293,9 @@
                 </div>
                 <button class="btn btn-success" style="margin-bottom:0; padding: 12px; font-size: 0.9em;" onclick="resetCoalTimer()">
                     🔄 Сменил / Стряхнул угли
+                </button>
+                <button class="ios-timer-btn" onclick="triggerNativeTimer(coalChangeTargetSec)">
+                    ⏰ Запустить системный таймер iPhone на угли
                 </button>
             </div>
             <button class="btn" onclick="finishSmoking()">4. Завершить покур</button>
@@ -352,9 +347,9 @@
         let stepStartTime;
         let coalTimerStart;
         
-        let coalHeatDuration = 0; // Время розжига на плите
+        let coalHeatDuration = 0;
         let warmupTargetSec = 300;
-        let actualWarmupDuration = 0; // Фактическое время прогрева чаши
+        let actualWarmupDuration = 0;
         let coalChangeTargetSec = 1500;
         let smokeDuration = 0;
         
@@ -364,94 +359,124 @@
         let coalAlarmFired = false;
         
         let audioCtx;
-        let wakeLock = null;
-        let silentLoopStarted = false;
+        let bgAudioReady = false;
 
         document.addEventListener('DOMContentLoaded', () => {
             renderData();
             setRating(5);
-            checkNotificationStatus();
+            initRealBackgroundAudio();
         });
 
-        // Разблокировка Push-уведомлений, фонового звука и запрета сна экрана
+        // Генерируем настоящий WAV-файл длиной 1 сек в памяти для обмана блокировки iOS
+        function initRealBackgroundAudio() {
+            const sampleRate = 8000;
+            const numSamples = sampleRate;
+            const buffer = new ArrayBuffer(44 + numSamples * 2);
+            const view = new DataView(buffer);
+
+            const writeString = (offset, str) => {
+                for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+            };
+
+            writeString(0, 'RIFF');
+            view.setUint32(4, 36 + numSamples * 2, true);
+            writeString(8, 'WAVE');
+            writeString(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeString(36, 'data');
+            view.setUint32(40, numSamples * 2, true);
+
+            // Заполняем минимальным шумом (1 единица), чтобы iOS не считала поток пустым
+            for (let i = 0; i < numSamples; i++) {
+                view.setInt16(44 + i * 2, (i % 2 === 0) ? 1 : -1, true);
+            }
+
+            const blob = new Blob([buffer], { type: 'audio/wav' });
+            const audioEl = document.getElementById('bg-audio');
+            audioEl.src = URL.createObjectURL(blob);
+            audioEl.volume = 0.01;
+        }
+
+        async function startKeepAliveAudio(titleText) {
+            const audioEl = document.getElementById('bg-audio');
+            try {
+                await audioEl.play();
+                bgAudioReady = true;
+                if ('mediaSession' in navigator) {
+                    navigator.mediaSession.metadata = new MediaMetadata({
+                        title: titleText || 'Контроль углей активен 🔥',
+                        artist: 'Hookah Liquid Tracker',
+                        album: 'Не закрывай приложение'
+                    });
+                }
+            } catch (e) {
+                console.log('KeepAlive play error:', e);
+            }
+        }
+
+        function stopKeepAliveAudio() {
+            const audioEl = document.getElementById('bg-audio');
+            audioEl.pause();
+        }
+
+        // Вызов системной Команды iOS (100% срабатывание на заблокированном айфоне)
+        function triggerNativeTimer(seconds) {
+            window.location.href = `shortcuts://run-shortcut?name=HookahTimer&input=text&text=${seconds}`;
+        }
+
         async function enablePermissions() {
             initAudio();
-            startSilentBackgroundAudio();
+            await startKeepAliveAudio('Фоновый режим активен 🔥');
 
-            // 1. Запрос системных Push-уведомлений (работает в PWA на экране Домой iOS 16.4+)
             if ('Notification' in window) {
                 const perm = await Notification.requestPermission();
                 if (perm === 'granted') {
-                    sendPush("Уведомления активны! 🔥", "Теперь ты не проспишь угли и прогрев чаши.");
+                    sendPush("Фоновый режим включен! 🔥", "На экране блокировки появится плеер — он не даст таймеру уснуть.");
                 }
             }
 
-            // 2. Запрет гашения экрана (Wake Lock API)
             if ('wakeLock' in navigator) {
-                try {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                } catch (e) {}
+                try { await navigator.wakeLock.request('screen'); } catch (e) {}
             }
 
-            checkNotificationStatus();
-        }
-
-        function checkNotificationStatus() {
             const btn = document.getElementById('btn-notify');
-            if (('Notification' in window && Notification.permission === 'granted') || silentLoopStarted) {
-                btn.classList.add('active');
-                btn.innerText = '✅ Push и Фон активны';
-            }
+            btn.classList.add('active');
+            btn.innerText = '✅ Фон iOS активен';
         }
 
-        // Отправка системного уведомления iOS
         function sendPush(title, body) {
             if ('Notification' in window && Notification.permission === 'granted') {
-                try {
-                    new Notification(title, { body: body, icon: 'https://abs.twimg.com/emoji/v2/72x72/1f525.png' });
-                } catch (e) {}
+                try { new Notification(title, { body: body }); } catch (e) {}
             }
         }
 
         function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
-        // Фоновый бесшумный генератор, чтобы iOS не убивала таймер при блокировке экрана
-        function startSilentBackgroundAudio() {
-            if (silentLoopStarted) return;
-            try {
-                initAudio();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                gain.gain.value = 0.0001; // Абсолютно неслышно для уха, но держит аудиосессию iOS живой
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                silentLoopStarted = true;
-            } catch (e) {}
-        }
-
+        // Громкий двойной сигнал будильника
         function playBeep() {
             try {
                 initAudio();
                 const now = audioCtx.currentTime;
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(987.77, now); // Нота Си
-                osc.frequency.setValueAtTime(1318.51, now + 0.15); // Нота Ми
-                gain.gain.setValueAtTime(0.4, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(880, now);
+                osc.frequency.setValueAtTime(1174.66, now + 0.18);
+                gain.gain.setValueAtTime(0.6, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start(now);
-                osc.stop(now + 0.7);
+                osc.stop(now + 0.8);
             } catch (e) {}
         }
 
@@ -474,7 +499,6 @@
             container.appendChild(row);
         }
 
-        // ШАГ 1: Поставили угли на плиту
         function startCoals() {
             enablePermissions();
             document.getElementById('status-title').innerText = '🔥 Шаг 1: Розжиг углей на плите';
@@ -489,7 +513,6 @@
             }, 1000);
         }
 
-        // ШАГ 2: Поставили угли на чашу -> Идет прогрев чаши
         function startWarmup() {
             initAudio();
             coalHeatDuration = Math.floor((Date.now() - stepStartTime) / 1000);
@@ -502,7 +525,9 @@
             const cSec = parseInt(document.getElementById('coal-sec').value) || 0;
             coalChangeTargetSec = (cMin * 60) + cSec;
 
-            document.getElementById('status-title').innerText = '⏳ Шаг 2: Прогрев чаши под колпаком';
+            startKeepAliveAudio('⏳ Идет прогрев чаши...');
+
+            document.getElementById('status-title').innerText = '⏳ Шаг 2: Прогрев чаши';
             document.getElementById('setup-form').classList.add('hidden');
             document.getElementById('warmup-controls').classList.remove('hidden');
 
@@ -525,22 +550,23 @@
             if (remaining <= 0) {
                 box.classList.add('alarm-active');
                 if (!warmupAlarmFired) {
-                    sendPush("Чаша прогрелась! 💨", "Пора раскуривать кальян, иначе сожжешь верхний слой!");
+                    sendPush("Чаша прогрелась! 💨", "Пора раскуривать кальян, иначе сожжешь табак!");
                     warmupAlarmFired = true;
                 }
-                if (Math.abs(remaining) % 4 === 0) playBeep();
+                if (Math.abs(remaining) % 3 === 0) playBeep();
             } else {
                 box.classList.remove('alarm-active');
             }
         }
 
-        // ШАГ 3: Начали сам покур
         function startSmoking() {
             initAudio();
             actualWarmupDuration = Math.floor((Date.now() - stepStartTime) / 1000);
             coalChanges = 0;
             document.getElementById('coal-changes-count').innerText = coalChanges;
             document.getElementById('warmup-box').classList.remove('alarm-active');
+
+            startKeepAliveAudio('💨 Идет покур (Контроль углей)');
 
             document.getElementById('status-title').innerText = '💨 Шаг 3: Идет покур';
             document.getElementById('warmup-controls').classList.add('hidden');
@@ -568,10 +594,10 @@
             if (remainingCoal <= 0) {
                 coalBox.classList.add('alarm-active');
                 if (!coalAlarmFired) {
-                    sendPush("Пора менять угли! 🔥", "Таймер углей истек — стряхни пепел или закинь свежие.");
+                    sendPush("Пора менять угли! 🔥", "Таймер углей вышел — стряхни пепел или закинь новые.");
                     coalAlarmFired = true;
                 }
-                if (Math.abs(remainingCoal) % 5 === 0) playBeep();
+                if (Math.abs(remainingCoal) % 4 === 0) playBeep();
             } else {
                 coalBox.classList.remove('alarm-active');
             }
@@ -586,10 +612,10 @@
             updateSmokingTimers();
         }
 
-        // ШАГ 4: Завершение
         function finishSmoking() {
             smokeDuration = Math.floor((Date.now() - stepStartTime) / 1000);
             clearInterval(timerInterval);
+            stopKeepAliveAudio();
             document.getElementById('coal-box').classList.remove('alarm-active');
             document.getElementById('status-title').innerText = '✅ Сессия завершена';
             document.getElementById('timer').innerText = formatTime(smokeDuration);
@@ -685,7 +711,7 @@
                     <td><b>${s.bowl}</b><br><span style="color:var(--text-secondary); font-size:0.82em;">🔥 ${s.coals} уг. (смен: ${s.coalChanges || 0})</span></td>
                     <td><div>${mixStr}</div>${commentHtml}</td>
                     <td style="font-size:0.82em; white-space:nowrap;">
-                        Плита: ${formatTime(s.coalHeatDuration || s.coalDuration || 0)}<br>
+                        Плита: ${formatTime(s.coalHeatDuration || 0)}<br>
                         Грев: ${formatTime(s.actualWarmupDuration || 0)}<br>
                         💨 <b>${formatTime(s.smokeDuration)}</b>
                     </td>

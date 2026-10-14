@@ -1,481 +1,107 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Кальян">
+    <meta name="apple-mobile-web-app-title" content="DimHookah">
     <title>Трекер кальянных сессий</title>
-    <style>
-        :root {
-            --glass-bg: rgba(30, 30, 35, 0.45);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --primary: #ff7b00;
-            --primary-glow: rgba(255, 123, 0, 0.45);
-            --info: #0a84ff;
-            --danger: #ff3b30;
-            --success: #34c759;
-            --text: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.55);
-            --safe-top: env(safe-area-inset-top, 20px);
-            --safe-bottom: env(safe-area-inset-bottom, 20px);
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif;
-            background: radial-gradient(circle at 10% 10%, #3a1c40, transparent 45%),
-                radial-gradient(circle at 90% 90%, #102542, transparent 50%),
-                #07070a;
-            background-attachment: fixed;
-            color: var(--text);
-            margin: 0 auto;
-            padding: calc(var(--safe-top) + 12px) 14px calc(var(--safe-bottom) + 16px);
-            max-width: 600px;
-            -webkit-tap-highlight-color: transparent;
-            min-height: 100vh;
-            box-sizing: border-box;
-        }
-
-        h1,
-        h2,
-        h3 {
-            font-weight: 800;
-            letter-spacing: -0.4px;
-            margin-top: 0;
-        }
-
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(28px) saturate(210%);
-            -webkit-backdrop-filter: blur(28px) saturate(210%);
-            border: 1px solid var(--glass-border);
-            border-top-color: rgba(255, 255, 255, 0.28);
-            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4), inset 0 1.5px 0 rgba(255, 255, 255, 0.22);
-            border-radius: 22px;
-            padding: 18px;
-            margin-bottom: 16px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .status-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .pill-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            color: #fff;
-            padding: 7px 12px;
-            border-radius: 20px;
-            font-size: 0.78em;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .pill-btn.active {
-            background: rgba(52, 199, 89, 0.25);
-            border-color: var(--success);
-            color: #8aff9d;
-        }
-
-        .timer-display {
-            font-size: 3.4em;
-            font-weight: 900;
-            text-align: center;
-            margin: 8px 0;
-            font-variant-numeric: tabular-nums;
-            background: linear-gradient(135deg, #ffffff, #ff8800);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 15px rgba(255, 123, 0, 0.35));
-        }
-
-        .sub-timer-box {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 14px;
-            margin-bottom: 14px;
-            text-align: center;
-        }
-
-        .sub-timer-display {
-            font-size: 2.3em;
-            font-weight: 800;
-            font-variant-numeric: tabular-nums;
-            margin: 6px 0;
-            color: #fff;
-        }
-
-        .alarm-active {
-            border-color: rgba(255, 59, 48, 0.8) !important;
-            background: rgba(255, 59, 48, 0.2) !important;
-            animation: pulse-border 1s infinite alternate;
-        }
-
-        @keyframes pulse-border {
-            0% {
-                box-shadow: 0 0 5px rgba(255, 59, 48, 0.3);
-            }
-
-            100% {
-                box-shadow: 0 0 25px rgba(255, 59, 48, 0.75);
-            }
-        }
-
-        .btn {
-            background: linear-gradient(180deg, #ff8800 0%, #ff5500 100%);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            box-shadow: 0 4px 15px var(--primary-glow), inset 0 1.5px 0 rgba(255, 255, 255, 0.35);
-            padding: 15px;
-            border-radius: 14px;
-            font-size: 1em;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-            margin-bottom: 10px;
-            transition: transform 0.15s ease;
-        }
-
-        .btn:active {
-            transform: scale(0.97);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.12);
-            box-shadow: none;
-        }
-
-        .btn-info {
-            background: linear-gradient(180deg, #0a84ff 0%, #0060df 100%);
-            box-shadow: 0 4px 15px rgba(10, 132, 255, 0.35);
-        }
-
-        .btn-success {
-            background: linear-gradient(180deg, #34c759 0%, #28a745 100%);
-            box-shadow: 0 4px 15px rgba(52, 199, 89, 0.35);
-        }
-
-        .btn-danger {
-            background: linear-gradient(180deg, #ff453a 0%, #d70015 100%);
-            width: auto;
-            padding: 9px 13px;
-            font-size: 0.85em;
-            margin-bottom: 0;
-            border-radius: 10px;
-        }
-
-        .btn-edit {
-            background: linear-gradient(180deg, #ff8800 0%, #ff5500 100%);
-            width: auto;
-            padding: 9px 13px;
-            font-size: 0.85em;
-            margin-bottom: 0;
-            border-radius: 10px;
-        }
-
-        .ios-timer-btn {
-            background: rgba(10, 132, 255, 0.18);
-            border: 1px solid rgba(10, 132, 255, 0.45);
-            color: #64b5f6;
-            padding: 10px;
-            border-radius: 12px;
-            font-size: 0.85em;
-            font-weight: 600;
-            width: 100%;
-            margin-top: 8px;
-            cursor: pointer;
-        }
-
-        .form-group {
-            margin-bottom: 14px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 6px;
-            color: var(--text-secondary);
-            font-size: 0.78em;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        input,
-        textarea {
-            width: 100%;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.07);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text);
-            border-radius: 12px;
-            box-sizing: border-box;
-            font-size: 16px;
-            outline: none;
-        }
-
-        .time-inputs {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
-
-        .time-inputs input {
-            text-align: center;
-            padding: 10px 6px;
-        }
-
-        .mix-row {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
-            align-items: center;
-        }
-
-        .mix-row input:first-child {
-            flex: 3;
-        }
-
-        .mix-row input:nth-child(2) {
-            flex: 1.1;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 8px;
-            font-size: 0.85em;
-        }
-
-        th,
-        td {
-            padding: 10px 8px;
-            text-align: left;
-            vertical-align: middle;
-        }
-
-        tr {
-            background: rgba(255, 255, 255, 0.04);
-        }
-
-        th {
-            color: var(--text-secondary);
-            font-size: 0.75em;
-            text-transform: uppercase;
-        }
-
-        td:first-child {
-            border-radius: 10px 0 0 10px;
-        }
-
-        td:last-child {
-            border-radius: 0 10px 10px 0;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .stars {
-            display: flex;
-            gap: 12px;
-            font-size: 2.4em;
-            justify-content: center;
-            margin: 12px 0;
-            cursor: pointer;
-        }
-
-        .star {
-            color: rgba(255, 255, 255, 0.15);
-        }
-
-        .star.active {
-            color: var(--primary);
-            filter: drop-shadow(0 0 8px var(--primary-glow));
-        }
-
-        .badge {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 3px 7px;
-            border-radius: 6px;
-            font-size: 0.82em;
-            display: inline-block;
-            margin: 2px 0;
-        }
-
-        /* Стили для расстановки углей и модалки */
-        .coal-setup-selector {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            margin: 10px 0;
-        }
-
-        .coal-chip {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            color: #fff;
-            padding: 8px 4px;
-            border-radius: 10px;
-            font-size: 0.78em;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .coal-chip.active {
-            background: rgba(255, 123, 0, 0.3);
-            border-color: var(--primary);
-            color: #ffaa55;
-        }
-
-        /* Модальное окно редактирования */
-        #edit-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-            box-sizing: border-box;
-        }
-
-        .modal-content {
-            background: #1c1c22;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 20px;
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-    <!-- Скрытый реальный аудио-плеер для удержания фонового режима iOS -->
+    <!-- Скрытый аудио-плеер для удержания фонового режима iOS -->
     <audio id="bg-audio" loop playsinline></audio>
 
-    <div class="status-bar">
-        <h2 style="margin:0; font-size: 1.4em;">💨 DimHookah</h2>
-        <button class="pill-btn" id="btn-notify" onclick="enablePermissions()">🔔 Активировать Фон iOS</button>
+    <div class="app-header">
+        <h2 style="margin:0; font-size: 1.3em;">💨 DimHookah</h2>
     </div>
 
+    <!-- Основная панель сессии -->
     <div class="glass-panel">
-        <h3 id="status-title"
-            style="color: var(--text-secondary); text-align: center; font-size: 0.9em; text-transform: uppercase; margin-bottom: 4px;">
-            Ожидание старта</h3>
+        <h3 id="status-title" style="color: var(--text-secondary); text-align: center; font-size: 0.85em; text-transform: uppercase; margin-bottom: 6px;">Новая сессия</h3>
         <div class="timer-display" id="timer">00:00</div>
-
-        <button class="btn" id="btn-coals" onclick="startCoals()">1. Поставить угли (Старт)</button>
-
-        <!-- Настройка сессии -->
-        <div id="setup-form" class="hidden">
+        
+        <!-- Шаг 1: Заполнение чаши (сразу при входе) -->
+        <div id="setup-form">
             <div class="form-group">
-                <label>Чаша и количество углей</label>
-                <div style="display: flex; gap: 8px;">
-                    <input type="text" id="bowl" placeholder="Облако Phunnel M" style="flex: 3;">
-                    <input type="number" id="coals-count" value="3" placeholder="Угли"
-                        style="flex: 1; text-align: center;">
-                </div>
+                <label>Название чаши</label>
+                <input type="text" id="bowl" placeholder="Облако Phunnel M">
             </div>
 
-            <div style="display: flex; gap: 12px;">
-                <div class="form-group" style="flex: 1;">
-                    <label>Прогрев чаши (Мин : Сек)</label>
-                    <div class="time-inputs">
-                        <input type="number" id="warmup-min" value="5" min="0">
-                        <span>:</span>
-                        <input type="number" id="warmup-sec" value="0" min="0" max="59">
-                    </div>
-                </div>
-                <div class="form-group" style="flex: 1;">
-                    <label>Смена угля (Мин : Сек)</label>
-                    <div class="time-inputs">
-                        <input type="number" id="coal-min" value="25" min="0">
-                        <span>:</span>
-                        <input type="number" id="coal-sec" value="0" min="0" max="59">
-                    </div>
-                </div>
-            </div>
-
+            <!-- Блок табака (Соло / Микс) -->
             <div class="form-group">
-                <label>Микс (Табаки и граммы)</label>
-                <div id="mix-container">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <label style="margin:0;">Табак</label>
+                    <button type="button" class="pill-btn" id="mix-toggle-btn" onclick="toggleMixMode()" style="font-size: 0.75em; padding: 4px 10px;">Режим: Соло</button>
+                </div>
+                
+                <!-- Соло забивка -->
+                <div id="solo-container" class="mix-row">
+                    <input type="text" id="solo-tobacco-name" placeholder="Бренд и вкус (Darkside Supernova)" style="flex: 3;">
+                    <input type="number" id="solo-tobacco-weight" placeholder="Гр" style="flex: 1.1;">
+                </div>
+
+                <!-- Мульти-микс забивка (скрыта по умолчанию) -->
+                <div id="mix-container" class="hidden">
                     <div class="mix-row">
-                        <input type="text" class="tobacco-name" placeholder="Darkside Supernova">
+                        <input type="text" class="tobacco-name" placeholder="Бренд и вкус">
                         <input type="number" class="tobacco-weight" placeholder="Гр">
+                        <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">✕</button>
                     </div>
                 </div>
-                <button type="button" class="btn btn-secondary" onclick="addMixRow()"
-                    style="padding: 10px; font-size:0.85em; margin-top: 4px;">+ Добавить табак</button>
+                <button type="button" id="add-mix-btn" class="btn btn-secondary hidden" onclick="addMixRow()" style="padding: 10px; font-size: 0.85em; margin-top: 6px;">+ Добавить табак в микс</button>
             </div>
 
-            <button class="btn btn-info" onclick="startWarmup()">2. Угли на чаше — Прогрев чаши</button>
+            <!-- Выбор времени прогрева (iOS скролл с шагом 1.5 мин) -->
+            <div class="form-group">
+                <label>Время прогрева чаши</label>
+                <div class="time-picker-container">
+                    <select id="warmup-select" style="width: 100%;">
+                        <option value="120">2 минуты (120 сек)</option>
+                        <option value="180">3 минуты (180 сек)</option>
+                        <option value="210">3 мин. 30 сек.</option>
+                        <option value="240">4 минуты (240 сек)</option>
+                        <option value="270">4 мин. 30 сек.</option>
+                        <option value="300" selected>5 минут (По умолчанию)</option>
+                        <option value="330">5 мин. 30 сек.</option>
+                        <option value="360">6 минут (360 сек)</option>
+                        <option value="420">7 минут (420 сек)</option>
+                        <option value="480">8 минут (480 сек)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn" onclick="startWarmupSession()">🚀 Начать прогрев чаши</button>
         </div>
 
-        <!-- Этап 2: Прогрев чаши -->
+        <!-- Шаг 2: Прогрев чаши -->
         <div id="warmup-controls" class="hidden">
             <div class="sub-timer-box" id="warmup-box">
-                <div style="font-size: 0.85em; color: var(--text-secondary);">Осталось греть чашу:</div>
+                <div style="font-size: 0.85em; color: var(--text-secondary);">Прогрев чаши под колпаком:</div>
                 <div class="sub-timer-display" id="warmup-countdown">05:00</div>
-                <button class="ios-timer-btn" onclick="triggerNativeTimer(warmupTargetSec)">
-                    ⏰ Продублировать в системный таймер iPhone (100% надежно)
-                </button>
+                <div style="font-size: 0.78em; color: var(--text-secondary);">Фоновый режим iOS активен автоматически</div>
             </div>
-            <button class="btn" onclick="startSmoking()">3. Чаша прогрета — Начать покур!</button>
+            <button class="btn btn-success" onclick="startSmokingFromWarmup()">💨 Чаша прогрета — Начать покур!</button>
         </div>
 
-        <!-- Этап 3: Покур -->
-        <!-- Этап 3: Покур -->
+        <!-- Шаг 3: Покур и выбор расстановки -->
         <div id="smoking-controls" class="hidden">
-            <div class="sub-timer-box" id="coal-box">
-                <div style="font-size: 0.85em; color: var(--text-secondary);">До смены углей:</div>
-                <div class="sub-timer-display" id="coal-countdown">25:00</div>
-                <div style="font-size: 0.82em; color: var(--text-secondary); margin-bottom: 6px;">
-                    Смен за сессию: <b id="coal-changes-count">0</b>
-                </div>
-
-                <!-- Выбор расстановки углей -->
-                <div style="font-size: 0.78em; color: var(--text-secondary); margin-top: 4px;">Расстановка углей:</div>
+            <div class="sub-timer-box">
+                <div style="font-size: 0.85em; color: var(--text-secondary); margin-bottom: 6px;">Текущая расстановка углей:</div>
                 <div class="coal-setup-selector">
                     <div class="coal-chip" id="chip-3" onclick="setCoalPlacement('3 в колодке')">3 в кол.</div>
                     <div class="coal-chip" id="chip-21" onclick="setCoalPlacement('2 + 1')">2 + 1</div>
                     <div class="coal-chip" id="chip-pyr" onclick="setCoalPlacement('Пирамидка')">Пирамидка</div>
                 </div>
-
-                <button class="btn btn-success" style="margin-bottom:6px; padding: 10px; font-size: 0.85em;"
-                    onclick="resetCoalTimer()">
-                    🔄 Сменил / Стряхнул угли
-                </button>
-                <button class="ios-timer-btn" onclick="triggerNativeTimer(coalChangeTargetSec)">
-                    ⏰ Таймер iPhone на угли
-                </button>
             </div>
-            <button class="btn" onclick="finishSmoking()">4. Завершить покур</button>
+            <button class="btn btn-danger" onclick="finishSmokingSession()">🏁 Завершить покур</button>
         </div>
 
-        <!-- Этап 4: Оценка -->
+        <!-- Шаг 4: Оценка и комментарий -->
         <div id="rating-form" class="hidden">
-            <h3 style="text-align: center; margin-bottom: 5px;">Оцените покур</h3>
+            <h3 style="text-align: center; margin-bottom: 8px;">Оцените покур</h3>
             <div class="stars">
                 <span class="star" onclick="setRating(1)">★</span>
                 <span class="star" onclick="setRating(2)">★</span>
@@ -485,23 +111,26 @@
             </div>
             <div class="form-group">
                 <label>Комментарий</label>
-                <textarea id="comment" rows="2" placeholder="Как вкус, не перегрел ли чашу?"></textarea>
+                <textarea id="comment" rows="2" placeholder="Как вкус, жар..."></textarea>
             </div>
-            <button class="btn" onclick="saveSession()">Сохранить в историю</button>
+            <button class="btn" onclick="saveSession()">💾 Сохранить в историю</button>
         </div>
     </div>
 
+    <!-- Рейтинг табаков -->
     <div class="glass-panel">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <h3 style="margin:0;">📅 История покуров</h3>
+        <h3>🏆 Рейтинг табаков</h3>
+        <div id="analytics-content" style="overflow-x: auto;">Нет данных</div>
+    </div>
+
+    <!-- История покуров -->
+    <div class="glass-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3 style="margin:0;">📅 История</h3>
             <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end;">
-                <button class="pill-btn" onclick="exportToNotes()" style="font-size:0.75em; padding: 5px 8px;">📋 В
-                    заметки</button>
-                <button class="pill-btn" onclick="exportToCSV()" style="font-size:0.75em; padding: 5px 8px;">📊
-                    Экспорт</button>
-                <button class="pill-btn" onclick="document.getElementById('csv-file-input').click()"
-                    style="font-size:0.75em; padding: 5px 8px; background: rgba(10,132,255,0.2); border-color: var(--info);">📂
-                    Импорт</button>
+                <button class="pill-btn" onclick="exportToNotes()">📋 Заметки</button>
+                <button class="pill-btn" onclick="exportToCSV()">📊 Экспорт</button>
+                <button class="pill-btn" onclick="document.getElementById('csv-file-input').click()" style="background: rgba(10,132,255,0.25); border-color: var(--info);">📂 Импорт</button>
                 <input type="file" id="csv-file-input" accept=".csv" class="hidden" onchange="importFromCSV(event)">
             </div>
         </div>
@@ -512,7 +141,7 @@
                         <th>Дата</th>
                         <th>Сетап</th>
                         <th>Микс</th>
-                        <th>Тайминги</th>
+                        <th>Время</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -521,626 +150,12 @@
         </div>
     </div>
 
-    <script>
-        let timerInterval;
-        let stepStartTime;
-        let coalTimerStart;
-
-        let coalHeatDuration = 0;
-        let warmupTargetSec = 300;
-        let actualWarmupDuration = 0;
-        let coalChangeTargetSec = 1500;
-        let smokeDuration = 0;
-
-        let coalChanges = 0;
-        let currentRating = 5;
-        let warmupAlarmFired = false;
-        let coalAlarmFired = false;
-
-        let audioCtx;
-        let bgAudioReady = false;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            renderData();
-            setRating(5);
-            initRealBackgroundAudio();
-        });
-
-        // Генерируем настоящий WAV-файл длиной 1 сек в памяти для обмана блокировки iOS
-        function initRealBackgroundAudio() {
-            const sampleRate = 8000;
-            const numSamples = sampleRate;
-            const buffer = new ArrayBuffer(44 + numSamples * 2);
-            const view = new DataView(buffer);
-
-            const writeString = (offset, str) => {
-                for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
-            };
-
-            writeString(0, 'RIFF');
-            view.setUint32(4, 36 + numSamples * 2, true);
-            writeString(8, 'WAVE');
-            writeString(12, 'fmt ');
-            view.setUint32(16, 16, true);
-            view.setUint16(20, 1, true);
-            view.setUint16(22, 1, true);
-            view.setUint32(24, sampleRate, true);
-            view.setUint32(28, sampleRate * 2, true);
-            view.setUint16(32, 2, true);
-            view.setUint16(34, 16, true);
-            writeString(36, 'data');
-            view.setUint32(40, numSamples * 2, true);
-
-            // Заполняем минимальным шумом (1 единица), чтобы iOS не считала поток пустым
-            for (let i = 0; i < numSamples; i++) {
-                view.setInt16(44 + i * 2, (i % 2 === 0) ? 1 : -1, true);
-            }
-
-            const blob = new Blob([buffer], { type: 'audio/wav' });
-            const audioEl = document.getElementById('bg-audio');
-            audioEl.src = URL.createObjectURL(blob);
-            audioEl.volume = 0.01;
-        }
-
-        async function startKeepAliveAudio(titleText) {
-            const audioEl = document.getElementById('bg-audio');
-            try {
-                await audioEl.play();
-                bgAudioReady = true;
-                if ('mediaSession' in navigator) {
-                    navigator.mediaSession.metadata = new MediaMetadata({
-                        title: titleText || 'Контроль углей активен 🔥',
-                        artist: 'Hookah Liquid Tracker',
-                        album: 'Не закрывай приложение'
-                    });
-                }
-            } catch (e) {
-                console.log('KeepAlive play error:', e);
-            }
-        }
-
-        function stopKeepAliveAudio() {
-            const audioEl = document.getElementById('bg-audio');
-            audioEl.pause();
-        }
-
-        // Вызов системной Команды iOS (100% срабатывание на заблокированном айфоне)
-        function triggerNativeTimer(seconds) {
-            window.location.href = `shortcuts://run-shortcut?name=HookahTimer&input=text&text=${seconds}`;
-        }
-
-        async function enablePermissions() {
-            initAudio();
-            await startKeepAliveAudio('Фоновый режим активен 🔥');
-
-            if ('Notification' in window) {
-                const perm = await Notification.requestPermission();
-                if (perm === 'granted') {
-                    sendPush("Фоновый режим включен! 🔥", "На экране блокировки появится плеер — он не даст таймеру уснуть.");
-                }
-            }
-
-            if ('wakeLock' in navigator) {
-                try { await navigator.wakeLock.request('screen'); } catch (e) { }
-            }
-
-            const btn = document.getElementById('btn-notify');
-            btn.classList.add('active');
-            btn.innerText = '✅ Фон iOS активен';
-        }
-
-        function sendPush(title, body) {
-            if ('Notification' in window && Notification.permission === 'granted') {
-                try { new Notification(title, { body: body }); } catch (e) { }
-            }
-        }
-
-        function initAudio() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-        }
-
-        // Громкий двойной сигнал будильника
-        function playBeep() {
-            try {
-                initAudio();
-                const now = audioCtx.currentTime;
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(880, now);
-                osc.frequency.setValueAtTime(1174.66, now + 0.18);
-                gain.gain.setValueAtTime(0.6, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start(now);
-                osc.stop(now + 0.8);
-            } catch (e) { }
-        }
-
-        function formatTime(seconds) {
-            const absSec = Math.abs(seconds);
-            const mins = Math.floor(absSec / 60).toString().padStart(2, '0');
-            const secs = (absSec % 60).toString().padStart(2, '0');
-            return (seconds < 0 ? '-' : '') + `${mins}:${secs}`;
-        }
-
-        function addMixRow() {
-            const container = document.getElementById('mix-container');
-            const row = document.createElement('div');
-            row.className = 'mix-row';
-            row.innerHTML = `
-                <input type="text" class="tobacco-name" placeholder="Бренд и вкус">
-                <input type="number" class="tobacco-weight" placeholder="Гр">
-                <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">✕</button>
-            `;
-            container.appendChild(row);
-        }
-
-        function startCoals() {
-            enablePermissions();
-            document.getElementById('status-title').innerText = '🔥 Шаг 1: Розжиг углей на плите';
-            document.getElementById('btn-coals').classList.add('hidden');
-            document.getElementById('setup-form').classList.remove('hidden');
-
-            stepStartTime = Date.now();
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - stepStartTime) / 1000);
-                document.getElementById('timer').innerText = formatTime(elapsed);
-            }, 1000);
-        }
-
-        function startWarmup() {
-            initAudio();
-            coalHeatDuration = Math.floor((Date.now() - stepStartTime) / 1000);
-
-            const wMin = parseInt(document.getElementById('warmup-min').value) || 0;
-            const wSec = parseInt(document.getElementById('warmup-sec').value) || 0;
-            warmupTargetSec = (wMin * 60) + wSec;
-
-            const cMin = parseInt(document.getElementById('coal-min').value) || 0;
-            const cSec = parseInt(document.getElementById('coal-sec').value) || 0;
-            coalChangeTargetSec = (cMin * 60) + cSec;
-
-            startKeepAliveAudio('⏳ Идет прогрев чаши...');
-
-            document.getElementById('status-title').innerText = '⏳ Шаг 2: Прогрев чаши';
-            document.getElementById('setup-form').classList.add('hidden');
-            document.getElementById('warmup-controls').classList.remove('hidden');
-
-            stepStartTime = Date.now();
-            warmupAlarmFired = false;
-
-            clearInterval(timerInterval);
-            timerInterval = setInterval(updateWarmupTimer, 1000);
-            updateWarmupTimer();
-        }
-
-        function updateWarmupTimer() {
-            const elapsed = Math.floor((Date.now() - stepStartTime) / 1000);
-            const remaining = warmupTargetSec - elapsed;
-
-            document.getElementById('timer').innerText = formatTime(elapsed);
-            document.getElementById('warmup-countdown').innerText = formatTime(remaining);
-
-            const box = document.getElementById('warmup-box');
-            if (remaining <= 0) {
-                box.classList.add('alarm-active');
-                if (!warmupAlarmFired) {
-                    sendPush("Чаша прогрелась! 💨", "Пора раскуривать кальян, иначе сожжешь табак!");
-                    warmupAlarmFired = true;
-                }
-                if (Math.abs(remaining) % 3 === 0) playBeep();
-            } else {
-                box.classList.remove('alarm-active');
-            }
-        }
-
-        function startSmoking() {
-            initAudio();
-            actualWarmupDuration = Math.floor((Date.now() - stepStartTime) / 1000);
-            coalChanges = 0;
-            document.getElementById('coal-changes-count').innerText = coalChanges;
-            document.getElementById('warmup-box').classList.remove('alarm-active');
-
-            startKeepAliveAudio('💨 Идет покур (Контроль углей)');
-
-            document.getElementById('status-title').innerText = '💨 Шаг 3: Идет покур';
-            document.getElementById('warmup-controls').classList.add('hidden');
-            document.getElementById('smoking-controls').classList.remove('hidden');
-
-            stepStartTime = Date.now();
-            coalTimerStart = Date.now();
-            coalAlarmFired = false;
-
-            clearInterval(timerInterval);
-            timerInterval = setInterval(updateSmokingTimers, 1000);
-            updateSmokingTimers();
-        }
-
-        function updateSmokingTimers() {
-            const now = Date.now();
-            const elapsedSmoke = Math.floor((now - stepStartTime) / 1000);
-            document.getElementById('timer').innerText = formatTime(elapsedSmoke);
-
-            const elapsedCoal = Math.floor((now - coalTimerStart) / 1000);
-            const remainingCoal = coalChangeTargetSec - elapsedCoal;
-            document.getElementById('coal-countdown').innerText = formatTime(remainingCoal);
-
-            const coalBox = document.getElementById('coal-box');
-            if (remainingCoal <= 0) {
-                coalBox.classList.add('alarm-active');
-                if (!coalAlarmFired) {
-                    sendPush("Пора менять угли! 🔥", "Таймер углей вышел — стряхни пепел или закинь новые.");
-                    coalAlarmFired = true;
-                }
-                if (Math.abs(remainingCoal) % 4 === 0) playBeep();
-            } else {
-                coalBox.classList.remove('alarm-active');
-            }
-        }
-
-        function resetCoalTimer() {
-            coalTimerStart = Date.now();
-            coalChanges++;
-            coalAlarmFired = false;
-            document.getElementById('coal-changes-count').innerText = coalChanges;
-            document.getElementById('coal-box').classList.remove('alarm-active');
-            updateSmokingTimers();
-        }
-
-        function finishSmoking() {
-            smokeDuration = Math.floor((Date.now() - stepStartTime) / 1000);
-            clearInterval(timerInterval);
-            stopKeepAliveAudio();
-            document.getElementById('coal-box').classList.remove('alarm-active');
-            document.getElementById('status-title').innerText = '✅ Сессия завершена';
-            document.getElementById('timer').innerText = formatTime(smokeDuration);
-            document.getElementById('smoking-controls').classList.add('hidden');
-            document.getElementById('rating-form').classList.remove('hidden');
-        }
-
-        function setRating(val) {
-            currentRating = val;
-            const stars = document.querySelectorAll('.star');
-            stars.forEach((star, index) => {
-                star.classList.toggle('active', index < val);
-            });
-        }
-
-        function saveSession() {
-            const bowl = document.getElementById('bowl').value.trim() || 'Не указана';
-            const coals = parseInt(document.getElementById('coals-count').value) || 0;
-            const comment = document.getElementById('comment').value.trim();
-
-            const names = document.querySelectorAll('.tobacco-name');
-            const weights = document.querySelectorAll('.tobacco-weight');
-            const mix = [];
-
-            for (let i = 0; i < names.length; i++) {
-                const name = names[i].value.trim();
-                const weight = parseFloat(weights[i].value) || 0;
-                if (name) mix.push({ name, weight });
-            }
-
-            if (mix.length === 0) mix.push({ name: 'Без названия', weight: 0 });
-
-            const session = {
-                id: Date.now(),
-                date: new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' }),
-                bowl,
-                coals,
-                placement: currentCoalPlacement,
-                coalChanges,
-                mix,
-                coalHeatDuration,
-                actualWarmupDuration,
-                smokeDuration,
-                rating: currentRating,
-                comment
-            };
-
-            const history = JSON.parse(localStorage.getItem('hookah_sessions') || '[]');
-            history.unshift(session);
-            localStorage.setItem('hookah_sessions', JSON.stringify(history));
-
-            resetForm();
-            renderData();
-        }
-
-        function resetForm() {
-            document.getElementById('status-title').innerText = 'Ожидание старта';
-            document.getElementById('timer').innerText = '00:00';
-            document.getElementById('btn-coals').classList.remove('hidden');
-            document.getElementById('rating-form').classList.add('hidden');
-            document.getElementById('bowl').value = '';
-            document.getElementById('comment').value = '';
-            document.getElementById('mix-container').innerHTML = `
-                <div class="mix-row">
-                    <input type="text" class="tobacco-name" placeholder="Бренд и вкус">
-                    <input type="number" class="tobacco-weight" placeholder="Гр">
-                </div>
-            `;
-        }
-
-        function deleteSession(id) {
-            if (confirm("Удалить эту запись из истории?")) {
-                let history = JSON.parse(localStorage.getItem('hookah_sessions') || '[]');
-                history = history.filter(s => s.id !== id);
-                localStorage.setItem('hookah_sessions', JSON.stringify(history));
-                renderData();
-            }
-        }
-
-        function renderData() {
-            const history = JSON.parse(localStorage.getItem('hookah_sessions') || '[]');
-            const tbody = document.getElementById('history-body');
-            tbody.innerHTML = '';
-
-            const tobaccoStats = {};
-
-            history.forEach(s => {
-                const tr = document.createElement('tr');
-                const mixStr = s.mix.map(m => `<span class="badge">${m.name} (${m.weight}г)</span>`).join(' ');
-                const commentHtml = s.comment ? `<div style="color:var(--text-secondary); margin-top:4px; font-size:0.85em; font-style:italic;">💬 ${s.comment}</div>` : '';
-
-                tr.innerHTML = `
-                    <td><b>${s.date}</b><br><span style="color:var(--primary); font-weight:700;">★ ${s.rating}</span></td>
-                    <td><b>${s.bowl}</b><br><span style="color:var(--text-secondary); font-size:0.82em;">🔥 ${s.coals} уг. (${s.placement || '3 в колодке'})</span></td>
-                    <td><div>${mixStr}</div>${commentHtml}</td>
-                    <td style="font-size:0.82em; white-space:nowrap;">💨 <b>${formatTime(s.smokeDuration)}</b></td>
-                    <td style="white-space: nowrap;">
-                        <button class="btn btn-edit" onclick="openFullEditModal(${s.id})">✏️</button>
-                        <button class="btn btn-danger" onclick="deleteSession(${s.id})">✕</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-
-                s.mix.forEach(m => {
-                    const key = m.name.toLowerCase();
-                    if (!tobaccoStats[key]) {
-                        tobaccoStats[key] = { name: m.name, count: 0, totalRating: 0, totalWeight: 0 };
-                    }
-                    tobaccoStats[key].count += 1;
-                    tobaccoStats[key].totalRating += s.rating;
-                    tobaccoStats[key].totalWeight += m.weight;
-                });
-            });
-
-            const analyticsDiv = document.getElementById('analytics-content');
-            const sortedTobaccos = Object.values(tobaccoStats).sort((a, b) => (b.totalRating / b.count) - (a.totalRating / a.count));
-
-            if (sortedTobaccos.length === 0) {
-                analyticsDiv.innerHTML = '<p style="color: var(--text-secondary); margin:0; font-size:0.9em;">Пока нет сохраненных сессий.</p>';
-                return;
-            }
-
-            let html = '<table><thead><tr><th>Табак</th><th>Рейтинг</th><th>Сессий</th><th>Вес</th></tr></thead><tbody>';
-            sortedTobaccos.forEach(t => {
-                const avg = (t.totalRating / t.count).toFixed(1);
-                html += `
-                    <tr>
-                        <td><b>${t.name}</b></td>
-                        <td style="color: var(--primary); font-weight: bold;">★ ${avg}</td>
-                        <td>${t.count}</td>
-                        <td>${t.totalWeight} г</td>
-                    </tr>
-                `;
-            });
-            html += '</tbody></table>';
-            analyticsDiv.innerHTML = html;
-        }
-        let currentCoalPlacement = '3 в колодке';
-
-        function setCoalPlacement(type) {
-            currentCoalPlacement = type;
-            document.querySelectorAll('.coal-chip').forEach(el => el.classList.remove('active'));
-            if (type === '3 в колодке') document.getElementById('chip-3').classList.add('active');
-            if (type === '2 + 1') document.getElementById('chip-21').classList.add('active');
-            if (type === 'Пирамидка') document.getElementById('chip-pyr').classList.add('active');
-        }
-
-        // Экспорт в заметки iPhone через Share Sheet
-        async function exportToNotes() {
-            const history = JSON.parse(localStorage.getItem('hookah_sessions') || '[]');
-            if (history.length === 0) {
-                alert('История пуста!');
-                return;
-            }
-
-            let text = "💨 ИСТОРИЯ ПОКУРОВ HOOKAH LIQUID\n\n";
-            history.forEach((s, index) => {
-                const mixStr = s.mix.map(m => `${m.name} (${m.weight}г)`).join(', ');
-                text += `${index + 1}. Дата: ${s.date} | Чаша: ${s.bowl}\n`;
-                text += `   Микс: ${mixStr}\n`;
-                text += `   Угли: ${s.coals} шт (${s.placement || '3 в колодке'}), смен: ${s.coalChanges || 0}\n`;
-                text += `   Покур: ${formatTime(s.smokeDuration)} | Оценка: ⭐${s.rating}\n`;
-                if (s.comment) text += `   Комментарий: ${s.comment}\n`;
-                text += `-----------------------------------\n`;
-            });
-
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        title: 'История покуров',
-                        text: text
-                    });
-                } catch (e) { }
-            } else {
-                // Запасной вариант если Share API недоступен
-                navigator.clipboard.writeText(text);
-                alert('История скопирована в буфер обмена! Вставь её в Заметки.');
-            }
-        }
-
-        // Экспорт в таблицу (CSV файл)
-        function exportToCSV() {
-            const history = JSON.parse(localStorage.getItem('hookah_sessions') || '[]');
-            if (history.length === 0) {
-                alert('История пуста!');
-                return;
-            }
-
-            let csv = '\uFEFFДата;Чаша;Угли;Расстановка;Смен угля;Микс;Время покура (сек);Оценка;Комментарий\n';
-            history.forEach(s => {
-                const mixStr = s.mix.map(m => `${m.name} (${m.weight}г)`).join(' + ');
-                csv += `"${s.date}";"${s.bowl}";"${s.coals}";"${s.placement || ''}";"${s.coalChanges || 0}";"${mixStr}";"${s.smokeDuration}";"${s.rating}";"${s.comment || ''}"\n`;
-            });
-
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `hookah_history_${new Date().toLocaleDateString()}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        // Открытие модального окна полного редактирования покура
-        function openFullEditModal(id) {
-            const history = JSON.parse(localStorage.getItem('hookah_sessions') || '[]');
-            const s = history.find(item => item.id === id);
-            if (!s) return;
-
-            document.getElementById('modal-id').value = s.id;
-            document.getElementById('modal-date').value = s.date;
-            document.getElementById('modal-bowl').value = s.bowl;
-            document.getElementById('modal-coals').value = s.coals;
-            document.getElementById('modal-changes').value = s.coalChanges || 0;
-            document.getElementById('modal-placement').value = s.placement || '3 в колодке';
-            document.getElementById('modal-smoke').value = s.smokeDuration || 0;
-            document.getElementById('modal-rating').value = s.rating;
-            document.getElementById('modal-comment').value = s.comment || '';
-
-            document.getElementById('edit-modal').classList.remove('hidden');
-        }
-
-        function closeEditModal() {
-            document.getElementById('edit-modal').classList.add('hidden');
-        }
-
-        function saveEditedSession() {
-            const id = parseInt(document.getElementById('modal-id').value);
-            let history = JSON.parse(localStorage.getItem('hookah_sessions') || '[]');
-
-            history = history.map(s => {
-                if (s.id === id) {
-                    s.date = document.getElementById('modal-date').value;
-                    s.bowl = document.getElementById('modal-bowl').value;
-                    s.coals = parseInt(document.getElementById('modal-coals').value) || 0;
-                    s.coalChanges = parseInt(document.getElementById('modal-changes').value) || 0;
-                    s.placement = document.getElementById('modal-placement').value;
-                    s.smokeDuration = parseInt(document.getElementById('modal-smoke').value) || 0;
-                    s.rating = parseInt(document.getElementById('modal-rating').value) || 5;
-                    s.comment = document.getElementById('modal-comment').value;
-                }
-                return s;
-            });
-
-            localStorage.setItem('hookah_sessions', JSON.stringify(history));
-            closeEditModal();
-            renderData();
-        }
-        // Импорт истории из CSV-файла
-        function importFromCSV(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const text = e.target.result;
-                const lines = text.split('\n');
-                if (lines.length < 2) {
-                    alert('Файл пустой или имеет неверный формат.');
-                    return;
-                }
-
-                let importedCount = 0;
-                let history = JSON.parse(localStorage.getItem('hookah_sessions') || '[]');
-
-                // Пропускаем первую строку (заголовки)
-                for (let i = 1; i < lines.length; i++) {
-                    const line = lines[i].trim();
-                    if (!line) continue;
-
-                    // Парсим CSV с учетом кавычек
-                    const row = [];
-                    let inRegex = false;
-                    let currentVal = '';
-                    for (let char of line) {
-                        if (char === '"') {
-                            inRegex = !inRegex;
-                        } else if (char === ';' && !inRegex) {
-                            row.push(currentVal);
-                            currentVal = '';
-                        } else {
-                            currentVal += char;
-                        }
-                    }
-                    row.push(currentVal);
-
-                    if (row.length >= 8) {
-                        const date = row[0].replace(/"/g, '');
-                        const bowl = row[1].replace(/"/g, '');
-                        const coals = parseInt(row[2]) || 3;
-                        const placement = row[3] ? row[3].replace(/"/g, '') : '3 в колодке';
-                        const coalChanges = parseInt(row[4]) || 0;
-                        const mixRaw = row[5] ? row[5].replace(/"/g, '') : '';
-                        const smokeDuration = parseInt(row[6]) || 0;
-                        const rating = parseInt(row[7]) || 5;
-                        const comment = row[8] ? row[8].replace(/"/g, '') : '';
-
-                        // Парсим микс вида "Табак 1 (15г) + Табак 2 (10г)" обратно в массив объектов
-                        const mix = [];
-                        const mixParts = mixRaw.split('+');
-                        mixParts.forEach(part => {
-                            const match = part.trim().match(/(.*?)\s*\((\d+)[гg]\)/i);
-                            if (match) {
-                                mix.push({ name: match[1].trim(), weight: parseFloat(match[2]) || 0 });
-                            } else if (part.trim()) {
-                                mix.push({ name: part.trim(), weight: 0 });
-                            }
-                        });
-
-                        if (mix.length === 0) mix.push({ name: 'Без названия', weight: 0 });
-
-                        const newSession = {
-                            id: Date.now() + i, // Уникальный ID
-                            date,
-                            bowl,
-                            coals,
-                            placement,
-                            coalChanges,
-                            mix,
-                            coalHeatDuration: 0,
-                            actualWarmupDuration: 0,
-                            smokeDuration,
-                            rating,
-                            comment
-                        };
-
-                        history.push(newSession);
-                        importedCount++;
-                    }
-                }
-
-                localStorage.setItem('hookah_sessions', JSON.stringify(history));
-                renderData();
-                alert(`Успешно импортировано сессий: ${importedCount}`);
-                event.target.value = ''; // Сбрасываем инпут
-            };
-            reader.readAsText(file, 'UTF-8');
-        }
-    </script>
-    <!-- Модальное окно полного редактирования сессии -->
+    <!-- Модальное окно редактирования -->
     <div id="edit-modal" class="hidden">
         <div class="modal-content">
             <h3 style="margin-bottom: 15px;">✏️ Редактирование покура</h3>
             <input type="hidden" id="modal-id">
-
+            
             <div class="form-group">
                 <label>Дата</label>
                 <input type="text" id="modal-date">
@@ -1151,23 +166,19 @@
             </div>
             <div style="display: flex; gap: 10px;">
                 <div class="form-group" style="flex: 1;">
-                    <label>Углей (шт)</label>
-                    <input type="number" id="modal-coals">
+                    <label>Прогрев (сек)</label>
+                    <input type="number" id="modal-warmup">
                 </div>
                 <div class="form-group" style="flex: 1;">
-                    <label>Смен угля</label>
-                    <input type="number" id="modal-changes">
+                    <label>Покур (сек)</label>
+                    <input type="number" id="modal-smoke">
                 </div>
             </div>
             <div class="form-group">
                 <label>Расстановка</label>
-                <input type="text" id="modal-placement" placeholder="3 в колодке / 2+1 / Пирамидка">
+                <input type="text" id="modal-placement">
             </div>
             <div style="display: flex; gap: 10px;">
-                <div class="form-group" style="flex: 1;">
-                    <label>Время покура (сек)</label>
-                    <input type="number" id="modal-smoke">
-                </div>
                 <div class="form-group" style="flex: 1;">
                     <label>Оценка (1-5)</label>
                     <input type="number" id="modal-rating" min="1" max="5">
@@ -1184,6 +195,7 @@
             </div>
         </div>
     </div>
-</body>
 
+    <script src="app.js"></script>
+</body>
 </html>

@@ -70,18 +70,12 @@
                     style="padding: 10px; font-size: 0.85em; margin-top: 6px;">+ Добавить табак в микс</button>
             </div>
 
-            <!-- Время прогрева (Крутилки iOS: Минуты 5-20 и Секунды) -->
             <div class="form-group">
                 <label>Время прогрева чаши</label>
-                <div class="wheel-picker-box">
-                    <div class="wheel-col">
+                <div class="wheel-picker-box" style="justify-content: center;">
+                    <div class="wheel-col" style="flex: none; width: 140px;">
                         <select id="warmup-min"></select>
                         <span>мин</span>
-                    </div>
-                    <div class="wheel-sep">:</div>
-                    <div class="wheel-col">
-                        <select id="warmup-sec"></select>
-                        <span>сек</span>
                     </div>
                 </div>
             </div>
@@ -139,9 +133,9 @@
 
     <!-- История -->
     <div class="glass-panel">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <h3 style="margin:0;">📅 История</h3>
-            <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end;">
+        <div style="margin-bottom: 12px;">
+            <h3 style="margin:0 0 8px 0;">📅 История</h3>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                 <button class="pill-btn" onclick="exportToNotes()">📋 Заметки</button>
                 <button class="pill-btn" onclick="exportToCSV()">📊 Экспорт</button>
                 <button class="pill-btn" onclick="document.getElementById('csv-file-input').click()"

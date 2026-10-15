@@ -43,21 +43,14 @@ document.addEventListener('DOMContentLoaded', () => {
 // Инициализация барабанов времени (Минуты от 5 до 20 с шагом 1, Секунды 00-55)
 function initTimeWheels() {
     const minSelect = document.getElementById('warmup-min');
-    const secSelect = document.getElementById('warmup-sec');
+    if (!minSelect) return;
 
     let minHtml = '';
-    for (let m = 5; m <= 20; m++) {
+    for (let m = 1; m <= 20; m++) {
         const sel = (m === 5) ? 'selected' : '';
         minHtml += `<option value="${m}" ${sel}>${m}</option>`;
     }
     minSelect.innerHTML = minHtml;
-
-    let secHtml = '';
-    for (let s = 0; s < 60; s += 5) {
-        const label = s.toString().padStart(2, '0');
-        secHtml += `<option value="${s}">${label}</option>`;
-    }
-    secSelect.innerHTML = secHtml;
 }
 
 // Загрузка истории и пользовательских списков чаш/брендов
@@ -451,8 +444,7 @@ async function startWarmupSession() {
     }
 
     const mins = parseInt(document.getElementById('warmup-min').value) || 5;
-    const secs = parseInt(document.getElementById('warmup-sec').value) || 0;
-    warmupTargetSec = (mins * 60) + secs;
+    warmupTargetSec = mins * 60;
 
     document.getElementById('status-title').innerText = '⏳ Прогрев чаши';
     document.getElementById('setup-form').classList.add('hidden');

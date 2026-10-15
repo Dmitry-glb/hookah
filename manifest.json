@@ -1,11 +1,11 @@
 {
-    "name": "DimHookah Tracker",
+    "name": "DimHookah",
     "short_name": "DimHookah",
     "description": "Трекер кальянных сессий и прогрева чаши",
     "start_url": "./index.html",
     "display": "standalone",
-    "background_color": "#030a06",
-    "theme_color": "#030a06",
+    "background_color": "#F2F2F7",
+    "theme_color": "#F2F2F7",
     "orientation": "portrait",
     "icons": [
         {

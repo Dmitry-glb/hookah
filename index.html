@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -8,30 +8,39 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="DimHookah">
-    <meta name="theme-color" content="#030a06">
+    <meta name="theme-color" content="#000000" id="meta-theme-color">
+    <title>DimHookah — Cupertino Ceramic iOS 27</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap"
+        rel="stylesheet">
+
+
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
-    <title>DimHookah Tracker</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-
-    <audio id="bg-audio" loop playsinline></audio>
+    <audio id="bg-audio" loop="" playsinline=""
+        src="blob:https://0rfuhjgtov5cy5804e7y1dtb4mpdg63fx96bcvh5buc6j0hs2n-h998661601.scf.usercontent.goog/a9d1a95b-c382-4591-8d00-e8a983493595"></audio>
 
     <div class="app-header">
-        <h2 style="margin:0; font-size: 1.3em;">💨 DimHookah</h2>
-        <button id="push-perm-btn" class="pill-btn hidden" onclick="requestPushPermission()"
-            style="font-size: 0.75em; padding: 5px 10px;">
-            🔔 Вкл. пуши
-        </button>
+        <h2 style="margin:0; font-size: 1.35em;">💨 DimHookah</h2>
+        <div class="header-actions">
+            <button id="theme-toggle-btn" class="pill-btn" onclick="cycleThemeMode()" title="Сменить тему оформления">🌗
+                Авто</button>
+            <button id="push-perm-btn" class="pill-btn" onclick="requestPushPermission()">
+                🔔 Пуши
+            </button>
+        </div>
     </div>
 
     <!-- Основная панель сессии -->
     <div class="glass-panel">
         <h3 id="status-title"
-            style="color: var(--text-secondary); text-align: center; font-size: 0.85em; text-transform: uppercase; margin-bottom: 6px;">
+            style="color: var(--text-secondary); text-align: center; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
             Новая сессия</h3>
         <div class="timer-display" id="timer">00:00</div>
 
@@ -40,7 +49,9 @@
             <div class="form-group">
                 <label>Чаша</label>
                 <div class="select-with-add">
-                    <select id="bowl-select"></select>
+                    <select id="bowl-select">
+                        <option value="" disabled="" selected="">Выбери чашу...</option>
+                    </select>
                     <button type="button" class="btn-plus" onclick="addNewBowlPrompt('bowl-select')"
                         title="Добавить чашу">+</button>
                     <button type="button" class="btn-minus" onclick="deleteSelectedBowl('bowl-select')"
@@ -59,7 +70,31 @@
                 <!-- Соло забивка -->
                 <div id="solo-container" class="tobacco-entry-card">
                     <div class="select-with-add" style="margin-bottom: 8px;">
-                        <select id="solo-tobacco-brand"></select>
+                        <select id="solo-tobacco-brand">
+                            <option value="" disabled="" selected="">Бренд</option>
+                            <option value="Наш">Наш</option>
+                            <option value="Adalya">Adalya</option>
+                            <option value="Afzal">Afzal</option>
+                            <option value="Banger">Banger</option>
+                            <option value="Black Burn">Black Burn</option>
+                            <option value="Bonche">Bonche</option>
+                            <option value="Brusko">Brusko</option>
+                            <option value="Burn">Burn</option>
+                            <option value="Chabacco">Chabacco</option>
+                            <option value="Daily Hookah">Daily Hookah</option>
+                            <option value="Darkside">Darkside</option>
+                            <option value="Deus">Deus</option>
+                            <option value="Duft">Duft</option>
+                            <option value="Element">Element</option>
+                            <option value="Jent">Jent</option>
+                            <option value="Musthave">Musthave</option>
+                            <option value="Overdose">Overdose</option>
+                            <option value="Satyr">Satyr</option>
+                            <option value="Sebero">Sebero</option>
+                            <option value="Spectrum">Spectrum</option>
+                            <option value="Tangiers">Tangiers</option>
+                            <option value="Trofimoff's">Trofimoff's</option>
+                        </select>
                         <button type="button" class="btn-plus" onclick="addNewBrandPrompt('solo-tobacco-brand')"
                             title="Добавить бренд">+</button>
                         <button type="button" class="btn-minus" onclick="deleteSelectedBrand('solo-tobacco-brand')"
@@ -81,8 +116,29 @@
                 <label>Время прогрева чаши</label>
                 <div class="wheel-picker-box" style="justify-content: center;">
                     <div class="wheel-col" style="flex: none; width: 140px;">
-                        <select id="warmup-min"></select>
-                        <span>мин</span>
+                        <select id="warmup-min">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5" selected="">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                            <option value="18">18</option>
+                            <option value="19">19</option>
+                            <option value="20">20</option>
+                        </select>
+                        <span style="color: var(--text-secondary); font-weight: 600;">мин</span>
                     </div>
                 </div>
             </div>
@@ -98,34 +154,40 @@
             </div>
             <button class="btn btn-success" onclick="startSmokingFromWarmup()">💨 Чаша прогрета — Начать покур!</button>
             <button class="btn btn-secondary" onclick="cancelActiveSession()"
-                style="font-size: 0.8em; padding: 8px; margin-bottom: 0;">✕ Отменить сессию</button>
+                style="font-size: 0.85em; padding: 10px; margin-bottom: 0;">✕ Отменить сессию</button>
         </div>
 
-        <!-- Шаг 3: Покур -->
+        <!-- Шаг 3: Покур (Чистый экран без лишних переключателей) -->
         <div id="smoking-controls" class="hidden">
             <div class="sub-timer-box">
-                <div style="font-size: 0.85em; color: var(--text-secondary); margin-bottom: 6px;">Текущая расстановка
-                    углей:</div>
+                <div style="font-size: 0.9em; color: var(--text-secondary);">Приятного дымного покура! 💨</div>
+                <div style="font-size: 0.8em; color: var(--text-secondary); margin-top: 4px;" id="active-mix-label">
+                </div>
+            </div>
+            <button class="btn" style="background: var(--danger); box-shadow: 0 8px 20px rgba(255,59,48,0.3);"
+                onclick="finishSmokingSession()">🏁 Завершить покур</button>
+        </div>
+
+        <!-- Шаг 4: Финал — Оценка и выбор основной расстановки углей -->
+        <div id="rating-form" class="hidden">
+            <h3 style="text-align: center; margin-bottom: 4px;">Оцените покур</h3>
+            <div class="stars">
+                <span class="star active" onclick="setRating(1)">★</span>
+                <span class="star active" onclick="setRating(2)">★</span>
+                <span class="star active" onclick="setRating(3)">★</span>
+                <span class="star active" onclick="setRating(4)">★</span>
+                <span class="star active" onclick="setRating(5)">★</span>
+            </div>
+
+            <div class="form-group">
+                <label>Основная расстановка углей при курении</label>
                 <div class="coal-setup-selector">
-                    <div class="coal-chip" id="chip-3" onclick="setCoalPlacement('3 в колодке')">3 в кол.</div>
+                    <div class="coal-chip active" id="chip-3" onclick="setCoalPlacement('3 в колодке')">3 в кол.</div>
                     <div class="coal-chip" id="chip-21" onclick="setCoalPlacement('2 + 1')">2 + 1</div>
                     <div class="coal-chip" id="chip-pyr" onclick="setCoalPlacement('Пирамида')">Пирамида</div>
                 </div>
             </div>
-            <button class="btn btn-danger" style="width: 100%; padding: 15px; font-size: 1em;"
-                onclick="finishSmokingSession()">🏁 Завершить покур</button>
-        </div>
 
-        <!-- Шаг 4: Оценка -->
-        <div id="rating-form" class="hidden">
-            <h3 style="text-align: center; margin-bottom: 8px;">Оцените покур</h3>
-            <div class="stars">
-                <span class="star" onclick="setRating(1)">★</span>
-                <span class="star" onclick="setRating(2)">★</span>
-                <span class="star" onclick="setRating(3)">★</span>
-                <span class="star" onclick="setRating(4)">★</span>
-                <span class="star" onclick="setRating(5)">★</span>
-            </div>
             <div class="form-group">
                 <label>Комментарий</label>
                 <textarea id="comment" rows="2" placeholder="Как вкус, жар..."></textarea>
@@ -137,22 +199,25 @@
     <!-- Рейтинг табаков -->
     <div class="glass-panel">
         <h3>🏆 Рейтинг табаков</h3>
-        <div id="analytics-content" style="overflow-x: auto;">Нет данных</div>
+        <div id="analytics-content">
+            <p style="color: var(--text-secondary); margin:0; font-size:0.9em;">Пока нет сохраненных сессий.</p>
+        </div>
     </div>
 
     <!-- История -->
     <div class="glass-panel">
         <div style="margin-bottom: 12px;">
-            <h3 style="margin:0 0 8px 0;">📅 История</h3>
+            <h3 style="margin:0 0 10px 0;">📅 История</h3>
             <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                 <button class="pill-btn" onclick="exportToNotes()">📋 Заметки</button>
                 <button class="pill-btn" onclick="exportToCSV()">📊 Экспорт</button>
                 <button class="pill-btn" onclick="document.getElementById('csv-file-input').click()"
-                    style="background: rgba(10,132,255,0.25); border-color: var(--info);">📂 Импорт</button>
+                    style="background: var(--primary-soft); color: var(--primary); border-color: var(--primary);">📂
+                    Импорт</button>
                 <input type="file" id="csv-file-input" accept=".csv" class="hidden" onchange="importFromCSV(event)">
             </div>
         </div>
-        <div style="overflow-x: auto;">
+        <div>
             <table>
                 <thead>
                     <tr>
@@ -193,7 +258,9 @@
             <div class="form-group">
                 <label>Чаша</label>
                 <div class="select-with-add">
-                    <select id="modal-bowl"></select>
+                    <select id="modal-bowl">
+                        <option value="" disabled="" selected="">Выбери чашу...</option>
+                    </select>
                     <button type="button" class="btn-plus" onclick="addNewBowlPrompt('modal-bowl')">+</button>
                     <button type="button" class="btn-minus" onclick="deleteSelectedBowl('modal-bowl')">−</button>
                 </div>
@@ -248,6 +315,28 @@
             </div>
         </div>
     </div>
+
+    <!-- Универсальное диалоговое окно iOS (вместо системных prompt/alert) -->
+    <div id="ios-dialog-modal" class="hidden">
+        <div class="ios-dialog-box">
+            <h3 id="ios-dialog-title" style="font-size: 1.05em; margin-bottom: 8px;">Новое значение</h3>
+            <p id="ios-dialog-msg" class="hidden"
+                style="font-size: 0.88em; color: var(--text-secondary); margin: 0 0 14px 0; line-height: 1.4;"></p>
+            <input type="text" id="ios-dialog-input" placeholder="Введите название..." style="margin-bottom: 14px;">
+            <div style="display: flex; gap: 8px;">
+                <button type="button" id="ios-dialog-cancel" class="btn btn-secondary" onclick="closeIosDialog()"
+                    style="margin:0; padding: 11px;">Отмена</button>
+                <button type="button" id="ios-dialog-ok" class="btn" style="margin:0; padding: 11px;">ОК</button>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
 
     <script src="app.js"></script>
 </body>

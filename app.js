@@ -12,6 +12,98 @@ let swRegistration = null;
 let silentAudioUrl = null;
 let alarmAudioUrl = null;
 
+// Режимы темы: 'auto' (по системе телефона) | 'light' | 'dark'
+let currentThemeMode = localStorage.getItem('hookah_theme_mode') || 'auto';
+const systemDarkMedia = window.matchMedia('(prefers-color-scheme: dark)');
+
+function applyTheme() {
+    let effectiveTheme = currentThemeMode;
+    if (currentThemeMode === 'auto') {
+        effectiveTheme = systemDarkMedia.matches ? 'dark' : 'light';
+    }
+
+    if (effectiveTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.getElementById('meta-theme-color')?.setAttribute('content', '#000000');
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+        document.getElementById('meta-theme-color')?.setAttribute('content', '#F2F2F7');
+    }
+
+    const btn = document.getElementById('theme-toggle-btn');
+    if (btn) {
+        if (currentThemeMode === 'auto') btn.innerText = '🌗 Авто';
+        else if (currentThemeMode === 'light') btn.innerText = '☀️ Светлая';
+        else btn.innerText = '🌙 Темная';
+    }
+}
+
+function cycleThemeMode() {
+    if (currentThemeMode === 'auto') currentThemeMode = 'dark';
+    else if (currentThemeMode === 'dark') currentThemeMode = 'light';
+    else currentThemeMode = 'auto';
+
+    localStorage.setItem('hookah_theme_mode', currentThemeMode);
+    applyTheme();
+}
+
+systemDarkMedia.addEventListener('change', () => {
+    if (currentThemeMode === 'auto') applyTheme();
+});
+
+// Кастомные диалоги в стиле iOS 27 (работают везде без блокировок)
+function openIosPrompt(title, placeholder, callback) {
+    const modal = document.getElementById('ios-dialog-modal');
+    const titleEl = document.getElementById('ios-dialog-title');
+    const msgEl = document.getElementById('ios-dialog-msg');
+    const inputEl = document.getElementById('ios-dialog-input');
+    const cancelBtn = document.getElementById('ios-dialog-cancel');
+    const okBtn = document.getElementById('ios-dialog-ok');
+
+    if (!modal) return;
+    titleEl.innerText = title;
+    msgEl.classList.add('hidden');
+    inputEl.classList.remove('hidden');
+    inputEl.placeholder = placeholder || '';
+    inputEl.value = '';
+    cancelBtn.classList.remove('hidden');
+
+    okBtn.onclick = () => {
+        const val = inputEl.value.trim();
+        closeIosDialog();
+        if (val && callback) callback(val);
+    };
+
+    modal.classList.remove('hidden');
+    setTimeout(() => inputEl.focus(), 60);
+}
+
+function showIosNotice(title, message) {
+    const modal = document.getElementById('ios-dialog-modal');
+    const titleEl = document.getElementById('ios-dialog-title');
+    const msgEl = document.getElementById('ios-dialog-msg');
+    const inputEl = document.getElementById('ios-dialog-input');
+    const cancelBtn = document.getElementById('ios-dialog-cancel');
+    const okBtn = document.getElementById('ios-dialog-ok');
+
+    if (!modal) return;
+    titleEl.innerText = title;
+    msgEl.innerText = message;
+    msgEl.classList.remove('hidden');
+    inputEl.classList.add('hidden');
+    cancelBtn.classList.add('hidden');
+
+    okBtn.onclick = () => closeIosDialog();
+    modal.classList.remove('hidden');
+}
+
+function closeIosDialog() {
+    const modal = document.getElementById('ios-dialog-modal');
+    const inputEl = document.getElementById('ios-dialog-input');
+    if (inputEl) inputEl.blur();
+    if (modal) modal.classList.add('hidden');
+}
+
 const DEFAULT_BRANDS = [
     'Adalya', 'Afzal', 'Banger', 'Black Burn', 'Bonche',
     'Brusko', 'Burn', 'Chabacco', 'Daily Hookah', 'Darkside',
@@ -25,6 +117,7 @@ let savedBrands = [];
 let removedItems = [];
 
 document.addEventListener('DOMContentLoaded', () => {
+    applyTheme();
     registerPWA();
     initTimeWheels();
     initRealBackgroundAudio();
@@ -49,9 +142,7 @@ async function registerPWA() {
     if ('serviceWorker' in navigator) {
         try {
             swRegistration = await navigator.serviceWorker.register('./sw.js');
-        } catch (e) {
-            console.warn('SW registration failed:', e);
-        }
+        } catch (e) { }
     }
     updatePushButtonState();
 }
@@ -68,7 +159,10 @@ function updatePushButtonState() {
 
 async function requestPushPermission() {
     if (!('Notification' in window)) {
-        alert('📲 Ты открыл сайт в обычном браузере!\n\nЧтобы работали пуши на iPhone:\n1. Нажми «Поделиться» внизу Safari.\n2. Выбери «На экран Домой».\n3. Открой DimHookah с иконки на рабочем столе!');
+        showIosNotice(
+            'Установка на iPhone 📲',
+            'Чтобы работали пуши:\n1. Нажми «Поделиться» внизу Safari.\n2. Выбери «На экран Домой».\n3. Открой DimHookah с иконки на рабочем столе!'
+        );
         return;
     }
     try {
@@ -78,11 +172,9 @@ async function requestPushPermission() {
             playBellSound();
             sendPush('Уведомления включены! 🔥', 'Теперь DimHookah предупредит, когда чаша прогреется.');
         } else {
-            alert('Уведомления запрещены. Проверь Настройки iPhone -> Уведомления -> DimHookah.');
+            showIosNotice('Пуши отключены', 'Разреши уведомления для DimHookah в настройках телефона.');
         }
-    } catch (e) {
-        alert('Ошибка запроса уведомлений: ' + e.message);
-    }
+    } catch (e) { }
 }
 
 function initTimeWheels() {
@@ -191,41 +283,35 @@ function populateSelects() {
 }
 
 function addNewBowlPrompt(targetSelectId = 'bowl-select') {
-    const newBowl = prompt('Введите название новой чаши:');
-    if (newBowl && newBowl.trim()) {
-        const clean = newBowl.trim();
+    openIosPrompt('Новая чаша', 'Например: Oblako Phunnel M', (clean) => {
         removedItems = removedItems.filter(item => item !== clean);
         if (!savedBowls.includes(clean)) savedBowls.push(clean);
         saveCatalogsToStorage();
         populateSelects();
         const target = document.getElementById(targetSelectId);
         if (target) target.value = clean;
-    }
+    });
 }
 
 function deleteSelectedBowl(targetSelectId = 'bowl-select') {
     const target = document.getElementById(targetSelectId);
     const val = target ? target.value : '';
     if (!val) {
-        alert('Сначала выбери чашу в списке, которую нужно удалить!');
+        showIosNotice('Чаша не выбрана', 'Сначала выбери чашу в выпадающем списке, чтобы удалить её.');
         return;
     }
-    if (confirm(`Удалить чашу «${val}» из списка?`)) {
-        savedBowls = savedBowls.filter(b => b !== val);
-        if (!removedItems.includes(val)) removedItems.push(val);
-        saveCatalogsToStorage();
-        if (target) {
-            target.blur();
-            target.value = '';
-        }
-        populateSelects();
+    savedBowls = savedBowls.filter(b => b !== val);
+    if (!removedItems.includes(val)) removedItems.push(val);
+    saveCatalogsToStorage();
+    if (target) {
+        target.blur();
+        target.value = '';
     }
+    populateSelects();
 }
 
 function addNewBrandPrompt(targetSelectOrElem) {
-    const newBrand = prompt('Введите название нового бренда табака:');
-    if (newBrand && newBrand.trim()) {
-        const clean = newBrand.trim();
+    openIosPrompt('Новый бренд табака', 'Например: Blackburn', (clean) => {
         removedItems = removedItems.filter(item => item !== clean);
         if (!savedBrands.includes(clean)) savedBrands.push(clean);
         saveCatalogsToStorage();
@@ -236,7 +322,7 @@ function addNewBrandPrompt(targetSelectOrElem) {
         } else if (targetSelectOrElem) {
             targetSelectOrElem.value = clean;
         }
-    }
+    });
 }
 
 function deleteSelectedBrand(targetSelectOrElem) {
@@ -245,19 +331,17 @@ function deleteSelectedBrand(targetSelectOrElem) {
         : targetSelectOrElem;
     const val = el ? el.value : '';
     if (!val) {
-        alert('Сначала выбери бренд в списке, который хочешь удалить!');
+        showIosNotice('Бренд не выбран', 'Сначала выбери бренд табака в списке, чтобы удалить его.');
         return;
     }
-    if (confirm(`Удалить бренд «${val}» из списка?`)) {
-        savedBrands = savedBrands.filter(b => b !== val);
-        if (!removedItems.includes(val)) removedItems.push(val);
-        saveCatalogsToStorage();
-        if (el) {
-            el.blur();
-            el.value = '';
-        }
-        populateSelects();
+    savedBrands = savedBrands.filter(b => b !== val);
+    if (!removedItems.includes(val)) removedItems.push(val);
+    saveCatalogsToStorage();
+    if (el) {
+        el.blur();
+        el.value = '';
     }
+    populateSelects();
 }
 
 function toggleMixMode() {
@@ -270,8 +354,8 @@ function toggleMixMode() {
 
     if (isMixMode) {
         btn.innerText = 'Режим: Микс';
-        btn.style.borderColor = 'var(--success)';
-        btn.style.color = '#8aff9d';
+        btn.style.borderColor = 'var(--primary)';
+        btn.style.color = 'var(--primary)';
         soloBox.classList.add('hidden');
         mixBox.classList.remove('hidden');
         addBtn.classList.remove('hidden');
@@ -281,8 +365,8 @@ function toggleMixMode() {
         }
     } else {
         btn.innerText = 'Режим: Соло';
-        btn.style.borderColor = 'rgba(10, 132, 255, 0.35)';
-        btn.style.color = '#64b5f6';
+        btn.style.borderColor = 'var(--glass-border)';
+        btn.style.color = 'var(--text)';
         soloBox.classList.remove('hidden');
         mixBox.classList.add('hidden');
         addBtn.classList.add('hidden');
@@ -294,17 +378,17 @@ function addMixRow(brand = '', flavor = '', weight = '') {
     const card = document.createElement('div');
     card.className = 'tobacco-entry-card mix-item';
     card.innerHTML = `
-        <div class="select-with-add" style="margin-bottom: 8px;">
-            <select class="tobacco-brand-select">${getBrandOptionsHtml(brand)}</select>
-            <button type="button" class="btn-plus" onclick="addNewBrandPrompt(this.previousElementSibling)">+</button>
-            <button type="button" class="btn-minus" onclick="deleteSelectedBrand(this.previousElementSibling.previousElementSibling)">−</button>
-            <button type="button" class="btn-danger" style="height: 42px; padding: 0 12px;" onclick="this.closest('.mix-item').remove()">✕</button>
-        </div>
-        <div style="display: flex; gap: 8px;">
-            <input type="text" class="tobacco-flavor" placeholder="Вкус" value="${flavor}" style="flex: 2.2;">
-            <input type="number" class="tobacco-weight" placeholder="Грамм" value="${weight}" style="flex: 1;">
-        </div>
-    `;
+                <div class="select-with-add" style="margin-bottom: 8px;">
+                    <select class="tobacco-brand-select">${getBrandOptionsHtml(brand)}</select>
+                    <button type="button" class="btn-plus" onclick="addNewBrandPrompt(this.previousElementSibling)">+</button>
+                    <button type="button" class="btn-minus" onclick="deleteSelectedBrand(this.previousElementSibling.previousElementSibling)">−</button>
+                    <button type="button" class="btn-danger" style="height: 44px; width: 44px;" onclick="this.closest('.mix-item').remove()">✕</button>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" class="tobacco-flavor" placeholder="Вкус" value="${flavor}" style="flex: 2.2;">
+                    <input type="number" class="tobacco-weight" placeholder="Грамм" value="${weight}" style="flex: 1;">
+                </div>
+            `;
     container.appendChild(card);
 }
 
@@ -326,7 +410,6 @@ function formatDurationHM(seconds) {
     return `${m} мин`;
 }
 
-// Генерация двух WAV-дорожек: 1) Бесшумная для удержания фона 2) Нежные «капельки» для будильника
 function initRealBackgroundAudio() {
     silentAudioUrl = createWavBlobUrl(false);
     alarmAudioUrl = createWavBlobUrl(true);
@@ -336,7 +419,6 @@ function initRealBackgroundAudio() {
         audioEl.src = silentAudioUrl;
         audioEl.volume = 0.05;
 
-        // Плеер сам будит таймер в фоне на заблокированном экране iOS
         audioEl.addEventListener('timeupdate', () => {
             if (!document.getElementById('warmup-controls').classList.contains('hidden')) {
                 updateWarmupTimer();
@@ -371,9 +453,9 @@ function createWavBlobUrl(isAlarm) {
     view.setUint32(40, numSamples * 2, true);
 
     const notes = [
-        { start: 0.05, freq: 1046.50 }, // C6
-        { start: 0.22, freq: 1318.51 }, // E6
-        { start: 0.39, freq: 1567.98 }  // G6
+        { start: 0.05, freq: 1046.50 },
+        { start: 0.22, freq: 1318.51 },
+        { start: 0.39, freq: 1567.98 }
     ];
 
     for (let i = 0; i < numSamples; i++) {
@@ -420,9 +502,7 @@ async function startKeepAliveAudio(titleText, subtitleText) {
     const audioEl = document.getElementById('bg-audio');
     try {
         if (audioEl) {
-            if (audioEl.src !== silentAudioUrl) {
-                audioEl.src = silentAudioUrl;
-            }
+            if (audioEl.src !== silentAudioUrl) audioEl.src = silentAudioUrl;
             audioEl.volume = 0.05;
             if (audioEl.paused) await audioEl.play();
         }
@@ -430,7 +510,6 @@ async function startKeepAliveAudio(titleText, subtitleText) {
     } catch (e) { }
 }
 
-// Проигрываем «капельки» ровно 2 раза (3.6 сек) и возвращаем тишину
 async function triggerLockScreenAudioAlarm() {
     const audioEl = document.getElementById('bg-audio');
     try {
@@ -511,25 +590,21 @@ function setCoalPlacement(type) {
 
 async function sendPush(title, body) {
     if (navigator.vibrate) {
-        try { navigator.vibrate([300, 150, 300, 150, 400]); } catch (e) { }
+        try { navigator.vibrate([300, 150, 300]); } catch (e) { }
     }
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
-
     try {
         if (swRegistration && swRegistration.showNotification) {
             await swRegistration.showNotification(title, {
                 body: body,
                 icon: 'icon.png',
-                vibrate: [300, 150, 300],
                 tag: 'dimhookah-warmup',
                 renotify: true
             });
         } else {
             new Notification(title, { body, icon: 'icon.png' });
         }
-    } catch (e) {
-        try { new Notification(title, { body }); } catch (err) { }
-    }
+    } catch (e) { }
 }
 
 function getDraftMixFromForm() {
@@ -623,6 +698,7 @@ function restoreActiveSessionIfAny() {
             updateWarmupTimer();
         } else if (state.stage === 'smoking') {
             document.getElementById('status-title').innerText = '💨 Идет покур';
+            document.getElementById('active-mix-label').innerText = getCurrentMixSummaryText();
             document.getElementById('smoking-controls').classList.remove('hidden');
             clearInterval(timerInterval);
             timerInterval = setInterval(updateSmokingTimer, 1000);
@@ -707,6 +783,7 @@ function startSmokingFromWarmup() {
 
     document.getElementById('warmup-box').classList.remove('alarm-active');
     document.getElementById('status-title').innerText = '💨 Идет покур';
+    document.getElementById('active-mix-label').innerText = getCurrentMixSummaryText();
     document.getElementById('warmup-controls').classList.add('hidden');
     document.getElementById('smoking-controls').classList.remove('hidden');
 
@@ -739,15 +816,13 @@ function finishSmokingSession() {
 }
 
 function cancelActiveSession() {
-    if (confirm('Отменить текущую сессию?')) {
-        clearInterval(timerInterval);
-        stopKeepAliveAudio();
-        document.getElementById('warmup-box').classList.remove('alarm-active');
-        document.getElementById('warmup-controls').classList.add('hidden');
-        document.getElementById('smoking-controls').classList.add('hidden');
-        saveActiveSessionState('idle');
-        resetForm();
-    }
+    clearInterval(timerInterval);
+    stopKeepAliveAudio();
+    document.getElementById('warmup-box').classList.remove('alarm-active');
+    document.getElementById('warmup-controls').classList.add('hidden');
+    document.getElementById('smoking-controls').classList.add('hidden');
+    saveActiveSessionState('idle');
+    resetForm();
 }
 
 function setRating(val) {
@@ -800,18 +875,17 @@ function resetForm() {
     document.getElementById('mix-container').innerHTML = '';
     document.getElementById('bowl-select').value = '';
     document.getElementById('solo-tobacco-brand').value = '';
+    setCoalPlacement('3 в колодке');
     if (isMixMode) toggleMixMode();
 }
 
 function deleteSession(id) {
-    if (confirm("Удалить эту запись из истории?")) {
-        loadAllData((history) => {
-            history = history.filter(s => s.id !== id);
-            saveSessionsToStorage(history, () => {
-                renderData(history);
-            });
+    loadAllData((history) => {
+        history = history.filter(s => s.id !== id);
+        saveSessionsToStorage(history, () => {
+            renderData(history);
         });
-    }
+    });
 }
 
 function renderData(history) {
@@ -835,21 +909,21 @@ function renderData(history) {
             return `<span class="badge">${b} ${f} (${m.weight || 0}г)</span>`;
         }).join(' ');
 
-        const commentHtml = s.comment ? `<div style="color:var(--text-secondary); margin-top:4px; font-size:0.85em; font-style:italic;">💬 ${s.comment}</div>` : '';
+        const commentHtml = s.comment ? `<div style="color:var(--text-secondary); margin-top:6px; font-size:0.85em; font-style:italic;">💬 ${s.comment}</div>` : '';
 
         tr.innerHTML = `
-            <td><b>${s.date}</b><br><span style="color:#ffb340; font-weight:700;">★ ${s.rating}</span></td>
-            <td><b>${s.bowl}</b><br><span style="color:var(--text-secondary); font-size:0.82em;">🔥 ${placementText}</span></td>
-            <td><div>${mixStr}</div>${commentHtml}</td>
-            <td style="font-size:0.82em; white-space:nowrap;">
-                🔥 ${formatDurationHM(s.actualWarmupDuration)}<br>
-                💨 <b>${formatDurationHM(s.smokeDuration)}</b>
-            </td>
-            <td style="white-space: nowrap;">
-                <button class="btn-edit" onclick="openFullEditModal(${s.id})">✏️</button>
-                <button class="btn-danger" onclick="deleteSession(${s.id})">✕</button>
-            </td>
-        `;
+                    <td><b>${s.date}</b><br><span style="color:#ffb340; font-weight:800;">★ ${s.rating}</span></td>
+                    <td><b>${s.bowl}</b><br><span style="color:var(--text-secondary); font-size:0.85em;">🔥 ${placementText}</span></td>
+                    <td><div>${mixStr}</div>${commentHtml}</td>
+                    <td style="font-size:0.82em; white-space:nowrap;">
+                        🔥 ${formatDurationHM(s.actualWarmupDuration)} &nbsp;•&nbsp;
+                        💨 <b>${formatDurationHM(s.smokeDuration)}</b>
+                    </td>
+                    <td style="white-space: nowrap;">
+                        <button class="btn-edit" onclick="openFullEditModal(${s.id})">✏️</button>
+                        <button class="btn-danger" onclick="deleteSession(${s.id})">✕</button>
+                    </td>
+                `;
         tbody.appendChild(tr);
 
         (s.mix || []).forEach(m => {
@@ -879,37 +953,35 @@ function renderData(history) {
     sortedTobaccos.forEach(t => {
         const avg = (t.totalRating / t.count).toFixed(1);
         html += `
-            <tr>
-                <td><b>${t.name}</b></td>
-                <td style="color: #ffb340; font-weight: bold;">★ ${avg}</td>
-                <td>${t.count}</td>
-                <td>${t.totalWeight} г</td>
-            </tr>
-        `;
+                    <tr>
+                        <td><b>${t.name}</b></td>
+                        <td style="color: #ffb340; font-weight: 800;">★ ${avg}</td>
+                        <td>${t.count}</td>
+                        <td>${t.totalWeight} г</td>
+                    </tr>
+                `;
     });
     html += '</tbody></table>';
     analyticsDiv.innerHTML = html;
 }
 
 function addModalMixRow(brand = '', flavor = '', weight = '') {
-    if (brand && !savedBrands.includes(brand)) {
-        savedBrands.push(brand);
-    }
+    if (brand && !savedBrands.includes(brand)) savedBrands.push(brand);
     const container = document.getElementById('modal-mix-container');
     const card = document.createElement('div');
     card.className = 'tobacco-entry-card modal-mix-item';
     card.innerHTML = `
-        <div class="select-with-add" style="margin-bottom: 8px;">
-            <select class="tobacco-brand-select">${getBrandOptionsHtml(brand)}</select>
-            <button type="button" class="btn-plus" onclick="addNewBrandPrompt(this.previousElementSibling)">+</button>
-            <button type="button" class="btn-minus" onclick="deleteSelectedBrand(this.previousElementSibling.previousElementSibling)">−</button>
-            <button type="button" class="btn-danger" style="height: 42px; padding: 0 12px;" onclick="this.closest('.modal-mix-item').remove()">✕</button>
-        </div>
-        <div style="display: flex; gap: 8px;">
-            <input type="text" class="modal-tobacco-flavor" placeholder="Вкус" value="${flavor}" style="flex: 2.2;">
-            <input type="number" class="modal-tobacco-weight" placeholder="Грамм" value="${weight}" style="flex: 1;">
-        </div>
-    `;
+                <div class="select-with-add" style="margin-bottom: 8px;">
+                    <select class="tobacco-brand-select">${getBrandOptionsHtml(brand)}</select>
+                    <button type="button" class="btn-plus" onclick="addNewBrandPrompt(this.previousElementSibling)">+</button>
+                    <button type="button" class="btn-minus" onclick="deleteSelectedBrand(this.previousElementSibling.previousElementSibling)">−</button>
+                    <button type="button" class="btn-danger" style="height: 44px; width: 44px;" onclick="this.closest('.modal-mix-item').remove()">✕</button>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" class="modal-tobacco-flavor" placeholder="Вкус" value="${flavor}" style="flex: 2.2;">
+                    <input type="number" class="modal-tobacco-weight" placeholder="Грамм" value="${weight}" style="flex: 1;">
+                </div>
+            `;
     container.appendChild(card);
 }
 
@@ -1005,7 +1077,10 @@ function saveEditedSession() {
 
 async function exportToNotes() {
     loadAllData(async (history) => {
-        if (history.length === 0) { alert('История пуста!'); return; }
+        if (history.length === 0) {
+            showIosNotice('История пуста', 'Сначала сохрани хотя бы один покур!');
+            return;
+        }
 
         let text = "💨 ИСТОРИЯ ПОКУРОВ DIMHOOKAH\n\n";
         history.forEach((s, index) => {
@@ -1020,17 +1095,24 @@ async function exportToNotes() {
         });
 
         if (navigator.share) {
-            try { await navigator.share({ title: 'История покуров', text: text }); } catch (e) { }
-        } else {
-            navigator.clipboard.writeText(text);
-            alert('История скопирована в буфер обмена!');
+            try { await navigator.share({ title: 'История покуров', text: text }); return; } catch (e) { }
         }
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showIosNotice('Скопировано! 📋', 'История покуров скопирована в буфер обмена.');
     });
 }
 
 function exportToCSV() {
     loadAllData((history) => {
-        if (history.length === 0) { alert('История пуста!'); return; }
+        if (history.length === 0) {
+            showIosNotice('История пуста', 'Нет записей для экспорта.');
+            return;
+        }
 
         let csv = '\uFEFFДата;Чаша;Расстановка;Микс;Время прогрева (сек);Время покура (сек);Оценка;Комментарий\n';
         history.forEach(s => {
@@ -1058,11 +1140,10 @@ function importFromCSV(event) {
     reader.onload = function (e) {
         const text = e.target.result;
         const lines = text.split('\n');
-        if (lines.length < 2) { alert('Файл пустой.'); return; }
+        if (lines.length < 2) return;
 
         loadAllData((history) => {
             let importedCount = 0;
-
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i].trim();
                 if (!line) continue;
@@ -1126,8 +1207,8 @@ function importFromCSV(event) {
             saveSessionsToStorage(history, () => {
                 populateSelects();
                 renderData(history);
-                alert(`Импортировано сессий: ${importedCount}`);
                 event.target.value = '';
+                showIosNotice('Импорт завершен ✅', `Успешно добавлено записей: ${importedCount}`);
             });
         });
     };

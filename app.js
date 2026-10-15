@@ -9,8 +9,17 @@ let isMixMode = false;
 let alarmAlreadyPlayed = false;
 let audioCtx;
 
+const DEFAULT_BRANDS = [
+    'Adalya', 'Afzal', 'Banger', 'Black Burn', 'Bonche',
+    'Brusko', 'Burn', 'Chabacco', 'Daily Hookah', 'Darkside',
+    'Deus', 'Duft', 'Element', 'Jent', 'Musthave',
+    'Overdose', 'Satyr', 'Sebero', 'Spectrum', 'Tangiers',
+    'Trofimoff\'s', 'Наш'
+].sort((a, b) => a.localeCompare(b, 'ru'));
+
 let savedBowls = [];
 let savedBrands = [];
+let removedItems = []; // Чтобы удаленные чаши/бренды не подтягивались заново из старой истории
 
 const tg = window.Telegram?.WebApp;
 if (tg) {
@@ -56,13 +65,15 @@ function loadAllData(callback) {
     try {
         savedBowls = JSON.parse(localStorage.getItem('hookah_custom_bowls') || '[]');
         savedBrands = JSON.parse(localStorage.getItem('hookah_custom_brands') || '[]');
+        removedItems = JSON.parse(localStorage.getItem('hookah_removed_items') || '[]');
     } catch (e) {
         savedBowls = [];
         savedBrands = [];
+        removedItems = [];
     }
 
     if (tg && tg.CloudStorage) {
-        tg.CloudStorage.getItems(['hookah_sessions', 'hookah_custom_bowls', 'hookah_custom_brands'], (err, values) => {
+        tg.CloudStorage.getItems(['hookah_sessions', 'hookah_custom_bowls', 'hookah_custom_brands', 'hookah_removed_items'], (err, values) => {
             let history = [];
             if (!err && values) {
                 if (values.hookah_sessions) {
@@ -73,6 +84,9 @@ function loadAllData(callback) {
                 }
                 if (values.hookah_custom_brands) {
                     try { savedBrands = JSON.parse(values.hookah_custom_brands); } catch (e) { }
+                }
+                if (values.hookah_removed_items) {
+                    try { removedItems = JSON.parse(values.hookah_removed_items); } catch (e) { }
                 }
             }
             if (history.length === 0) {
@@ -101,33 +115,42 @@ function saveSessionsToStorage(history, callback) {
 }
 
 function saveCatalogsToStorage() {
+    savedBowls.sort((a, b) => a.localeCompare(b, 'ru'));
+    savedBrands.sort((a, b) => a.localeCompare(b, 'ru'));
+
     const bowlsStr = JSON.stringify(savedBowls);
     const brandsStr = JSON.stringify(savedBrands);
+    const removedStr = JSON.stringify(removedItems);
+
     localStorage.setItem('hookah_custom_bowls', bowlsStr);
     localStorage.setItem('hookah_custom_brands', brandsStr);
+    localStorage.setItem('hookah_removed_items', removedStr);
 
     if (tg && tg.CloudStorage) {
         tg.CloudStorage.setItem('hookah_custom_bowls', bowlsStr);
         tg.CloudStorage.setItem('hookah_custom_brands', brandsStr);
+        tg.CloudStorage.setItem('hookah_removed_items', removedStr);
     }
 }
 
-// Собираем все чаши и бренды из истории покуров
-// Собираем только реальные чаши и бренды из истории без дефолтного мусора
 function syncCatalogFromHistory(history) {
-    const bowlSet = new Set(savedBowls.filter(b => b !== 'Облако Phunnel M'));
-    const brandSet = new Set(savedBrands.filter(b => !['Darkside', 'Musthave', 'Black Burn'].includes(b)));
+    const bowlSet = new Set(savedBowls.filter(b => b !== 'Облако Phunnel M' && !removedItems.includes(b)));
+    const brandSet = new Set([...DEFAULT_BRANDS, ...savedBrands].filter(b => !removedItems.includes(b)));
 
     (history || []).forEach(s => {
-        if (s.bowl && s.bowl !== 'Не указана') bowlSet.add(s.bowl);
+        if (s.bowl && s.bowl !== 'Не указана' && !removedItems.includes(s.bowl)) {
+            bowlSet.add(s.bowl);
+        }
         (s.mix || []).forEach(m => {
             const b = (m.brand || m.name || '').trim();
-            if (b && b !== 'Без названия') brandSet.add(b);
+            if (b && b !== 'Без названия' && !removedItems.includes(b)) {
+                brandSet.add(b);
+            }
         });
     });
 
-    savedBowls = Array.from(bowlSet);
-    savedBrands = Array.from(brandSet);
+    savedBowls = Array.from(bowlSet).sort((a, b) => a.localeCompare(b, 'ru'));
+    savedBrands = Array.from(brandSet).sort((a, b) => a.localeCompare(b, 'ru'));
     saveCatalogsToStorage();
 }
 
@@ -171,25 +194,42 @@ function addNewBowlPrompt(targetSelectId = 'bowl-select') {
     const newBowl = prompt('Введите название новой чаши:');
     if (newBowl && newBowl.trim()) {
         const clean = newBowl.trim();
+        removedItems = removedItems.filter(item => item !== clean);
         if (!savedBowls.includes(clean)) {
             savedBowls.push(clean);
-            saveCatalogsToStorage();
         }
+        saveCatalogsToStorage();
         populateSelects();
         const target = document.getElementById(targetSelectId);
         if (target) target.value = clean;
     }
 }
 
-// Добавление нового бренда табака через "+"
+function deleteSelectedBowl(targetSelectId = 'bowl-select') {
+    const target = document.getElementById(targetSelectId);
+    const val = target ? target.value : '';
+    if (!val) {
+        alert('Сначала выбери чашу в списке, которую нужно удалить!');
+        return;
+    }
+    if (confirm(`Удалить чашу «${val}» из списка?`)) {
+        savedBowls = savedBowls.filter(b => b !== val);
+        if (!removedItems.includes(val)) removedItems.push(val);
+        saveCatalogsToStorage();
+        populateSelects();
+        if (target) target.value = '';
+    }
+}
+
 function addNewBrandPrompt(targetSelectOrElem) {
     const newBrand = prompt('Введите название нового бренда табака:');
     if (newBrand && newBrand.trim()) {
         const clean = newBrand.trim();
+        removedItems = removedItems.filter(item => item !== clean);
         if (!savedBrands.includes(clean)) {
             savedBrands.push(clean);
-            saveCatalogsToStorage();
         }
+        saveCatalogsToStorage();
         populateSelects();
         if (typeof targetSelectOrElem === 'string') {
             const el = document.getElementById(targetSelectOrElem);
@@ -197,6 +237,24 @@ function addNewBrandPrompt(targetSelectOrElem) {
         } else if (targetSelectOrElem) {
             targetSelectOrElem.value = clean;
         }
+    }
+}
+
+function deleteSelectedBrand(targetSelectOrElem) {
+    const el = (typeof targetSelectOrElem === 'string')
+        ? document.getElementById(targetSelectOrElem)
+        : targetSelectOrElem;
+    const val = el ? el.value : '';
+    if (!val) {
+        alert('Сначала выбери бренд в списке, который хочешь удалить!');
+        return;
+    }
+    if (confirm(`Удалить бренд «${val}» из списка?`)) {
+        savedBrands = savedBrands.filter(b => b !== val);
+        if (!removedItems.includes(val)) removedItems.push(val);
+        saveCatalogsToStorage();
+        populateSelects();
+        if (el) el.value = '';
     }
 }
 
@@ -237,7 +295,8 @@ function addMixRow(brand = '', flavor = '', weight = '') {
         <div class="select-with-add" style="margin-bottom: 8px;">
             <select class="tobacco-brand-select">${getBrandOptionsHtml(brand)}</select>
             <button type="button" class="btn-plus" onclick="addNewBrandPrompt(this.previousElementSibling)">+</button>
-            <button type="button" class="btn-danger" style="height: 44px; padding: 0 14px;" onclick="this.closest('.mix-item').remove()">✕</button>
+            <button type="button" class="btn-minus" onclick="deleteSelectedBrand(this.previousElementSibling.previousElementSibling)">−</button>
+            <button type="button" class="btn-danger" style="height: 42px; padding: 0 12px;" onclick="this.closest('.mix-item').remove()">✕</button>
         </div>
         <div style="display: flex; gap: 8px;">
             <input type="text" class="tobacco-flavor" placeholder="Вкус" value="${flavor}" style="flex: 2.2;">
@@ -604,7 +663,8 @@ function addModalMixRow(brand = '', flavor = '', weight = '') {
         <div class="select-with-add" style="margin-bottom: 8px;">
             <select class="tobacco-brand-select">${getBrandOptionsHtml(brand)}</select>
             <button type="button" class="btn-plus" onclick="addNewBrandPrompt(this.previousElementSibling)">+</button>
-            <button type="button" class="btn-danger" style="height: 44px; padding: 0 14px;" onclick="this.closest('.modal-mix-item').remove()">✕</button>
+            <button type="button" class="btn-minus" onclick="deleteSelectedBrand(this.previousElementSibling.previousElementSibling)">−</button>
+            <button type="button" class="btn-danger" style="height: 42px; padding: 0 12px;" onclick="this.closest('.modal-mix-item').remove()">✕</button>
         </div>
         <div style="display: flex; gap: 8px;">
             <input type="text" class="modal-tobacco-flavor" placeholder="Вкус" value="${flavor}" style="flex: 2.2;">

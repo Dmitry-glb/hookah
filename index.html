@@ -34,7 +34,10 @@
                 <label>Чаша</label>
                 <div class="select-with-add">
                     <select id="bowl-select"></select>
-                    <button type="button" class="btn-plus" onclick="addNewBowlPrompt()" title="Добавить чашу">+</button>
+                    <button type="button" class="btn-plus" onclick="addNewBowlPrompt('bowl-select')"
+                        title="Добавить чашу">+</button>
+                    <button type="button" class="btn-minus" onclick="deleteSelectedBowl('bowl-select')"
+                        title="Удалить выбранную чашу">−</button>
                 </div>
             </div>
 
@@ -52,6 +55,8 @@
                         <select id="solo-tobacco-brand"></select>
                         <button type="button" class="btn-plus" onclick="addNewBrandPrompt('solo-tobacco-brand')"
                             title="Добавить бренд">+</button>
+                        <button type="button" class="btn-minus" onclick="deleteSelectedBrand('solo-tobacco-brand')"
+                            title="Удалить выбранный бренд">−</button>
                     </div>
                     <div style="display: flex; gap: 8px;">
                         <input type="text" id="solo-tobacco-flavor" placeholder="Вкус" style="flex: 2;">
@@ -187,6 +192,7 @@
                 <div class="select-with-add">
                     <select id="modal-bowl"></select>
                     <button type="button" class="btn-plus" onclick="addNewBowlPrompt('modal-bowl')">+</button>
+                    <button type="button" class="btn-minus" onclick="deleteSelectedBowl('modal-bowl')">−</button>
                 </div>
             </div>
 

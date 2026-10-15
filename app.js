@@ -165,27 +165,32 @@ function getBrandOptionsHtml(selectedVal = '') {
 }
 
 function populateSelects() {
+    // Безопасное обновление с сохранением выбранного значения, если оно еще существует
     const bowlSelect = document.getElementById('bowl-select');
     if (bowlSelect) {
         const current = bowlSelect.value;
         bowlSelect.innerHTML = getBowlOptionsHtml(current);
+        if (savedBowls.includes(current)) bowlSelect.value = current;
     }
 
     const soloBrand = document.getElementById('solo-tobacco-brand');
     if (soloBrand) {
         const current = soloBrand.value;
         soloBrand.innerHTML = getBrandOptionsHtml(current);
+        if (savedBrands.includes(current) || DEFAULT_BRANDS.includes(current)) soloBrand.value = current;
     }
 
     document.querySelectorAll('.tobacco-brand-select').forEach(sel => {
         const current = sel.value;
         sel.innerHTML = getBrandOptionsHtml(current);
+        if (savedBrands.includes(current) || DEFAULT_BRANDS.includes(current)) sel.value = current;
     });
 
     const modalBowl = document.getElementById('modal-bowl');
     if (modalBowl) {
         const current = modalBowl.value;
         modalBowl.innerHTML = getBowlOptionsHtml(current);
+        if (savedBowls.includes(current)) modalBowl.value = current;
     }
 }
 
@@ -216,8 +221,15 @@ function deleteSelectedBowl(targetSelectId = 'bowl-select') {
         savedBowls = savedBowls.filter(b => b !== val);
         if (!removedItems.includes(val)) removedItems.push(val);
         saveCatalogsToStorage();
+
+        // Сбрасываем фокус и значение ДО перерисовки списка
+        if (target) {
+            target.blur();
+            target.value = '';
+        }
+
+        // Безопасно обновляем все селекты чаш на странице
         populateSelects();
-        if (target) target.value = '';
     }
 }
 
@@ -253,13 +265,22 @@ function deleteSelectedBrand(targetSelectOrElem) {
         savedBrands = savedBrands.filter(b => b !== val);
         if (!removedItems.includes(val)) removedItems.push(val);
         saveCatalogsToStorage();
+
+        // Сбрасываем фокус и значение ДО перерисовки списка
+        if (el) {
+            el.blur();
+            el.value = '';
+        }
+
+        // Безопасно обновляем все селекты брендов
         populateSelects();
-        if (el) el.value = '';
     }
 }
 
 // Переключение Соло / Микс
 function toggleMixMode() {
+
+    document.querySelectorAll('select').forEach(s => s.blur());
     isMixMode = !isMixMode;
     const btn = document.getElementById('mix-toggle-btn');
     const soloBox = document.getElementById('solo-container');
@@ -684,6 +705,7 @@ function setModalRating(val) {
 }
 
 function openFullEditModal(id) {
+    document.querySelectorAll('select, input').forEach(el => el.blur()); // Снимаем фокус
     loadAllData((history) => {
         const s = history.find(item => item.id === id);
         if (!s) return;
@@ -722,6 +744,7 @@ function openFullEditModal(id) {
 }
 
 function closeEditModal() {
+    document.querySelectorAll('#edit-modal select, #edit-modal input').forEach(el => el.blur());
     document.getElementById('edit-modal').classList.add('hidden');
 }
 

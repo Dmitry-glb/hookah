@@ -8,13 +8,13 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="DimHookah">
-    <title>Трекер кальянных сессий</title>
+    <title>DimHookah Tracker</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <!-- Скрытый аудио-плеер для удержания фонового режима iOS -->
     <audio id="bg-audio" loop playsinline></audio>
 
     <div class="app-header">
@@ -28,11 +28,14 @@
             Новая сессия</h3>
         <div class="timer-display" id="timer">00:00</div>
 
-        <!-- Шаг 1: Заполнение чаши (сразу при входе) -->
+        <!-- Шаг 1: Заполнение чаши -->
         <div id="setup-form">
             <div class="form-group">
-                <label>Название чаши</label>
-                <input type="text" id="bowl" placeholder="CosmoBowl" list="bowls-list">
+                <label>Чаша</label>
+                <div class="select-with-add">
+                    <select id="bowl-select"></select>
+                    <button type="button" class="btn-plus" onclick="addNewBowlPrompt()" title="Добавить чашу">+</button>
+                </div>
             </div>
 
             <!-- Блок табака (Соло / Микс) -->
@@ -44,42 +47,36 @@
                 </div>
 
                 <!-- Соло забивка -->
-                <div id="solo-container" class="mix-row">
-                    <input type="text" id="solo-tobacco-brand" placeholder="Бренд (Darkside)" list="brands-list"
-                        style="flex: 1.5;">
-                    <input type="text" id="solo-tobacco-flavor" placeholder="Вкус (Supernova)" list="flavors-list"
-                        style="flex: 1.8;">
-                    <input type="number" id="solo-tobacco-weight" placeholder="Гр" style="flex: 0.9;">
-                </div>
-
-                <!-- Мульти-микс забивка (скрыта по умолчанию) -->
-                <div id="mix-container" class="hidden">
-                    <div class="mix-row">
-                        <input type="text" class="tobacco-name" placeholder="Бренд и вкус">
-                        <input type="number" class="tobacco-weight" placeholder="Гр">
-                        <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">✕</button>
+                <div id="solo-container" class="tobacco-entry-card">
+                    <div class="select-with-add" style="margin-bottom: 8px;">
+                        <select id="solo-tobacco-brand"></select>
+                        <button type="button" class="btn-plus" onclick="addNewBrandPrompt('solo-tobacco-brand')"
+                            title="Добавить бренд">+</button>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="solo-tobacco-flavor" placeholder="Вкус (Supernova)" style="flex: 2.2;">
+                        <input type="number" id="solo-tobacco-weight" placeholder="Гр" style="flex: 1;">
                     </div>
                 </div>
+
+                <!-- Мульти-микс забивка -->
+                <div id="mix-container" class="hidden"></div>
                 <button type="button" id="add-mix-btn" class="btn btn-secondary hidden" onclick="addMixRow()"
                     style="padding: 10px; font-size: 0.85em; margin-top: 6px;">+ Добавить табак в микс</button>
             </div>
 
-            <!-- Выбор времени прогрева (Минуты и Секунды) -->
+            <!-- Время прогрева (Крутилки iOS: Минуты 5-20 и Секунды) -->
             <div class="form-group">
                 <label>Время прогрева чаши</label>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <div style="flex: 1;">
-                        <input type="number" id="warmup-min" value="5" min="0" max="60" style="text-align: center;"
-                            placeholder="Мин">
-                        <span
-                            style="font-size: 0.7em; color: var(--text-secondary); display: block; text-align: center; margin-top: 2px;">минут</span>
+                <div class="wheel-picker-box">
+                    <div class="wheel-col">
+                        <select id="warmup-min"></select>
+                        <span>мин</span>
                     </div>
-                    <span style="font-size: 1.2em; font-weight: bold; color: var(--text-secondary);">:</span>
-                    <div style="flex: 1;">
-                        <input type="number" id="warmup-sec" value="0" min="0" max="59" style="text-align: center;"
-                            placeholder="Сек">
-                        <span
-                            style="font-size: 0.7em; color: var(--text-secondary); display: block; text-align: center; margin-top: 2px;">секунд</span>
+                    <div class="wheel-sep">:</div>
+                    <div class="wheel-col">
+                        <select id="warmup-sec"></select>
+                        <span>сек</span>
                     </div>
                 </div>
             </div>
@@ -90,15 +87,13 @@
         <!-- Шаг 2: Прогрев чаши -->
         <div id="warmup-controls" class="hidden">
             <div class="sub-timer-box" id="warmup-box">
-                <div style="font-size: 0.85em; color: var(--text-secondary);">Прогрев чаши под колпаком:</div>
+                <div style="font-size: 0.85em; color: var(--text-secondary);">Прогрев чаши:</div>
                 <div class="sub-timer-display" id="warmup-countdown">05:00</div>
-                <div style="font-size: 0.78em; color: var(--text-secondary);">Фоновый режим iOS активен автоматически
-                </div>
             </div>
             <button class="btn btn-success" onclick="startSmokingFromWarmup()">💨 Чаша прогрета — Начать покур!</button>
         </div>
 
-        <!-- Шаг 3: Покур и выбор расстановки -->
+        <!-- Шаг 3: Покур -->
         <div id="smoking-controls" class="hidden">
             <div class="sub-timer-box">
                 <div style="font-size: 0.85em; color: var(--text-secondary); margin-bottom: 6px;">Текущая расстановка
@@ -109,10 +104,11 @@
                     <div class="coal-chip" id="chip-pyr" onclick="setCoalPlacement('Пирамида')">Пирамида</div>
                 </div>
             </div>
-            <button class="btn btn-danger" onclick="finishSmokingSession()">🏁 Завершить покур</button>
+            <button class="btn btn-danger" style="width: 100%; padding: 15px; font-size: 1em;"
+                onclick="finishSmokingSession()">🏁 Завершить покур</button>
         </div>
 
-        <!-- Шаг 4: Оценка и комментарий -->
+        <!-- Шаг 4: Оценка -->
         <div id="rating-form" class="hidden">
             <h3 style="text-align: center; margin-bottom: 8px;">Оцените покур</h3>
             <div class="stars">
@@ -136,7 +132,7 @@
         <div id="analytics-content" style="overflow-x: auto;">Нет данных</div>
     </div>
 
-    <!-- История покуров -->
+    <!-- История -->
     <div class="glass-panel">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
             <h3 style="margin:0;">📅 История</h3>
@@ -170,34 +166,63 @@
             <h3 style="margin-bottom: 15px;">✏️ Редактирование покура</h3>
             <input type="hidden" id="modal-id">
 
-            <div class="form-group">
-                <label>Дата</label>
-                <input type="text" id="modal-date">
-            </div>
-            <div class="form-group">
-                <label>Чаша</label>
-                <input type="text" id="modal-bowl">
-            </div>
             <div style="display: flex; gap: 10px;">
                 <div class="form-group" style="flex: 1;">
-                    <label>Прогрев (сек)</label>
-                    <input type="number" id="modal-warmup">
+                    <label>Дата</label>
+                    <input type="text" id="modal-date">
                 </div>
-                <div class="form-group" style="flex: 1;">
-                    <label>Покур (сек)</label>
-                    <input type="number" id="modal-smoke">
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Расстановка</label>
-                <input type="text" id="modal-placement">
-            </div>
-            <div style="display: flex; gap: 10px;">
                 <div class="form-group" style="flex: 1;">
                     <label>Оценка (1-5)</label>
                     <input type="number" id="modal-rating" min="1" max="5">
                 </div>
             </div>
+
+            <div class="form-group">
+                <label>Чаша</label>
+                <div class="select-with-add">
+                    <select id="modal-bowl"></select>
+                    <button type="button" class="btn-plus" onclick="addNewBowlPrompt('modal-bowl')">+</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Расстановка</label>
+                <select id="modal-placement">
+                    <option value="3 в колодке">3 в колодке</option>
+                    <option value="2 + 1">2 + 1</option>
+                    <option value="Пирамида">Пирамида</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Табак в забивке</label>
+                <div id="modal-mix-container"></div>
+                <button type="button" class="btn btn-secondary" onclick="addModalMixRow()"
+                    style="padding: 8px; font-size: 0.8em; margin-top: 4px; margin-bottom: 0;">+ Добавить табак</button>
+            </div>
+
+            <div class="form-group">
+                <label>Время прогрева (Часы и Минуты)</label>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="number" id="modal-warmup-h" min="0" placeholder="Час" style="text-align: center;">
+                    <span>ч</span>
+                    <input type="number" id="modal-warmup-m" min="0" max="59" placeholder="Мин"
+                        style="text-align: center;">
+                    <span>мин</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Время покура (Часы и Минуты)</label>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="number" id="modal-smoke-h" min="0" placeholder="Час" style="text-align: center;">
+                    <span>ч</span>
+                    <input type="number" id="modal-smoke-m" min="0" max="59" placeholder="Мин"
+                        style="text-align: center;">
+                    <span>мин</span>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label>Комментарий</label>
                 <textarea id="modal-comment" rows="2"></textarea>
@@ -211,11 +236,6 @@
     </div>
 
     <script src="app.js"></script>
-
-    <!-- Списки автозаполнения из истории (Чаши, Бренды, Вкусы) -->
-    <datalist id="bowls-list"></datalist>
-    <datalist id="brands-list"></datalist>
-    <datalist id="flavors-list"></datalist>
 </body>
 
 </html>

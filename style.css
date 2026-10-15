@@ -405,3 +405,83 @@ td:last-child {
     overflow-y: auto;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
 }
+
+/* Компактный режим и идеальное выравнивание */
+body {
+    max-width: 480px;
+    padding: calc(var(--safe-top) + 8px) 12px calc(var(--safe-bottom) + 12px);
+}
+
+.glass-panel {
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    border-radius: 18px;
+}
+
+.timer-display {
+    font-size: 2.6em;
+    margin: 4px 0 10px;
+}
+
+.sub-timer-box {
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.sub-timer-display {
+    font-size: 1.9em;
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+input,
+textarea,
+select {
+    padding: 10px 12px;
+    font-size: 15px;
+    height: 42px;
+    border-radius: 10px;
+}
+
+textarea {
+    height: auto;
+}
+
+.btn-plus {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    font-size: 1.2em;
+}
+
+.btn {
+    padding: 12px;
+    font-size: 0.95em;
+    border-radius: 12px;
+    margin-bottom: 8px;
+}
+
+.wheel-picker-box {
+    padding: 6px 12px;
+    border-radius: 12px;
+}
+
+.wheel-col select {
+    height: 36px;
+    font-size: 1.1em;
+    padding: 4px;
+}
+
+/* Звезды в модальном окне */
+.modal-star {
+    color: rgba(255, 255, 255, 0.15);
+    transition: color 0.15s ease;
+    cursor: pointer;
+}
+
+.modal-star.active {
+    color: #ffb340;
+    filter: drop-shadow(0 0 8px rgba(255, 179, 64, 0.5));
+}

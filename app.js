@@ -113,9 +113,10 @@ function saveCatalogsToStorage() {
 }
 
 // Собираем все чаши и бренды из истории покуров
+// Собираем только реальные чаши и бренды из истории без дефолтного мусора
 function syncCatalogFromHistory(history) {
-    const bowlSet = new Set(savedBowls);
-    const brandSet = new Set(savedBrands);
+    const bowlSet = new Set(savedBowls.filter(b => b !== 'Облако Phunnel M'));
+    const brandSet = new Set(savedBrands.filter(b => !['Darkside', 'Musthave', 'Black Burn'].includes(b)));
 
     (history || []).forEach(s => {
         if (s.bowl && s.bowl !== 'Не указана') bowlSet.add(s.bowl);
@@ -125,24 +126,19 @@ function syncCatalogFromHistory(history) {
         });
     });
 
-    if (bowlSet.size === 0) bowlSet.add('Облако Phunnel M');
-    if (brandSet.size === 0) {
-        brandSet.add('Darkside');
-        brandSet.add('Musthave');
-        brandSet.add('Black Burn');
-    }
-
     savedBowls = Array.from(bowlSet);
     savedBrands = Array.from(brandSet);
     saveCatalogsToStorage();
 }
 
 function getBowlOptionsHtml(selectedVal = '') {
-    return savedBowls.map(b => `<option value="${b}" ${b === selectedVal ? 'selected' : ''}>${b}</option>`).join('');
+    const placeholder = `<option value="" disabled ${!selectedVal ? 'selected' : ''}>Выбери чашу...</option>`;
+    return placeholder + savedBowls.map(b => `<option value="${b}" ${b === selectedVal ? 'selected' : ''}>${b}</option>`).join('');
 }
 
 function getBrandOptionsHtml(selectedVal = '') {
-    return savedBrands.map(b => `<option value="${b}" ${b === selectedVal ? 'selected' : ''}>${b}</option>`).join('');
+    const placeholder = `<option value="" disabled ${!selectedVal ? 'selected' : ''}>Бренд</option>`;
+    return placeholder + savedBrands.map(b => `<option value="${b}" ${b === selectedVal ? 'selected' : ''}>${b}</option>`).join('');
 }
 
 function populateSelects() {
@@ -245,7 +241,7 @@ function addMixRow(brand = '', flavor = '', weight = '') {
         </div>
         <div style="display: flex; gap: 8px;">
             <input type="text" class="tobacco-flavor" placeholder="Вкус" value="${flavor}" style="flex: 2.2;">
-            <input type="number" class="tobacco-weight" placeholder="Гр" value="${weight}" style="flex: 1;">
+            <input type="number" class="tobacco-weight" placeholder="Грамм" value="${weight}" style="flex: 1;">
         </div>
     `;
     container.appendChild(card);
@@ -354,10 +350,22 @@ function setCoalPlacement(type) {
     if (type === 'Пирамида') document.getElementById('chip-pyr')?.classList.add('active');
 }
 
+function sendPush(title, body) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        try { new Notification(title, { body }); } catch (e) { }
+    }
+    if (tg && tg.showPopup) {
+        try { tg.showPopup({ title: title, message: body, buttons: [{ type: 'ok' }] }); } catch (e) { }
+    }
+}
+
 async function startWarmupSession() {
     initAudio();
     await startKeepAliveAudio('⏳ Идет прогрев чаши...');
 
+    if ('Notification' in window && Notification.permission !== 'granted') {
+        try { await Notification.requestPermission(); } catch (e) { }
+    }
     if ('wakeLock' in navigator) {
         try { await navigator.wakeLock.request('screen'); } catch (e) { }
     }
@@ -391,6 +399,7 @@ function updateWarmupTimer() {
         if (!alarmAlreadyPlayed) {
             playBellSound();
             if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('warning');
+            sendPush('Чаша прогрелась! 🔥', 'Пора раскуривать кальян, пока не сжег табак!');
             alarmAlreadyPlayed = true;
         }
     } else {
@@ -490,6 +499,8 @@ function resetForm() {
     document.getElementById('solo-tobacco-flavor').value = '';
     document.getElementById('solo-tobacco-weight').value = '';
     document.getElementById('mix-container').innerHTML = '';
+    document.getElementById('bowl-select').value = '';
+    document.getElementById('solo-tobacco-brand').value = '';
     if (isMixMode) toggleMixMode();
 }
 
@@ -597,13 +608,21 @@ function addModalMixRow(brand = '', flavor = '', weight = '') {
         </div>
         <div style="display: flex; gap: 8px;">
             <input type="text" class="modal-tobacco-flavor" placeholder="Вкус" value="${flavor}" style="flex: 2.2;">
-            <input type="number" class="modal-tobacco-weight" placeholder="Гр" value="${weight}" style="flex: 1;">
+            <input type="number" class="modal-tobacco-weight" placeholder="Грамм" value="${weight}" style="flex: 1;">
         </div>
     `;
     container.appendChild(card);
 }
 
 // Открытие модального окна с редактированием табака и времени (Часы / Минуты)
+let currentModalRating = 5;
+function setModalRating(val) {
+    currentModalRating = val;
+    document.querySelectorAll('.modal-star').forEach((star, index) => {
+        star.classList.toggle('active', index < val);
+    });
+}
+
 function openFullEditModal(id) {
     loadAllData((history) => {
         const s = history.find(item => item.id === id);
@@ -618,7 +637,7 @@ function openFullEditModal(id) {
 
         const placementVal = (s.placement === 'Пирамидка') ? 'Пирамида' : (s.placement || '3 в колодке');
         document.getElementById('modal-placement').value = placementVal;
-        document.getElementById('modal-rating').value = s.rating;
+        setModalRating(s.rating || 5);
         document.getElementById('modal-comment').value = s.comment || '';
 
         // Переводим секунды в Часы и Минуты
@@ -654,7 +673,7 @@ function saveEditedSession() {
                 s.date = document.getElementById('modal-date').value;
                 s.bowl = document.getElementById('modal-bowl').value;
                 s.placement = document.getElementById('modal-placement').value;
-                s.rating = parseInt(document.getElementById('modal-rating').value) || 5;
+                s.rating = currentModalRating;
                 s.comment = document.getElementById('modal-comment').value;
 
                 // Считываем часы и минуты обратно в секунды

@@ -54,8 +54,8 @@
                             title="Добавить бренд">+</button>
                     </div>
                     <div style="display: flex; gap: 8px;">
-                        <input type="text" id="solo-tobacco-flavor" placeholder="Вкус (Supernova)" style="flex: 2.2;">
-                        <input type="number" id="solo-tobacco-weight" placeholder="Гр" style="flex: 1;">
+                        <input type="text" id="solo-tobacco-flavor" placeholder="Вкус" style="flex: 2;">
+                        <input type="number" id="solo-tobacco-weight" placeholder="Грамм" style="flex: 1;">
                     </div>
                 </div>
 
@@ -166,14 +166,19 @@
             <h3 style="margin-bottom: 15px;">✏️ Редактирование покура</h3>
             <input type="hidden" id="modal-id">
 
-            <div style="display: flex; gap: 10px;">
-                <div class="form-group" style="flex: 1;">
-                    <label>Дата</label>
-                    <input type="text" id="modal-date">
-                </div>
-                <div class="form-group" style="flex: 1;">
-                    <label>Оценка (1-5)</label>
-                    <input type="number" id="modal-rating" min="1" max="5">
+            <div class="form-group">
+                <label>Дата</label>
+                <input type="text" id="modal-date">
+            </div>
+
+            <div class="form-group">
+                <label style="text-align: center;">Оценка</label>
+                <div class="stars" id="modal-stars" style="margin: 4px 0 8px; font-size: 2em;">
+                    <span class="modal-star" onclick="setModalRating(1)">★</span>
+                    <span class="modal-star" onclick="setModalRating(2)">★</span>
+                    <span class="modal-star" onclick="setModalRating(3)">★</span>
+                    <span class="modal-star" onclick="setModalRating(4)">★</span>
+                    <span class="modal-star" onclick="setModalRating(5)">★</span>
                 </div>
             </div>
 

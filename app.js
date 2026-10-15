@@ -444,21 +444,24 @@ async function startWarmupSession() {
     warmupTargetSec = mins * 60;
 
     // 🚀 Отправляем задачу таймера на наш Cloudflare Worker
-    if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-        const chatId = tg.initDataUnsafe.user.id;
-        const botToken = "8815581013:AAHR4Nz-lhEBeIs_5b2KmBd5m4rjiGauzBc"; // Вставь сюда токен от BotFather
-        const workerUrl = "https://dimhookah-push-worker.swenplay23.workers.dev"; // Ссылка на твой воркер
+    const chatId = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user.id : 432088312; // Страховка: если телеграм не отдал ID, подставим твой чистый ID вручную!
+    const botToken = "8815581013:AAHR4Nz-lhEBeIs_5b2KmBd5m4rjiGauzBc";
+    const workerUrl = "https://dimhookah-push-worker.swenplay23.workers.dev";
 
-        fetch(workerUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                chatId: chatId,
-                botToken: botToken,
-                delaySec: warmupTargetSec
-            })
-        }).catch(err => console.log("Cloud push error:", err));
-    }
+    console.log("Отправка пуша на воркер для chatId:", chatId, "на секунд:", warmupTargetSec);
+
+    fetch(workerUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            chatId: chatId,
+            botToken: botToken,
+            delaySec: warmupTargetSec
+        })
+    })
+        .then(res => res.json())
+        .then(data => console.log("Ответ от воркера:", data))
+        .catch(err => console.log("Ошибка отправки на воркер:", err));
 
     document.getElementById('status-title').innerText = '⏳ Прогрев чаши';
     document.getElementById('setup-form').classList.add('hidden');

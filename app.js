@@ -9,6 +9,8 @@ let isMixMode = false;
 let alarmAlreadyPlayed = false;
 let audioCtx;
 let swRegistration = null;
+let silentAudioUrl = null;
+let alarmAudioUrl = null;
 
 const DEFAULT_BRANDS = [
     'Adalya', 'Afzal', 'Banger', 'Black Burn', 'Bonche',
@@ -36,7 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
         restoreActiveSessionIfAny();
     });
 
-    // Когда возвращаемся в приложение или разблокируем телефон — мгновенно синхронизируем таймер
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
             syncActiveTimerOnWake();
@@ -44,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Регистрация Service Worker и проверка разрешений на пуши
 async function registerPWA() {
     if ('serviceWorker' in navigator) {
         try {
@@ -59,30 +59,32 @@ async function registerPWA() {
 function updatePushButtonState() {
     const btn = document.getElementById('push-perm-btn');
     if (!btn) return;
-    if ('Notification' in window && Notification.permission !== 'granted') {
-        btn.classList.remove('hidden');
-    } else {
+    if ('Notification' in window && Notification.permission === 'granted') {
         btn.classList.add('hidden');
+    } else {
+        btn.classList.remove('hidden');
     }
 }
 
 async function requestPushPermission() {
     if (!('Notification' in window)) {
-        alert('Чтобы получать пуш-уведомления на iPhone, нажми «Поделиться» в Safari -> «На экран Домой» и открой приложение с иконки!');
+        alert('📲 Ты открыл сайт в обычном браузере!\n\nЧтобы работали пуши на iPhone:\n1. Нажми «Поделиться» внизу Safari.\n2. Выбери «На экран Домой».\n3. Открой DimHookah с иконки на рабочем столе!');
         return;
     }
     try {
         const perm = await Notification.requestPermission();
         updatePushButtonState();
         if (perm === 'granted') {
+            playBellSound();
             sendPush('Уведомления включены! 🔥', 'Теперь DimHookah предупредит, когда чаша прогреется.');
         } else {
-            alert('Доступ к уведомлениям отклонен. Проверь настройки уведомлений для DimHookah в настройках телефона.');
+            alert('Уведомления запрещены. Проверь Настройки iPhone -> Уведомления -> DimHookah.');
         }
-    } catch (e) { }
+    } catch (e) {
+        alert('Ошибка запроса уведомлений: ' + e.message);
+    }
 }
 
-// Инициализация выбора минут (от 1 до 20, по умолчанию 5)
 function initTimeWheels() {
     const minSelect = document.getElementById('warmup-min');
     if (!minSelect) return;
@@ -95,7 +97,6 @@ function initTimeWheels() {
     minSelect.innerHTML = minHtml;
 }
 
-// Локальная загрузка данных (без задержек облака)
 function loadAllData(callback) {
     try {
         savedBowls = JSON.parse(localStorage.getItem('hookah_custom_bowls') || '[]');
@@ -189,7 +190,6 @@ function populateSelects() {
     }
 }
 
-// Управление инвентарем чаш и брендов
 function addNewBowlPrompt(targetSelectId = 'bowl-select') {
     const newBowl = prompt('Введите название новой чаши:');
     if (newBowl && newBowl.trim()) {
@@ -326,10 +326,31 @@ function formatDurationHM(seconds) {
     return `${m} мин`;
 }
 
-// Генерация тихого WAV-потока для удержания фонового режима iOS и экрана блокировки
+// Генерация двух WAV-дорожек: 1) Бесшумная для удержания фона 2) Нежные «капельки» для будильника
 function initRealBackgroundAudio() {
-    const sampleRate = 8000;
-    const numSamples = sampleRate;
+    silentAudioUrl = createWavBlobUrl(false);
+    alarmAudioUrl = createWavBlobUrl(true);
+
+    const audioEl = document.getElementById('bg-audio');
+    if (audioEl) {
+        audioEl.src = silentAudioUrl;
+        audioEl.volume = 0.05;
+
+        // Плеер сам будит таймер в фоне на заблокированном экране iOS
+        audioEl.addEventListener('timeupdate', () => {
+            if (!document.getElementById('warmup-controls').classList.contains('hidden')) {
+                updateWarmupTimer();
+            } else if (!document.getElementById('smoking-controls').classList.contains('hidden')) {
+                updateSmokingTimer();
+            }
+        });
+    }
+}
+
+function createWavBlobUrl(isAlarm) {
+    const sampleRate = 16000;
+    const durationSec = 2;
+    const numSamples = sampleRate * durationSec;
     const buffer = new ArrayBuffer(44 + numSamples * 2);
     const view = new DataView(buffer);
     const writeString = (offset, str) => {
@@ -348,15 +369,32 @@ function initRealBackgroundAudio() {
     view.setUint16(34, 16, true);
     writeString(36, 'data');
     view.setUint32(40, numSamples * 2, true);
+
+    const notes = [
+        { start: 0.05, freq: 1046.50 }, // C6
+        { start: 0.22, freq: 1318.51 }, // E6
+        { start: 0.39, freq: 1567.98 }  // G6
+    ];
+
     for (let i = 0; i < numSamples; i++) {
-        view.setInt16(44 + i * 2, (i % 2 === 0) ? 1 : -1, true);
+        let sample = 0;
+        if (isAlarm) {
+            const t = i / sampleRate;
+            for (const n of notes) {
+                if (t >= n.start && t < n.start + 0.35) {
+                    const localT = t - n.start;
+                    const env = Math.exp(-localT * 14);
+                    const pitchSlide = n.freq * (1 + 0.08 * Math.exp(-localT * 40));
+                    sample += Math.sin(2 * Math.PI * pitchSlide * localT) * env * 12000;
+                }
+            }
+        } else {
+            sample = (i % 2 === 0) ? 1 : -1;
+        }
+        view.setInt16(44 + i * 2, Math.max(-32768, Math.min(32767, sample)), true);
     }
     const blob = new Blob([buffer], { type: 'audio/wav' });
-    const audioEl = document.getElementById('bg-audio');
-    if (audioEl) {
-        audioEl.src = URL.createObjectURL(blob);
-        audioEl.volume = 0.01;
-    }
+    return URL.createObjectURL(blob);
 }
 
 function getCurrentMixSummaryText() {
@@ -381,8 +419,34 @@ function getCurrentMixSummaryText() {
 async function startKeepAliveAudio(titleText, subtitleText) {
     const audioEl = document.getElementById('bg-audio');
     try {
-        if (audioEl && audioEl.paused) await audioEl.play();
+        if (audioEl) {
+            if (audioEl.src !== silentAudioUrl) {
+                audioEl.src = silentAudioUrl;
+            }
+            audioEl.volume = 0.05;
+            if (audioEl.paused) await audioEl.play();
+        }
         updateLockScreenMetadata(titleText, subtitleText);
+    } catch (e) { }
+}
+
+// Проигрываем «капельки» ровно 2 раза (3.6 сек) и возвращаем тишину
+async function triggerLockScreenAudioAlarm() {
+    const audioEl = document.getElementById('bg-audio');
+    try {
+        if (audioEl && alarmAudioUrl) {
+            audioEl.src = alarmAudioUrl;
+            audioEl.volume = 0.9;
+            await audioEl.play();
+
+            setTimeout(async () => {
+                if (!document.getElementById('warmup-controls').classList.contains('hidden')) {
+                    audioEl.src = silentAudioUrl;
+                    audioEl.volume = 0.05;
+                    try { await audioEl.play(); } catch (e) { }
+                }
+            }, 3600);
+        }
     } catch (e) { }
 }
 
@@ -400,7 +464,10 @@ function updateLockScreenMetadata(titleText, subtitleText) {
 
 function stopKeepAliveAudio() {
     const audioEl = document.getElementById('bg-audio');
-    if (audioEl) audioEl.pause();
+    if (audioEl) {
+        audioEl.pause();
+        if (silentAudioUrl) audioEl.src = silentAudioUrl;
+    }
 }
 
 function initAudio() {
@@ -408,22 +475,26 @@ function initAudio() {
     if (audioCtx.state === 'suspended') audioCtx.resume();
 }
 
-// Двойной громкий перезвон по окончании прогрева
 function playBellSound() {
     try {
         initAudio();
         const now = audioCtx.currentTime;
-        [0, 0.35].forEach(offset => {
+        const notes = [1046.50, 1318.51, 1567.98];
+        notes.forEach((freq, idx) => {
+            const start = now + idx * 0.16;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(1046.50, now + offset);
-            gain.gain.setValueAtTime(0.6, now + offset);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 1.2);
+            osc.frequency.setValueAtTime(freq * 0.92, start);
+            osc.frequency.exponentialRampToValueAtTime(freq, start + 0.04);
+
+            gain.gain.setValueAtTime(0.4, start);
+            gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.45);
+
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-            osc.start(now + offset);
-            osc.stop(now + offset + 1.2);
+            osc.start(start);
+            osc.stop(start + 0.45);
         });
     } catch (e) { }
 }
@@ -438,7 +509,6 @@ function setCoalPlacement(type) {
     saveActiveSessionState();
 }
 
-// Нативные PWA пуш-уведомления (через Service Worker или Notification API)
 async function sendPush(title, body) {
     if (navigator.vibrate) {
         try { navigator.vibrate([300, 150, 300, 150, 400]); } catch (e) { }
@@ -449,19 +519,19 @@ async function sendPush(title, body) {
         if (swRegistration && swRegistration.showNotification) {
             await swRegistration.showNotification(title, {
                 body: body,
+                icon: 'icon.png',
                 vibrate: [300, 150, 300],
                 tag: 'dimhookah-warmup',
                 renotify: true
             });
         } else {
-            new Notification(title, { body });
+            new Notification(title, { body, icon: 'icon.png' });
         }
     } catch (e) {
         try { new Notification(title, { body }); } catch (err) { }
     }
 }
 
-// Сохранение и восстановление активного состояния (защита от перезагрузки страницы)
 function getDraftMixFromForm() {
     const mix = [];
     if (isMixMode) {
@@ -622,6 +692,7 @@ function updateWarmupTimer() {
             alarmAlreadyPlayed = true;
             saveActiveSessionState('warmup');
             playBellSound();
+            triggerLockScreenAudioAlarm();
             sendPush('Чаша прогрелась! 🔥', 'Пора раскуривать кальян, пока не сжег табак!');
         }
     } else {
@@ -820,7 +891,6 @@ function renderData(history) {
     analyticsDiv.innerHTML = html;
 }
 
-// Строка табака в модальном окне редактирования
 function addModalMixRow(brand = '', flavor = '', weight = '') {
     if (brand && !savedBrands.includes(brand)) {
         savedBrands.push(brand);
@@ -933,7 +1003,6 @@ function saveEditedSession() {
     });
 }
 
-// Экспорт в заметки
 async function exportToNotes() {
     loadAllData(async (history) => {
         if (history.length === 0) { alert('История пуста!'); return; }
@@ -959,7 +1028,6 @@ async function exportToNotes() {
     });
 }
 
-// Экспорт в CSV
 function exportToCSV() {
     loadAllData((history) => {
         if (history.length === 0) { alert('История пуста!'); return; }
@@ -982,7 +1050,6 @@ function exportToCSV() {
     });
 }
 
-// Импорт из CSV
 function importFromCSV(event) {
     const file = event.target.files[0];
     if (!file) return;

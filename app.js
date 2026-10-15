@@ -447,7 +447,7 @@ async function startWarmupSession() {
     if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
         const chatId = tg.initDataUnsafe.user.id;
         const botToken = "8815581013:AAHR4Nz-lhEBeIs_5b2KmBd5m4rjiGauzBc"; // Вставь сюда токен от BotFather
-        const workerUrl = "https://dimhookah-push-worker.swenplay23.workers.dev/"; // Ссылка на твой воркер
+        const workerUrl = "https://dimhookah-push-worker.swenplay23.workers.dev"; // Ссылка на твой воркер
 
         fetch(workerUrl, {
             method: "POST",

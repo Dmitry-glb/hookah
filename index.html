@@ -8,8 +8,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="DimHookah">
+    <meta name="theme-color" content="#030a06">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230b3a1e'/><text y='68' x='50' text-anchor='middle' font-size='55'>💨</text></svg>">
     <title>DimHookah Tracker</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -19,6 +22,10 @@
 
     <div class="app-header">
         <h2 style="margin:0; font-size: 1.3em;">💨 DimHookah</h2>
+        <button id="push-perm-btn" class="pill-btn hidden" onclick="requestPushPermission()"
+            style="font-size: 0.75em; padding: 5px 10px;">
+            🔔 Вкл. пуши
+        </button>
     </div>
 
     <!-- Основная панель сессии -->
@@ -86,10 +93,12 @@
         <!-- Шаг 2: Прогрев чаши -->
         <div id="warmup-controls" class="hidden">
             <div class="sub-timer-box" id="warmup-box">
-                <div style="font-size: 0.85em; color: var(--text-secondary);">Прогрев чаши:</div>
+                <div style="font-size: 0.85em; color: var(--text-secondary);">Осталось греть:</div>
                 <div class="sub-timer-display" id="warmup-countdown">05:00</div>
             </div>
             <button class="btn btn-success" onclick="startSmokingFromWarmup()">💨 Чаша прогрета — Начать покур!</button>
+            <button class="btn btn-secondary" onclick="cancelActiveSession()"
+                style="font-size: 0.8em; padding: 8px; margin-bottom: 0;">✕ Отменить сессию</button>
         </div>
 
         <!-- Шаг 3: Покур -->

@@ -8,6 +8,7 @@ let currentCoalPlacement = '3 в колодке';
 let isMixMode = false;
 let alarmAlreadyPlayed = false;
 let audioCtx;
+let swRegistration = null;
 
 const DEFAULT_BRANDS = [
     'Adalya', 'Afzal', 'Banger', 'Black Burn', 'Bonche',
@@ -19,15 +20,10 @@ const DEFAULT_BRANDS = [
 
 let savedBowls = [];
 let savedBrands = [];
-let removedItems = []; // Чтобы удаленные чаши/бренды не подтягивались заново из старой истории
-
-const tg = window.Telegram?.WebApp;
-if (tg) {
-    tg.expand();
-    tg.ready();
-}
+let removedItems = [];
 
 document.addEventListener('DOMContentLoaded', () => {
+    registerPWA();
     initTimeWheels();
     initRealBackgroundAudio();
     setRating(5);
@@ -37,10 +33,56 @@ document.addEventListener('DOMContentLoaded', () => {
         syncCatalogFromHistory(history);
         populateSelects();
         renderData(history);
+        restoreActiveSessionIfAny();
+    });
+
+    // Когда возвращаемся в приложение или разблокируем телефон — мгновенно синхронизируем таймер
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            syncActiveTimerOnWake();
+        }
     });
 });
 
-// Инициализация барабанов времени (Минуты от 5 до 20 с шагом 1, Секунды 00-55)
+// Регистрация Service Worker и проверка разрешений на пуши
+async function registerPWA() {
+    if ('serviceWorker' in navigator) {
+        try {
+            swRegistration = await navigator.serviceWorker.register('./sw.js');
+        } catch (e) {
+            console.warn('SW registration failed:', e);
+        }
+    }
+    updatePushButtonState();
+}
+
+function updatePushButtonState() {
+    const btn = document.getElementById('push-perm-btn');
+    if (!btn) return;
+    if ('Notification' in window && Notification.permission !== 'granted') {
+        btn.classList.remove('hidden');
+    } else {
+        btn.classList.add('hidden');
+    }
+}
+
+async function requestPushPermission() {
+    if (!('Notification' in window)) {
+        alert('Чтобы получать пуш-уведомления на iPhone, нажми «Поделиться» в Safari -> «На экран Домой» и открой приложение с иконки!');
+        return;
+    }
+    try {
+        const perm = await Notification.requestPermission();
+        updatePushButtonState();
+        if (perm === 'granted') {
+            sendPush('Уведомления включены! 🔥', 'Теперь DimHookah предупредит, когда чаша прогреется.');
+        } else {
+            alert('Доступ к уведомлениям отклонен. Проверь настройки уведомлений для DimHookah в настройках телефона.');
+        }
+    } catch (e) { }
+}
+
+// Инициализация выбора минут (от 1 до 20, по умолчанию 5)
 function initTimeWheels() {
     const minSelect = document.getElementById('warmup-min');
     if (!minSelect) return;
@@ -53,7 +95,7 @@ function initTimeWheels() {
     minSelect.innerHTML = minHtml;
 }
 
-// Загрузка истории и пользовательских списков чаш/брендов
+// Локальная загрузка данных (без задержек облака)
 function loadAllData(callback) {
     try {
         savedBowls = JSON.parse(localStorage.getItem('hookah_custom_bowls') || '[]');
@@ -65,65 +107,26 @@ function loadAllData(callback) {
         removedItems = [];
     }
 
-    if (tg && tg.CloudStorage) {
-        tg.CloudStorage.getItems(['hookah_sessions', 'hookah_custom_bowls', 'hookah_custom_brands', 'hookah_removed_items'], (err, values) => {
-            let history = [];
-            if (!err && values) {
-                if (values.hookah_sessions) {
-                    try { history = JSON.parse(values.hookah_sessions); } catch (e) { }
-                }
-                if (values.hookah_custom_bowls) {
-                    try { savedBowls = JSON.parse(values.hookah_custom_bowls); } catch (e) { }
-                }
-                if (values.hookah_custom_brands) {
-                    try { savedBrands = JSON.parse(values.hookah_custom_brands); } catch (e) { }
-                }
-                if (values.hookah_removed_items) {
-                    try { removedItems = JSON.parse(values.hookah_removed_items); } catch (e) { }
-                }
-            }
-            if (history.length === 0) {
-                try { history = JSON.parse(localStorage.getItem('hookah_sessions') || '[]'); } catch (e) { }
-            }
-            callback(history);
-        });
-    } else {
-        let history = [];
-        try { history = JSON.parse(localStorage.getItem('hookah_sessions') || '[]'); } catch (e) { }
-        callback(history);
-    }
+    let history = [];
+    try {
+        history = JSON.parse(localStorage.getItem('hookah_sessions') || '[]');
+    } catch (e) { }
+
+    if (callback) callback(history);
 }
 
 function saveSessionsToStorage(history, callback) {
-    const jsonStr = JSON.stringify(history);
-    localStorage.setItem('hookah_sessions', jsonStr);
-
-    if (tg && tg.CloudStorage) {
-        tg.CloudStorage.setItem('hookah_sessions', jsonStr, () => {
-            if (callback) callback();
-        });
-    } else {
-        if (callback) callback();
-    }
+    localStorage.setItem('hookah_sessions', JSON.stringify(history));
+    if (callback) callback();
 }
 
 function saveCatalogsToStorage() {
     savedBowls.sort((a, b) => a.localeCompare(b, 'ru'));
     savedBrands.sort((a, b) => a.localeCompare(b, 'ru'));
 
-    const bowlsStr = JSON.stringify(savedBowls);
-    const brandsStr = JSON.stringify(savedBrands);
-    const removedStr = JSON.stringify(removedItems);
-
-    localStorage.setItem('hookah_custom_bowls', bowlsStr);
-    localStorage.setItem('hookah_custom_brands', brandsStr);
-    localStorage.setItem('hookah_removed_items', removedStr);
-
-    if (tg && tg.CloudStorage) {
-        tg.CloudStorage.setItem('hookah_custom_bowls', bowlsStr);
-        tg.CloudStorage.setItem('hookah_custom_brands', brandsStr);
-        tg.CloudStorage.setItem('hookah_removed_items', removedStr);
-    }
+    localStorage.setItem('hookah_custom_bowls', JSON.stringify(savedBowls));
+    localStorage.setItem('hookah_custom_brands', JSON.stringify(savedBrands));
+    localStorage.setItem('hookah_removed_items', JSON.stringify(removedItems));
 }
 
 function syncCatalogFromHistory(history) {
@@ -158,7 +161,6 @@ function getBrandOptionsHtml(selectedVal = '') {
 }
 
 function populateSelects() {
-    // Безопасное обновление с сохранением выбранного значения, если оно еще существует
     const bowlSelect = document.getElementById('bowl-select');
     if (bowlSelect) {
         const current = bowlSelect.value;
@@ -187,15 +189,13 @@ function populateSelects() {
     }
 }
 
-// Добавление новой чаши через "+"
+// Управление инвентарем чаш и брендов
 function addNewBowlPrompt(targetSelectId = 'bowl-select') {
     const newBowl = prompt('Введите название новой чаши:');
     if (newBowl && newBowl.trim()) {
         const clean = newBowl.trim();
         removedItems = removedItems.filter(item => item !== clean);
-        if (!savedBowls.includes(clean)) {
-            savedBowls.push(clean);
-        }
+        if (!savedBowls.includes(clean)) savedBowls.push(clean);
         saveCatalogsToStorage();
         populateSelects();
         const target = document.getElementById(targetSelectId);
@@ -214,14 +214,10 @@ function deleteSelectedBowl(targetSelectId = 'bowl-select') {
         savedBowls = savedBowls.filter(b => b !== val);
         if (!removedItems.includes(val)) removedItems.push(val);
         saveCatalogsToStorage();
-
-        // Сбрасываем фокус и значение ДО перерисовки списка
         if (target) {
             target.blur();
             target.value = '';
         }
-
-        // Безопасно обновляем все селекты чаш на странице
         populateSelects();
     }
 }
@@ -231,9 +227,7 @@ function addNewBrandPrompt(targetSelectOrElem) {
     if (newBrand && newBrand.trim()) {
         const clean = newBrand.trim();
         removedItems = removedItems.filter(item => item !== clean);
-        if (!savedBrands.includes(clean)) {
-            savedBrands.push(clean);
-        }
+        if (!savedBrands.includes(clean)) savedBrands.push(clean);
         saveCatalogsToStorage();
         populateSelects();
         if (typeof targetSelectOrElem === 'string') {
@@ -258,21 +252,15 @@ function deleteSelectedBrand(targetSelectOrElem) {
         savedBrands = savedBrands.filter(b => b !== val);
         if (!removedItems.includes(val)) removedItems.push(val);
         saveCatalogsToStorage();
-
-        // Сбрасываем фокус и значение ДО перерисовки списка
         if (el) {
             el.blur();
             el.value = '';
         }
-
-        // Безопасно обновляем все селекты брендов
         populateSelects();
     }
 }
 
-// Переключение Соло / Микс
 function toggleMixMode() {
-
     document.querySelectorAll('select').forEach(s => s.blur());
     isMixMode = !isMixMode;
     const btn = document.getElementById('mix-toggle-btn');
@@ -320,7 +308,6 @@ function addMixRow(brand = '', flavor = '', weight = '') {
     container.appendChild(card);
 }
 
-// Форматирование секунд для активного секундомера (ММ:СС)
 function formatTimerSec(seconds) {
     const isNegative = seconds < 0;
     const absSec = Math.abs(seconds);
@@ -329,7 +316,6 @@ function formatTimerSec(seconds) {
     return (isNegative ? '-' : '') + `${mins}:${secs}`;
 }
 
-// Форматирование времени для истории в Часы и Минуты
 function formatDurationHM(seconds) {
     const totalMins = Math.round((seconds || 0) / 60);
     if (totalMins <= 0) return '1 мин';
@@ -340,7 +326,7 @@ function formatDurationHM(seconds) {
     return `${m} мин`;
 }
 
-// Фоновое аудио для iOS
+// Генерация тихого WAV-потока для удержания фонового режима iOS и экрана блокировки
 function initRealBackgroundAudio() {
     const sampleRate = 8000;
     const numSamples = sampleRate;
@@ -373,18 +359,43 @@ function initRealBackgroundAudio() {
     }
 }
 
-async function startKeepAliveAudio(titleText) {
+function getCurrentMixSummaryText() {
+    const bowl = document.getElementById('bowl-select')?.value || 'Чаша';
+    let tobText = '';
+    if (isMixMode) {
+        const parts = [];
+        document.querySelectorAll('#mix-container .mix-item').forEach(item => {
+            const b = item.querySelector('.tobacco-brand-select')?.value || '';
+            const f = item.querySelector('.tobacco-flavor')?.value || '';
+            if (b || f) parts.push(`${b} ${f}`.trim());
+        });
+        tobText = parts.join(' + ');
+    } else {
+        const b = document.getElementById('solo-tobacco-brand')?.value || '';
+        const f = document.getElementById('solo-tobacco-flavor')?.value || '';
+        tobText = `${b} ${f}`.trim();
+    }
+    return tobText ? `${bowl} • ${tobText}` : bowl;
+}
+
+async function startKeepAliveAudio(titleText, subtitleText) {
     const audioEl = document.getElementById('bg-audio');
     try {
-        if (audioEl) await audioEl.play();
-        if ('mediaSession' in navigator) {
+        if (audioEl && audioEl.paused) await audioEl.play();
+        updateLockScreenMetadata(titleText, subtitleText);
+    } catch (e) { }
+}
+
+function updateLockScreenMetadata(titleText, subtitleText) {
+    if ('mediaSession' in navigator) {
+        try {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: titleText || 'DimHookah Активен 🔥',
-                artist: 'DimHookah Tracker',
-                album: 'Сессия кальяна'
+                artist: subtitleText || getCurrentMixSummaryText(),
+                album: 'DimHookah Tracker'
             });
-        }
-    } catch (e) { }
+        } catch (e) { }
+    }
 }
 
 function stopKeepAliveAudio() {
@@ -397,20 +408,23 @@ function initAudio() {
     if (audioCtx.state === 'suspended') audioCtx.resume();
 }
 
+// Двойной громкий перезвон по окончании прогрева
 function playBellSound() {
     try {
         initAudio();
         const now = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(1046.50, now);
-        gain.gain.setValueAtTime(0.5, now);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.5);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(now);
-        osc.stop(now + 1.5);
+        [0, 0.35].forEach(offset => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1046.50, now + offset);
+            gain.gain.setValueAtTime(0.6, now + offset);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 1.2);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now + offset);
+            osc.stop(now + offset + 1.2);
+        });
     } catch (e) { }
 }
 
@@ -421,20 +435,155 @@ function setCoalPlacement(type) {
     if (type === '3 в колодке') document.getElementById('chip-3')?.classList.add('active');
     if (type === '2 + 1') document.getElementById('chip-21')?.classList.add('active');
     if (type === 'Пирамида') document.getElementById('chip-pyr')?.classList.add('active');
+    saveActiveSessionState();
 }
 
-function sendPush(title, body) {
-    if ('Notification' in window && Notification.permission === 'granted') {
-        try { new Notification(title, { body }); } catch (e) { }
+// Нативные PWA пуш-уведомления (через Service Worker или Notification API)
+async function sendPush(title, body) {
+    if (navigator.vibrate) {
+        try { navigator.vibrate([300, 150, 300, 150, 400]); } catch (e) { }
     }
-    if (tg && tg.showPopup) {
-        try { tg.showPopup({ title: title, message: body, buttons: [{ type: 'ok' }] }); } catch (e) { }
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+    try {
+        if (swRegistration && swRegistration.showNotification) {
+            await swRegistration.showNotification(title, {
+                body: body,
+                vibrate: [300, 150, 300],
+                tag: 'dimhookah-warmup',
+                renotify: true
+            });
+        } else {
+            new Notification(title, { body });
+        }
+    } catch (e) {
+        try { new Notification(title, { body }); } catch (err) { }
+    }
+}
+
+// Сохранение и восстановление активного состояния (защита от перезагрузки страницы)
+function getDraftMixFromForm() {
+    const mix = [];
+    if (isMixMode) {
+        document.querySelectorAll('#mix-container .mix-item').forEach(item => {
+            const brand = item.querySelector('.tobacco-brand-select')?.value.trim() || '';
+            const flavor = item.querySelector('.tobacco-flavor')?.value.trim() || '';
+            const weight = parseFloat(item.querySelector('.tobacco-weight')?.value) || 0;
+            if (brand || flavor || weight) mix.push({ brand, flavor, weight });
+        });
+    } else {
+        const brand = document.getElementById('solo-tobacco-brand')?.value.trim() || '';
+        const flavor = document.getElementById('solo-tobacco-flavor')?.value.trim() || '';
+        const weight = parseFloat(document.getElementById('solo-tobacco-weight')?.value) || 0;
+        if (brand || flavor || weight) mix.push({ brand, flavor, weight });
+    }
+    return mix;
+}
+
+function saveActiveSessionState(stageOverride = null) {
+    let stage = stageOverride;
+    if (!stage) {
+        if (!document.getElementById('warmup-controls').classList.contains('hidden')) stage = 'warmup';
+        else if (!document.getElementById('smoking-controls').classList.contains('hidden')) stage = 'smoking';
+        else if (!document.getElementById('rating-form').classList.contains('hidden')) stage = 'rating';
+        else stage = 'idle';
+    }
+
+    if (stage === 'idle') {
+        localStorage.removeItem('hookah_active_session');
+        return;
+    }
+
+    const state = {
+        stage,
+        stepStartTime,
+        warmupTargetSec,
+        actualWarmupDuration,
+        smokeDuration,
+        alarmAlreadyPlayed,
+        currentCoalPlacement,
+        isMixMode,
+        bowl: document.getElementById('bowl-select')?.value || '',
+        mix: getDraftMixFromForm()
+    };
+    localStorage.setItem('hookah_active_session', JSON.stringify(state));
+}
+
+function restoreActiveSessionIfAny() {
+    const raw = localStorage.getItem('hookah_active_session');
+    if (!raw) return;
+
+    try {
+        const state = JSON.parse(raw);
+        if (!state || !state.stage || state.stage === 'idle') return;
+
+        stepStartTime = state.stepStartTime || Date.now();
+        warmupTargetSec = state.warmupTargetSec || 300;
+        actualWarmupDuration = state.actualWarmupDuration || 0;
+        smokeDuration = state.smokeDuration || 0;
+        alarmAlreadyPlayed = !!state.alarmAlreadyPlayed;
+        setCoalPlacement(state.currentCoalPlacement || '3 в колодке');
+
+        if (state.bowl) {
+            const bowlSel = document.getElementById('bowl-select');
+            if (bowlSel) bowlSel.value = state.bowl;
+        }
+
+        if (state.isMixMode && !isMixMode) toggleMixMode();
+        if (state.mix && state.mix.length > 0) {
+            if (state.isMixMode) {
+                const container = document.getElementById('mix-container');
+                container.innerHTML = '';
+                state.mix.forEach(m => addMixRow(m.brand, m.flavor, m.weight || ''));
+            } else {
+                const m = state.mix[0];
+                document.getElementById('solo-tobacco-brand').value = m.brand || '';
+                document.getElementById('solo-tobacco-flavor').value = m.flavor || '';
+                document.getElementById('solo-tobacco-weight').value = m.weight || '';
+            }
+        }
+
+        document.getElementById('setup-form').classList.add('hidden');
+
+        if (state.stage === 'warmup') {
+            document.getElementById('status-title').innerText = '⏳ Прогрев чаши';
+            document.getElementById('warmup-controls').classList.remove('hidden');
+            clearInterval(timerInterval);
+            timerInterval = setInterval(updateWarmupTimer, 1000);
+            updateWarmupTimer();
+        } else if (state.stage === 'smoking') {
+            document.getElementById('status-title').innerText = '💨 Идет покур';
+            document.getElementById('smoking-controls').classList.remove('hidden');
+            clearInterval(timerInterval);
+            timerInterval = setInterval(updateSmokingTimer, 1000);
+            updateSmokingTimer();
+        } else if (state.stage === 'rating') {
+            document.getElementById('status-title').innerText = '✅ Сессия завершена';
+            document.getElementById('timer').innerText = formatTimerSec(smokeDuration);
+            document.getElementById('rating-form').classList.remove('hidden');
+        }
+    } catch (e) {
+        localStorage.removeItem('hookah_active_session');
+    }
+}
+
+function syncActiveTimerOnWake() {
+    if (!document.getElementById('warmup-controls').classList.contains('hidden')) {
+        updateWarmupTimer();
+    } else if (!document.getElementById('smoking-controls').classList.contains('hidden')) {
+        updateSmokingTimer();
     }
 }
 
 async function startWarmupSession() {
     initAudio();
-    await startKeepAliveAudio('⏳ Идет прогрев чаши...');
+
+    if ('Notification' in window && Notification.permission === 'default') {
+        try {
+            await Notification.requestPermission();
+            updatePushButtonState();
+        } catch (e) { }
+    }
 
     if ('wakeLock' in navigator) {
         try { await navigator.wakeLock.request('screen'); } catch (e) { }
@@ -443,32 +592,15 @@ async function startWarmupSession() {
     const mins = parseInt(document.getElementById('warmup-min').value) || 5;
     warmupTargetSec = mins * 60;
 
-    // 🚀 Отправляем задачу таймера на наш Cloudflare Worker
-    const chatId = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user.id : 432088312; // Страховка: если телеграм не отдал ID, подставим твой чистый ID вручную!
-    const botToken = "8815581013:AAHR4Nz-lhEBeIs_5b2KmBd5m4rjiGauzBc";
-    const workerUrl = "https://dimhookah-push-worker.swenplay23.workers.dev";
-
-    console.log("Отправка пуша на воркер для chatId:", chatId, "на секунд:", warmupTargetSec);
-
-    fetch(workerUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            chatId: chatId,
-            botToken: botToken,
-            delaySec: warmupTargetSec
-        })
-    })
-        .then(res => res.json())
-        .then(data => console.log("Ответ от воркера:", data))
-        .catch(err => console.log("Ошибка отправки на воркер:", err));
-
     document.getElementById('status-title').innerText = '⏳ Прогрев чаши';
     document.getElementById('setup-form').classList.add('hidden');
     document.getElementById('warmup-controls').classList.remove('hidden');
 
     stepStartTime = Date.now();
     alarmAlreadyPlayed = false;
+    saveActiveSessionState('warmup');
+
+    await startKeepAliveAudio(`⏳ Прогрев: ${formatTimerSec(warmupTargetSec)}`, getCurrentMixSummaryText());
 
     clearInterval(timerInterval);
     timerInterval = setInterval(updateWarmupTimer, 1000);
@@ -485,14 +617,16 @@ function updateWarmupTimer() {
     const box = document.getElementById('warmup-box');
     if (remaining <= 0) {
         box.classList.add('alarm-active');
+        updateLockScreenMetadata('🔥 ЧАША ПРОГРЕЛАСЬ!', 'Пора раскуривать кальян!');
         if (!alarmAlreadyPlayed) {
-            playBellSound();
-            if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('warning');
-            sendPush('Чаша прогрелась! 🔥', 'Пора раскуривать кальян, пока не сжег табак!');
             alarmAlreadyPlayed = true;
+            saveActiveSessionState('warmup');
+            playBellSound();
+            sendPush('Чаша прогрелась! 🔥', 'Пора раскуривать кальян, пока не сжег табак!');
         }
     } else {
         box.classList.remove('alarm-active');
+        updateLockScreenMetadata(`⏳ Прогрев: ${formatTimerSec(remaining)}`, getCurrentMixSummaryText());
     }
 }
 
@@ -505,14 +639,20 @@ function startSmokingFromWarmup() {
     document.getElementById('warmup-controls').classList.add('hidden');
     document.getElementById('smoking-controls').classList.remove('hidden');
 
-    startKeepAliveAudio('💨 Идет покур кальяна');
     stepStartTime = Date.now();
+    saveActiveSessionState('smoking');
+    startKeepAliveAudio('💨 Покур: 00:00', getCurrentMixSummaryText());
 
     clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
-        const elapsedSmoke = Math.floor((Date.now() - stepStartTime) / 1000);
-        document.getElementById('timer').innerText = formatTimerSec(elapsedSmoke);
-    }, 1000);
+    timerInterval = setInterval(updateSmokingTimer, 1000);
+    updateSmokingTimer();
+}
+
+function updateSmokingTimer() {
+    const elapsedSmoke = Math.floor((Date.now() - stepStartTime) / 1000);
+    const formatted = formatTimerSec(elapsedSmoke);
+    document.getElementById('timer').innerText = formatted;
+    updateLockScreenMetadata(`💨 Покур: ${formatted}`, getCurrentMixSummaryText());
 }
 
 function finishSmokingSession() {
@@ -524,6 +664,19 @@ function finishSmokingSession() {
     document.getElementById('timer').innerText = formatTimerSec(smokeDuration);
     document.getElementById('smoking-controls').classList.add('hidden');
     document.getElementById('rating-form').classList.remove('hidden');
+    saveActiveSessionState('rating');
+}
+
+function cancelActiveSession() {
+    if (confirm('Отменить текущую сессию?')) {
+        clearInterval(timerInterval);
+        stopKeepAliveAudio();
+        document.getElementById('warmup-box').classList.remove('alarm-active');
+        document.getElementById('warmup-controls').classList.add('hidden');
+        document.getElementById('smoking-controls').classList.add('hidden');
+        saveActiveSessionState('idle');
+        resetForm();
+    }
 }
 
 function setRating(val) {
@@ -537,22 +690,7 @@ function setRating(val) {
 function saveSession() {
     const bowl = document.getElementById('bowl-select').value || 'Не указана';
     const comment = document.getElementById('comment').value.trim();
-    const mix = [];
-
-    if (isMixMode) {
-        const items = document.querySelectorAll('#mix-container .mix-item');
-        items.forEach(item => {
-            const brand = item.querySelector('.tobacco-brand-select').value.trim();
-            const flavor = item.querySelector('.tobacco-flavor').value.trim();
-            const weight = parseFloat(item.querySelector('.tobacco-weight').value) || 0;
-            if (brand || flavor) mix.push({ brand, flavor, weight });
-        });
-    } else {
-        const brand = document.getElementById('solo-tobacco-brand').value.trim();
-        const flavor = document.getElementById('solo-tobacco-flavor').value.trim();
-        const weight = parseFloat(document.getElementById('solo-tobacco-weight').value) || 0;
-        if (brand || flavor) mix.push({ brand, flavor, weight });
-    }
+    const mix = getDraftMixFromForm();
 
     if (mix.length === 0) mix.push({ brand: 'Без названия', flavor: '', weight: 0 });
 
@@ -572,6 +710,7 @@ function saveSession() {
         history.unshift(session);
         syncCatalogFromHistory(history);
         saveSessionsToStorage(history, () => {
+            saveActiveSessionState('idle');
             resetForm();
             populateSelects();
             renderData(history);
@@ -704,7 +843,6 @@ function addModalMixRow(brand = '', flavor = '', weight = '') {
     container.appendChild(card);
 }
 
-// Открытие модального окна с редактированием табака и времени (Часы / Минуты)
 let currentModalRating = 5;
 function setModalRating(val) {
     currentModalRating = val;
@@ -714,7 +852,7 @@ function setModalRating(val) {
 }
 
 function openFullEditModal(id) {
-    document.querySelectorAll('select, input').forEach(el => el.blur()); // Снимаем фокус
+    document.querySelectorAll('select, input').forEach(el => el.blur());
     loadAllData((history) => {
         const s = history.find(item => item.id === id);
         if (!s) return;
@@ -731,7 +869,6 @@ function openFullEditModal(id) {
         setModalRating(s.rating || 5);
         document.getElementById('modal-comment').value = s.comment || '';
 
-        // Переводим секунды в Часы и Минуты
         const warmupTotalMins = Math.round((s.actualWarmupDuration || 0) / 60);
         document.getElementById('modal-warmup-h').value = Math.floor(warmupTotalMins / 60);
         document.getElementById('modal-warmup-m').value = warmupTotalMins % 60;
@@ -740,7 +877,6 @@ function openFullEditModal(id) {
         document.getElementById('modal-smoke-h').value = Math.floor(smokeTotalMins / 60);
         document.getElementById('modal-smoke-m').value = smokeTotalMins % 60;
 
-        // Заполняем табаки
         const mixContainer = document.getElementById('modal-mix-container');
         mixContainer.innerHTML = '';
         (s.mix || []).forEach(m => {
@@ -768,7 +904,6 @@ function saveEditedSession() {
                 s.rating = currentModalRating;
                 s.comment = document.getElementById('modal-comment').value;
 
-                // Считываем часы и минуты обратно в секунды
                 const wh = parseInt(document.getElementById('modal-warmup-h').value) || 0;
                 const wm = parseInt(document.getElementById('modal-warmup-m').value) || 0;
                 s.actualWarmupDuration = (wh * 3600) + (wm * 60);
@@ -777,7 +912,6 @@ function saveEditedSession() {
                 const sm = parseInt(document.getElementById('modal-smoke-m').value) || 0;
                 s.smokeDuration = (sh * 3600) + (sm * 60);
 
-                // Считываем отредактированный табак
                 const updatedMix = [];
                 document.querySelectorAll('#modal-mix-container .modal-mix-item').forEach(item => {
                     const brand = item.querySelector('.tobacco-brand-select').value.trim();

@@ -1,0 +1,18 @@
+{
+    "name": "DimHookah Tracker",
+    "short_name": "DimHookah",
+    "description": "Трекер кальянных сессий и прогрева чаши",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#030a06",
+    "theme_color": "#030a06",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230b3a1e'/><text y='68' x='50' text-anchor='middle' font-size='55'>💨</text></svg>",
+            "sizes": "192x192 512x512",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ]
+}

@@ -12,6 +12,45 @@ let swRegistration = null;
 let silentAudioUrl = null;
 let alarmAudioUrl = null;
 
+// Тема оформления (auto | light | dark)
+let currentThemeMode = localStorage.getItem('hookah_theme_mode') || 'auto';
+const systemDarkMedia = window.matchMedia('(prefers-color-scheme: dark)');
+
+function applyTheme() {
+    let effectiveTheme = currentThemeMode;
+    if (currentThemeMode === 'auto') {
+        effectiveTheme = systemDarkMedia.matches ? 'dark' : 'light';
+    }
+
+    if (effectiveTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.getElementById('meta-theme-color')?.setAttribute('content', '#000000');
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+        document.getElementById('meta-theme-color')?.setAttribute('content', '#F2F2F7');
+    }
+
+    const btn = document.getElementById('theme-toggle-btn');
+    if (btn) {
+        if (currentThemeMode === 'auto') btn.innerText = '🌗 Авто';
+        else if (currentThemeMode === 'light') btn.innerText = '☀️ Светлая';
+        else btn.innerText = '🌙 Темная';
+    }
+}
+
+function cycleThemeMode() {
+    if (currentThemeMode === 'auto') currentThemeMode = 'dark';
+    else if (currentThemeMode === 'dark') currentThemeMode = 'light';
+    else currentThemeMode = 'auto';
+
+    localStorage.setItem('hookah_theme_mode', currentThemeMode);
+    applyTheme();
+}
+
+systemDarkMedia.addEventListener('change', () => {
+    if (currentThemeMode === 'auto') applyTheme();
+});
+
 const DEFAULT_BRANDS = [
     'Adalya', 'Afzal', 'Banger', 'Black Burn', 'Bonche',
     'Brusko', 'Burn', 'Chabacco', 'Daily Hookah', 'Darkside',
@@ -25,6 +64,7 @@ let savedBrands = [];
 let removedItems = [];
 
 document.addEventListener('DOMContentLoaded', () => {
+    applyTheme();
     registerPWA();
     initTimeWheels();
     initRealBackgroundAudio();
@@ -49,9 +89,7 @@ async function registerPWA() {
     if ('serviceWorker' in navigator) {
         try {
             swRegistration = await navigator.serviceWorker.register('./sw.js');
-        } catch (e) {
-            console.warn('SW registration failed:', e);
-        }
+        } catch (e) { }
     }
     updatePushButtonState();
 }
@@ -68,7 +106,7 @@ function updatePushButtonState() {
 
 async function requestPushPermission() {
     if (!('Notification' in window)) {
-        alert('📲 Ты открыл сайт в обычном браузере!\n\nЧтобы работали пуши на iPhone:\n1. Нажми «Поделиться» внизу Safari.\n2. Выбери «На экран Домой».\n3. Открой DimHookah с иконки на рабочем столе!');
+        alert('📲 Чтобы работали пуши на iPhone:\n1. Нажми «Поделиться» внизу Safari.\n2. Выбери «На экран Домой».\n3. Открой DimHookah с иконки на рабочем столе!');
         return;
     }
     try {
@@ -78,11 +116,9 @@ async function requestPushPermission() {
             playBellSound();
             sendPush('Уведомления включены! 🔥', 'Теперь DimHookah предупредит, когда чаша прогреется.');
         } else {
-            alert('Уведомления запрещены. Проверь Настройки iPhone -> Уведомления -> DimHookah.');
+            alert('Уведомления запрещены в настройках телефона.');
         }
-    } catch (e) {
-        alert('Ошибка запроса уведомлений: ' + e.message);
-    }
+    } catch (e) { }
 }
 
 function initTimeWheels() {
@@ -205,7 +241,7 @@ function deleteSelectedBowl(targetSelectId = 'bowl-select') {
     const target = document.getElementById(targetSelectId);
     const val = target ? target.value : '';
     if (!val) {
-        showIosNotice('Чаша не выбрана', 'Сначала выбери чашу в выпадающем списке, чтобы удалить её.');
+        showIosNotice('Чаша не выбрана', 'Сначала выбери чашу в выпадающем списке.');
         return;
     }
     savedBowls = savedBowls.filter(b => b !== val);
@@ -239,7 +275,7 @@ function deleteSelectedBrand(targetSelectOrElem) {
         : targetSelectOrElem;
     const val = el ? el.value : '';
     if (!val) {
-        showIosNotice('Бренд не выбран', 'Сначала выбери бренд табака в списке, чтобы удалить его.');
+        showIosNotice('Бренд не выбран', 'Сначала выбери бренд в списке.');
         return;
     }
     savedBrands = savedBrands.filter(b => b !== val);
@@ -855,7 +891,7 @@ function deleteSession(id) {
 
     if (!modal) return;
     titleEl.innerText = 'Удалить покур?';
-    msgEl.innerText = 'Запись будет безвозвратно стерта из истории и рейтинга табаков.';
+    msgEl.innerText = 'Запись будет безвозвратно стерта из истории и статистики.';
     msgEl.classList.remove('hidden');
     inputEl.classList.add('hidden');
     cancelBtn.classList.remove('hidden');
@@ -881,7 +917,7 @@ function renderHookahStats(history) {
         statsContainer.innerHTML = `
             <div class="stat-card">
                 <div class="stat-value">—</div>
-                <div class="stat-label">В дыму (часы)</div>
+                <div class="stat-label">В дыму</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value">—</div>
@@ -897,7 +933,7 @@ function renderHookahStats(history) {
 
     let totalSeconds = 0;
     const bowlCounts = {};
-    const tobaccoSmokeCounts = {};
+    const tobaccoCounts = {};
 
     history.forEach(s => {
         totalSeconds += (s.smokeDuration || 0);
@@ -908,8 +944,8 @@ function renderHookahStats(history) {
 
         (s.mix || []).forEach(m => {
             const bName = ((m.brand || m.name || '') + ' ' + (m.flavor || '')).trim();
-            if (bName) {
-                tobaccoSmokeCounts[bName] = (tobaccoSmokeCounts[bName] || 0) + 1;
+            if (bName && bName !== 'Без названия') {
+                tobaccoCounts[bName] = (tobaccoCounts[bName] || 0) + 1;
             }
         });
     });
@@ -927,7 +963,7 @@ function renderHookahStats(history) {
 
     let topTobacco = '—';
     let maxTobCount = 0;
-    for (const [tob, count] of Object.entries(tobaccoSmokeCounts)) {
+    for (const [tob, count] of Object.entries(tobaccoCounts)) {
         if (count > maxTobCount) {
             maxTobCount = count;
             topTobacco = tob;
@@ -940,11 +976,11 @@ function renderHookahStats(history) {
             <div class="stat-label">В дыму</div>
         </div>
         <div class="stat-card">
-            <div class="stat-value" style="font-size: 1.1em; padding-top: 4px;" title="${topTobacco}">${topTobacco}</div>
+            <div class="stat-value" style="font-size: 0.95em; padding-top: 6px;" title="${topTobacco}">${topTobacco}</div>
             <div class="stat-label">Топ табак</div>
         </div>
         <div class="stat-card">
-            <div class="stat-value" style="font-size: 1.1em; padding-top: 4px;" title="${topBowl}">${topBowl}</div>
+            <div class="stat-value" style="font-size: 0.95em; padding-top: 6px;" title="${topBowl}">${topBowl}</div>
             <div class="stat-label">Топ чаша</div>
         </div>
     `;

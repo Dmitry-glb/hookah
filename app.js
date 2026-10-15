@@ -12,98 +12,6 @@ let swRegistration = null;
 let silentAudioUrl = null;
 let alarmAudioUrl = null;
 
-// Режимы темы: 'auto' (по системе телефона) | 'light' | 'dark'
-let currentThemeMode = localStorage.getItem('hookah_theme_mode') || 'auto';
-const systemDarkMedia = window.matchMedia('(prefers-color-scheme: dark)');
-
-function applyTheme() {
-    let effectiveTheme = currentThemeMode;
-    if (currentThemeMode === 'auto') {
-        effectiveTheme = systemDarkMedia.matches ? 'dark' : 'light';
-    }
-
-    if (effectiveTheme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        document.getElementById('meta-theme-color')?.setAttribute('content', '#000000');
-    } else {
-        document.documentElement.removeAttribute('data-theme');
-        document.getElementById('meta-theme-color')?.setAttribute('content', '#F2F2F7');
-    }
-
-    const btn = document.getElementById('theme-toggle-btn');
-    if (btn) {
-        if (currentThemeMode === 'auto') btn.innerText = '🌗 Авто';
-        else if (currentThemeMode === 'light') btn.innerText = '☀️ Светлая';
-        else btn.innerText = '🌙 Темная';
-    }
-}
-
-function cycleThemeMode() {
-    if (currentThemeMode === 'auto') currentThemeMode = 'dark';
-    else if (currentThemeMode === 'dark') currentThemeMode = 'light';
-    else currentThemeMode = 'auto';
-
-    localStorage.setItem('hookah_theme_mode', currentThemeMode);
-    applyTheme();
-}
-
-systemDarkMedia.addEventListener('change', () => {
-    if (currentThemeMode === 'auto') applyTheme();
-});
-
-// Кастомные диалоги в стиле iOS 27 (работают везде без блокировок)
-function openIosPrompt(title, placeholder, callback) {
-    const modal = document.getElementById('ios-dialog-modal');
-    const titleEl = document.getElementById('ios-dialog-title');
-    const msgEl = document.getElementById('ios-dialog-msg');
-    const inputEl = document.getElementById('ios-dialog-input');
-    const cancelBtn = document.getElementById('ios-dialog-cancel');
-    const okBtn = document.getElementById('ios-dialog-ok');
-
-    if (!modal) return;
-    titleEl.innerText = title;
-    msgEl.classList.add('hidden');
-    inputEl.classList.remove('hidden');
-    inputEl.placeholder = placeholder || '';
-    inputEl.value = '';
-    cancelBtn.classList.remove('hidden');
-
-    okBtn.onclick = () => {
-        const val = inputEl.value.trim();
-        closeIosDialog();
-        if (val && callback) callback(val);
-    };
-
-    modal.classList.remove('hidden');
-    setTimeout(() => inputEl.focus(), 60);
-}
-
-function showIosNotice(title, message) {
-    const modal = document.getElementById('ios-dialog-modal');
-    const titleEl = document.getElementById('ios-dialog-title');
-    const msgEl = document.getElementById('ios-dialog-msg');
-    const inputEl = document.getElementById('ios-dialog-input');
-    const cancelBtn = document.getElementById('ios-dialog-cancel');
-    const okBtn = document.getElementById('ios-dialog-ok');
-
-    if (!modal) return;
-    titleEl.innerText = title;
-    msgEl.innerText = message;
-    msgEl.classList.remove('hidden');
-    inputEl.classList.add('hidden');
-    cancelBtn.classList.add('hidden');
-
-    okBtn.onclick = () => closeIosDialog();
-    modal.classList.remove('hidden');
-}
-
-function closeIosDialog() {
-    const modal = document.getElementById('ios-dialog-modal');
-    const inputEl = document.getElementById('ios-dialog-input');
-    if (inputEl) inputEl.blur();
-    if (modal) modal.classList.add('hidden');
-}
-
 const DEFAULT_BRANDS = [
     'Adalya', 'Afzal', 'Banger', 'Black Burn', 'Bonche',
     'Brusko', 'Burn', 'Chabacco', 'Daily Hookah', 'Darkside',
@@ -117,7 +25,6 @@ let savedBrands = [];
 let removedItems = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-    applyTheme();
     registerPWA();
     initTimeWheels();
     initRealBackgroundAudio();
@@ -142,7 +49,9 @@ async function registerPWA() {
     if ('serviceWorker' in navigator) {
         try {
             swRegistration = await navigator.serviceWorker.register('./sw.js');
-        } catch (e) { }
+        } catch (e) {
+            console.warn('SW registration failed:', e);
+        }
     }
     updatePushButtonState();
 }
@@ -159,10 +68,7 @@ function updatePushButtonState() {
 
 async function requestPushPermission() {
     if (!('Notification' in window)) {
-        showIosNotice(
-            'Установка на iPhone 📲',
-            'Чтобы работали пуши:\n1. Нажми «Поделиться» внизу Safari.\n2. Выбери «На экран Домой».\n3. Открой DimHookah с иконки на рабочем столе!'
-        );
+        alert('📲 Ты открыл сайт в обычном браузере!\n\nЧтобы работали пуши на iPhone:\n1. Нажми «Поделиться» внизу Safari.\n2. Выбери «На экран Домой».\n3. Открой DimHookah с иконки на рабочем столе!');
         return;
     }
     try {
@@ -172,9 +78,11 @@ async function requestPushPermission() {
             playBellSound();
             sendPush('Уведомления включены! 🔥', 'Теперь DimHookah предупредит, когда чаша прогреется.');
         } else {
-            showIosNotice('Пуши отключены', 'Разреши уведомления для DimHookah в настройках телефона.');
+            alert('Уведомления запрещены. Проверь Настройки iPhone -> Уведомления -> DimHookah.');
         }
-    } catch (e) { }
+    } catch (e) {
+        alert('Ошибка запроса уведомлений: ' + e.message);
+    }
 }
 
 function initTimeWheels() {
@@ -344,6 +252,58 @@ function deleteSelectedBrand(targetSelectOrElem) {
     populateSelects();
 }
 
+function openIosPrompt(title, placeholder, callback) {
+    const modal = document.getElementById('ios-dialog-modal');
+    const titleEl = document.getElementById('ios-dialog-title');
+    const msgEl = document.getElementById('ios-dialog-msg');
+    const inputEl = document.getElementById('ios-dialog-input');
+    const cancelBtn = document.getElementById('ios-dialog-cancel');
+    const okBtn = document.getElementById('ios-dialog-ok');
+
+    if (!modal) return;
+    titleEl.innerText = title;
+    msgEl.classList.add('hidden');
+    inputEl.classList.remove('hidden');
+    inputEl.placeholder = placeholder || '';
+    inputEl.value = '';
+    cancelBtn.classList.remove('hidden');
+
+    okBtn.onclick = () => {
+        const val = inputEl.value.trim();
+        closeIosDialog();
+        if (val && callback) callback(val);
+    };
+
+    modal.classList.remove('hidden');
+    setTimeout(() => inputEl.focus(), 60);
+}
+
+function showIosNotice(title, message) {
+    const modal = document.getElementById('ios-dialog-modal');
+    const titleEl = document.getElementById('ios-dialog-title');
+    const msgEl = document.getElementById('ios-dialog-msg');
+    const inputEl = document.getElementById('ios-dialog-input');
+    const cancelBtn = document.getElementById('ios-dialog-cancel');
+    const okBtn = document.getElementById('ios-dialog-ok');
+
+    if (!modal) return;
+    titleEl.innerText = title;
+    msgEl.innerText = message;
+    msgEl.classList.remove('hidden');
+    inputEl.classList.add('hidden');
+    cancelBtn.classList.add('hidden');
+
+    okBtn.onclick = () => closeIosDialog();
+    modal.classList.remove('hidden');
+}
+
+function closeIosDialog() {
+    const modal = document.getElementById('ios-dialog-modal');
+    const inputEl = document.getElementById('ios-dialog-input');
+    if (inputEl) inputEl.blur();
+    if (modal) modal.classList.add('hidden');
+}
+
 function toggleMixMode() {
     document.querySelectorAll('select').forEach(s => s.blur());
     isMixMode = !isMixMode;
@@ -378,17 +338,17 @@ function addMixRow(brand = '', flavor = '', weight = '') {
     const card = document.createElement('div');
     card.className = 'tobacco-entry-card mix-item';
     card.innerHTML = `
-                <div class="select-with-add" style="margin-bottom: 8px;">
-                    <select class="tobacco-brand-select">${getBrandOptionsHtml(brand)}</select>
-                    <button type="button" class="btn-plus" onclick="addNewBrandPrompt(this.previousElementSibling)">+</button>
-                    <button type="button" class="btn-minus" onclick="deleteSelectedBrand(this.previousElementSibling.previousElementSibling)">−</button>
-                    <button type="button" class="btn-danger" style="height: 44px; width: 44px;" onclick="this.closest('.mix-item').remove()">✕</button>
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <input type="text" class="tobacco-flavor" placeholder="Вкус" value="${flavor}" style="flex: 2.2;">
-                    <input type="number" class="tobacco-weight" placeholder="Грамм" value="${weight}" style="flex: 1;">
-                </div>
-            `;
+        <div class="select-with-add" style="margin-bottom: 8px;">
+            <select class="tobacco-brand-select">${getBrandOptionsHtml(brand)}</select>
+            <button type="button" class="btn-plus" onclick="addNewBrandPrompt(this.previousElementSibling)">+</button>
+            <button type="button" class="btn-minus" onclick="deleteSelectedBrand(this.previousElementSibling.previousElementSibling)">−</button>
+            <button type="button" class="btn-danger" style="height: 44px; width: 44px;" onclick="this.closest('.mix-item').remove()">✕</button>
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <input type="text" class="tobacco-flavor" placeholder="Вкус" value="${flavor}" style="flex: 2.2;">
+            <input type="number" class="tobacco-weight" placeholder="Грамм" value="${weight}" style="flex: 1;">
+        </div>
+    `;
     container.appendChild(card);
 }
 
@@ -502,7 +462,9 @@ async function startKeepAliveAudio(titleText, subtitleText) {
     const audioEl = document.getElementById('bg-audio');
     try {
         if (audioEl) {
-            if (audioEl.src !== silentAudioUrl) audioEl.src = silentAudioUrl;
+            if (audioEl.src !== silentAudioUrl) {
+                audioEl.src = silentAudioUrl;
+            }
             audioEl.volume = 0.05;
             if (audioEl.paused) await audioEl.play();
         }
@@ -590,21 +552,25 @@ function setCoalPlacement(type) {
 
 async function sendPush(title, body) {
     if (navigator.vibrate) {
-        try { navigator.vibrate([300, 150, 300]); } catch (e) { }
+        try { navigator.vibrate([300, 150, 300, 150, 400]); } catch (e) { }
     }
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
     try {
         if (swRegistration && swRegistration.showNotification) {
             await swRegistration.showNotification(title, {
                 body: body,
                 icon: 'icon.png',
+                vibrate: [300, 150, 300],
                 tag: 'dimhookah-warmup',
                 renotify: true
             });
         } else {
             new Notification(title, { body, icon: 'icon.png' });
         }
-    } catch (e) { }
+    } catch (e) {
+        try { new Notification(title, { body }); } catch (err) { }
+    }
 }
 
 function getDraftMixFromForm() {
@@ -698,7 +664,6 @@ function restoreActiveSessionIfAny() {
             updateWarmupTimer();
         } else if (state.stage === 'smoking') {
             document.getElementById('status-title').innerText = '💨 Идет покур';
-            document.getElementById('active-mix-label').innerText = getCurrentMixSummaryText();
             document.getElementById('smoking-controls').classList.remove('hidden');
             clearInterval(timerInterval);
             timerInterval = setInterval(updateSmokingTimer, 1000);
@@ -783,7 +748,6 @@ function startSmokingFromWarmup() {
 
     document.getElementById('warmup-box').classList.remove('alarm-active');
     document.getElementById('status-title').innerText = '💨 Идет покур';
-    document.getElementById('active-mix-label').innerText = getCurrentMixSummaryText();
     document.getElementById('warmup-controls').classList.add('hidden');
     document.getElementById('smoking-controls').classList.remove('hidden');
 
@@ -816,13 +780,15 @@ function finishSmokingSession() {
 }
 
 function cancelActiveSession() {
-    clearInterval(timerInterval);
-    stopKeepAliveAudio();
-    document.getElementById('warmup-box').classList.remove('alarm-active');
-    document.getElementById('warmup-controls').classList.add('hidden');
-    document.getElementById('smoking-controls').classList.add('hidden');
-    saveActiveSessionState('idle');
-    resetForm();
+    if (confirm('Отменить текущую сессию?')) {
+        clearInterval(timerInterval);
+        stopKeepAliveAudio();
+        document.getElementById('warmup-box').classList.remove('alarm-active');
+        document.getElementById('warmup-controls').classList.add('hidden');
+        document.getElementById('smoking-controls').classList.add('hidden');
+        saveActiveSessionState('idle');
+        resetForm();
+    }
 }
 
 function setRating(val) {
@@ -880,12 +846,108 @@ function resetForm() {
 }
 
 function deleteSession(id) {
-    loadAllData((history) => {
-        history = history.filter(s => s.id !== id);
-        saveSessionsToStorage(history, () => {
-            renderData(history);
+    const modal = document.getElementById('ios-dialog-modal');
+    const titleEl = document.getElementById('ios-dialog-title');
+    const msgEl = document.getElementById('ios-dialog-msg');
+    const inputEl = document.getElementById('ios-dialog-input');
+    const cancelBtn = document.getElementById('ios-dialog-cancel');
+    const okBtn = document.getElementById('ios-dialog-ok');
+
+    if (!modal) return;
+    titleEl.innerText = 'Удалить покур?';
+    msgEl.innerText = 'Запись будет безвозвратно стерта из истории и рейтинга табаков.';
+    msgEl.classList.remove('hidden');
+    inputEl.classList.add('hidden');
+    cancelBtn.classList.remove('hidden');
+
+    okBtn.onclick = () => {
+        closeIosDialog();
+        loadAllData((history) => {
+            history = history.filter(s => s.id !== id);
+            saveSessionsToStorage(history, () => {
+                renderData(history);
+            });
+        });
+    };
+
+    modal.classList.remove('hidden');
+}
+
+function renderHookahStats(history) {
+    const statsContainer = document.getElementById('hookah-stats-grid');
+    if (!statsContainer) return;
+
+    if (!history || history.length === 0) {
+        statsContainer.innerHTML = `
+            <div class="stat-card">
+                <div class="stat-value">—</div>
+                <div class="stat-label">В дыму (часы)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">—</div>
+                <div class="stat-label">Топ табак</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">—</div>
+                <div class="stat-label">Топ чаша</div>
+            </div>
+        `;
+        return;
+    }
+
+    let totalSeconds = 0;
+    const bowlCounts = {};
+    const tobaccoSmokeCounts = {};
+
+    history.forEach(s => {
+        totalSeconds += (s.smokeDuration || 0);
+
+        if (s.bowl && s.bowl !== 'Не указана') {
+            bowlCounts[s.bowl] = (bowlCounts[s.bowl] || 0) + 1;
+        }
+
+        (s.mix || []).forEach(m => {
+            const bName = ((m.brand || m.name || '') + ' ' + (m.flavor || '')).trim();
+            if (bName) {
+                tobaccoSmokeCounts[bName] = (tobaccoSmokeCounts[bName] || 0) + 1;
+            }
         });
     });
+
+    const totalHours = (totalSeconds / 3600).toFixed(1);
+
+    let topBowl = '—';
+    let maxBowlCount = 0;
+    for (const [bowl, count] of Object.entries(bowlCounts)) {
+        if (count > maxBowlCount) {
+            maxBowlCount = count;
+            topBowl = bowl;
+        }
+    }
+
+    let topTobacco = '—';
+    let maxTobCount = 0;
+    for (const [tob, count] of Object.entries(tobaccoSmokeCounts)) {
+        if (count > maxTobCount) {
+            maxTobCount = count;
+            topTobacco = tob;
+        }
+    }
+
+    statsContainer.innerHTML = `
+        <div class="stat-card">
+            <div class="stat-value">${totalHours} ч</div>
+            <div class="stat-label">В дыму</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="font-size: 1.1em; padding-top: 4px;" title="${topTobacco}">${topTobacco}</div>
+            <div class="stat-label">Топ табак</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="font-size: 1.1em; padding-top: 4px;" title="${topBowl}">${topBowl}</div>
+            <div class="stat-label">Топ чаша</div>
+        </div>
+    `;
 }
 
 function renderData(history) {
@@ -893,6 +955,8 @@ function renderData(history) {
         loadAllData((h) => renderData(h));
         return;
     }
+
+    renderHookahStats(history);
 
     const tbody = document.getElementById('history-body');
     if (!tbody) return;
@@ -912,18 +976,18 @@ function renderData(history) {
         const commentHtml = s.comment ? `<div style="color:var(--text-secondary); margin-top:6px; font-size:0.85em; font-style:italic;">💬 ${s.comment}</div>` : '';
 
         tr.innerHTML = `
-                    <td><b>${s.date}</b><br><span style="color:#ffb340; font-weight:800;">★ ${s.rating}</span></td>
-                    <td><b>${s.bowl}</b><br><span style="color:var(--text-secondary); font-size:0.85em;">🔥 ${placementText}</span></td>
-                    <td><div>${mixStr}</div>${commentHtml}</td>
-                    <td style="font-size:0.82em; white-space:nowrap;">
-                        🔥 ${formatDurationHM(s.actualWarmupDuration)} &nbsp;•&nbsp;
-                        💨 <b>${formatDurationHM(s.smokeDuration)}</b>
-                    </td>
-                    <td style="white-space: nowrap;">
-                        <button class="btn-edit" onclick="openFullEditModal(${s.id})">✏️</button>
-                        <button class="btn-danger" onclick="deleteSession(${s.id})">✕</button>
-                    </td>
-                `;
+            <td><b>${s.date}</b><br><span style="color:#ffb340; font-weight:800;">★ ${s.rating}</span></td>
+            <td><b>${s.bowl}</b><br><span style="color:var(--text-secondary); font-size:0.85em;">🔥 ${placementText}</span></td>
+            <td><div>${mixStr}</div>${commentHtml}</td>
+            <td style="font-size:0.82em; white-space:nowrap;">
+                🔥 ${formatDurationHM(s.actualWarmupDuration)} &nbsp;•&nbsp;
+                💨 <b>${formatDurationHM(s.smokeDuration)}</b>
+            </td>
+            <td style="white-space: nowrap;">
+                <button class="btn-edit" onclick="openFullEditModal(${s.id})">✏️</button>
+                <button class="btn-danger" onclick="deleteSession(${s.id})">✕</button>
+            </td>
+        `;
         tbody.appendChild(tr);
 
         (s.mix || []).forEach(m => {
@@ -953,13 +1017,13 @@ function renderData(history) {
     sortedTobaccos.forEach(t => {
         const avg = (t.totalRating / t.count).toFixed(1);
         html += `
-                    <tr>
-                        <td><b>${t.name}</b></td>
-                        <td style="color: #ffb340; font-weight: 800;">★ ${avg}</td>
-                        <td>${t.count}</td>
-                        <td>${t.totalWeight} г</td>
-                    </tr>
-                `;
+            <tr>
+                <td><b>${t.name}</b></td>
+                <td style="color: #ffb340; font-weight: 800;">★ ${avg}</td>
+                <td>${t.count}</td>
+                <td>${t.totalWeight} г</td>
+            </tr>
+        `;
     });
     html += '</tbody></table>';
     analyticsDiv.innerHTML = html;
@@ -971,17 +1035,17 @@ function addModalMixRow(brand = '', flavor = '', weight = '') {
     const card = document.createElement('div');
     card.className = 'tobacco-entry-card modal-mix-item';
     card.innerHTML = `
-                <div class="select-with-add" style="margin-bottom: 8px;">
-                    <select class="tobacco-brand-select">${getBrandOptionsHtml(brand)}</select>
-                    <button type="button" class="btn-plus" onclick="addNewBrandPrompt(this.previousElementSibling)">+</button>
-                    <button type="button" class="btn-minus" onclick="deleteSelectedBrand(this.previousElementSibling.previousElementSibling)">−</button>
-                    <button type="button" class="btn-danger" style="height: 44px; width: 44px;" onclick="this.closest('.modal-mix-item').remove()">✕</button>
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <input type="text" class="modal-tobacco-flavor" placeholder="Вкус" value="${flavor}" style="flex: 2.2;">
-                    <input type="number" class="modal-tobacco-weight" placeholder="Грамм" value="${weight}" style="flex: 1;">
-                </div>
-            `;
+        <div class="select-with-add" style="margin-bottom: 8px;">
+            <select class="tobacco-brand-select">${getBrandOptionsHtml(brand)}</select>
+            <button type="button" class="btn-plus" onclick="addNewBrandPrompt(this.previousElementSibling)">+</button>
+            <button type="button" class="btn-minus" onclick="deleteSelectedBrand(this.previousElementSibling.previousElementSibling)">−</button>
+            <button type="button" class="btn-danger" style="height: 44px; width: 44px;" onclick="this.closest('.modal-mix-item').remove()">✕</button>
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <input type="text" class="modal-tobacco-flavor" placeholder="Вкус" value="${flavor}" style="flex: 2.2;">
+            <input type="number" class="modal-tobacco-weight" placeholder="Грамм" value="${weight}" style="flex: 1;">
+        </div>
+    `;
     container.appendChild(card);
 }
 

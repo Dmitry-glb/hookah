@@ -11,6 +11,8 @@ let audioCtx;
 let swRegistration = null;
 let silentAudioUrl = null;
 let alarmAudioUrl = null;
+let selectedPeriod = 'all';
+let brandPackDefaults = {};
 
 // Тема оформления (auto | light | dark)
 let currentThemeMode = localStorage.getItem('hookah_theme_mode') || 'auto';
@@ -83,6 +85,13 @@ document.addEventListener('DOMContentLoaded', () => {
             syncActiveTimerOnWake();
         }
     });
+
+    document.addEventListener('click', (e) => {
+        const wrap = document.getElementById('period-dropdown-wrap');
+        if (wrap && !wrap.contains(e.target)) {
+            closePeriodDropdown();
+        }
+    });
 });
 
 async function registerPWA() {
@@ -138,10 +147,12 @@ function loadAllData(callback) {
         savedBowls = JSON.parse(localStorage.getItem('hookah_custom_bowls') || '[]');
         savedBrands = JSON.parse(localStorage.getItem('hookah_custom_brands') || '[]');
         removedItems = JSON.parse(localStorage.getItem('hookah_removed_items') || '[]');
+        brandPackDefaults = JSON.parse(localStorage.getItem('hookah_brand_packs') || '{}');
     } catch (e) {
         savedBowls = [];
         savedBrands = [];
         removedItems = [];
+        brandPackDefaults = {};
     }
 
     let history = [];
@@ -150,6 +161,66 @@ function loadAllData(callback) {
     } catch (e) { }
 
     if (callback) callback(history);
+}
+
+function saveBrandPackDefault(brand, packPrice, packWeight) {
+    if (!brand) return;
+    brandPackDefaults[brand] = {
+        price: parseFloat(packPrice) || 0,
+        weight: parseFloat(packWeight) || 0
+    };
+    localStorage.setItem('hookah_brand_packs', JSON.stringify(brandPackDefaults));
+}
+
+function onBrandSelectChange(selectEl) {
+    const brand = selectEl.value;
+    const card = selectEl.closest('.tobacco-entry-card');
+    if (!card || !brand) return;
+
+    const saved = brandPackDefaults[brand];
+    const priceInput = card.querySelector('#solo-pack-price, .tobacco-pack-price, .modal-pack-price');
+    const weightInput = card.querySelector('#solo-pack-weight, .tobacco-pack-weight, .modal-pack-weight');
+
+    if (saved) {
+        if (priceInput && saved.price) priceInput.value = saved.price;
+        if (weightInput && saved.weight) weightInput.value = saved.weight;
+    }
+    recalcLiveBowlCost();
+}
+
+function onPackInfoInput(inputEl) {
+    const card = inputEl.closest('.tobacco-entry-card');
+    if (card) {
+        const brandSel = card.querySelector('select');
+        const priceInput = card.querySelector('#solo-pack-price, .tobacco-pack-price, .modal-pack-price');
+        const weightInput = card.querySelector('#solo-pack-weight, .tobacco-pack-weight, .modal-pack-weight');
+        if (brandSel && brandSel.value && priceInput && weightInput) {
+            saveBrandPackDefault(brandSel.value, priceInput.value, weightInput.value);
+        }
+    }
+    recalcLiveBowlCost();
+}
+
+function calcSingleTobaccoCost(usedGrams, packPrice, packWeight) {
+    const g = parseFloat(usedGrams) || 0;
+    const p = parseFloat(packPrice) || 0;
+    const pw = parseFloat(packWeight) || 0;
+    if (g <= 0 || p <= 0 || pw <= 0) return 0;
+    return (p / pw) * g;
+}
+
+function recalcLiveBowlCost() {
+    const draft = getDraftMixFromForm();
+    let totalCost = 0;
+    let totalGrams = 0;
+    draft.forEach(m => {
+        totalGrams += (parseFloat(m.weight) || 0);
+        totalCost += calcSingleTobaccoCost(m.weight, m.packPrice, m.packWeight);
+    });
+    const valEl = document.getElementById('live-bowl-cost-val');
+    if (valEl) {
+        valEl.innerText = `${Math.round(totalCost)} ₽ (${totalGrams} г)`;
+    }
 }
 
 function saveSessionsToStorage(history, callback) {
@@ -367,25 +438,38 @@ function toggleMixMode() {
         mixBox.classList.add('hidden');
         addBtn.classList.add('hidden');
     }
+    recalcLiveBowlCost();
 }
 
-function addMixRow(brand = '', flavor = '', weight = '') {
+function addMixRow(brand = '', flavor = '', weight = '', packPrice = '', packWeight = '') {
+    if (brand && (!packPrice || !packWeight) && brandPackDefaults[brand]) {
+        packPrice = brandPackDefaults[brand].price || '';
+        packWeight = brandPackDefaults[brand].weight || '';
+    }
     const container = document.getElementById('mix-container');
     const card = document.createElement('div');
     card.className = 'tobacco-entry-card mix-item';
     card.innerHTML = `
         <div class="select-with-add" style="margin-bottom: 8px;">
-            <select class="tobacco-brand-select">${getBrandOptionsHtml(brand)}</select>
+            <select class="tobacco-brand-select" onchange="onBrandSelectChange(this)">${getBrandOptionsHtml(brand)}</select>
             <button type="button" class="btn-plus" onclick="addNewBrandPrompt(this.previousElementSibling)">+</button>
             <button type="button" class="btn-minus" onclick="deleteSelectedBrand(this.previousElementSibling.previousElementSibling)">−</button>
-            <button type="button" class="btn-danger" style="height: 44px; width: 44px;" onclick="this.closest('.mix-item').remove()">✕</button>
+            <button type="button" class="btn-danger" style="height: 44px; width: 44px;" onclick="this.closest('.mix-item').remove(); recalcLiveBowlCost();">✕</button>
         </div>
         <div style="display: flex; gap: 8px;">
-            <input type="text" class="tobacco-flavor" placeholder="Вкус" value="${flavor}" style="flex: 2.2;">
-            <input type="number" class="tobacco-weight" placeholder="Грамм" value="${weight}" style="flex: 1;">
+            <input type="text" class="tobacco-flavor" placeholder="Вкус" value="${flavor}" style="flex: 2;">
+            <input type="number" class="tobacco-weight" placeholder="Грамм в чашу" value="${weight}" oninput="recalcLiveBowlCost()" style="flex: 1.2;">
+        </div>
+        <div class="pack-price-row">
+            <span class="pack-price-label">🏷️ Пачка:</span>
+            <input type="number" class="tobacco-pack-price" placeholder="Цена ₽" value="${packPrice}" oninput="onPackInfoInput(this)">
+            <span class="pack-price-label">за</span>
+            <input type="number" class="tobacco-pack-weight" placeholder="Грамм" value="${packWeight}" oninput="onPackInfoInput(this)">
+            <span class="pack-price-label">г</span>
         </div>
     `;
     container.appendChild(card);
+    recalcLiveBowlCost();
 }
 
 function formatTimerSec(seconds) {
@@ -616,13 +700,21 @@ function getDraftMixFromForm() {
             const brand = item.querySelector('.tobacco-brand-select')?.value.trim() || '';
             const flavor = item.querySelector('.tobacco-flavor')?.value.trim() || '';
             const weight = parseFloat(item.querySelector('.tobacco-weight')?.value) || 0;
-            if (brand || flavor || weight) mix.push({ brand, flavor, weight });
+            const packPrice = parseFloat(item.querySelector('.tobacco-pack-price')?.value) || 0;
+            const packWeight = parseFloat(item.querySelector('.tobacco-pack-weight')?.value) || 0;
+            const cost = Math.round(calcSingleTobaccoCost(weight, packPrice, packWeight));
+            if (brand && packPrice > 0 && packWeight > 0) saveBrandPackDefault(brand, packPrice, packWeight);
+            if (brand || flavor || weight) mix.push({ brand, flavor, weight, packPrice, packWeight, cost });
         });
     } else {
         const brand = document.getElementById('solo-tobacco-brand')?.value.trim() || '';
         const flavor = document.getElementById('solo-tobacco-flavor')?.value.trim() || '';
         const weight = parseFloat(document.getElementById('solo-tobacco-weight')?.value) || 0;
-        if (brand || flavor || weight) mix.push({ brand, flavor, weight });
+        const packPrice = parseFloat(document.getElementById('solo-pack-price')?.value) || 0;
+        const packWeight = parseFloat(document.getElementById('solo-pack-weight')?.value) || 0;
+        const cost = Math.round(calcSingleTobaccoCost(weight, packPrice, packWeight));
+        if (brand && packPrice > 0 && packWeight > 0) saveBrandPackDefault(brand, packPrice, packWeight);
+        if (brand || flavor || weight) mix.push({ brand, flavor, weight, packPrice, packWeight, cost });
     }
     return mix;
 }
@@ -840,14 +932,17 @@ function saveSession() {
     const comment = document.getElementById('comment').value.trim();
     const mix = getDraftMixFromForm();
 
-    if (mix.length === 0) mix.push({ brand: 'Без названия', flavor: '', weight: 0 });
+    if (mix.length === 0) mix.push({ brand: 'Без названия', flavor: '', weight: 0, packPrice: 0, packWeight: 0, cost: 0 });
+    const sessionCost = Math.round(mix.reduce((acc, m) => acc + (m.cost || calcSingleTobaccoCost(m.weight, m.packPrice, m.packWeight)), 0));
 
+    const now = new Date();
     const session = {
         id: Date.now(),
-        date: new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' }),
+        date: now.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }),
         bowl,
         placement: currentCoalPlacement,
         mix,
+        sessionCost,
         actualWarmupDuration,
         smokeDuration,
         rating: currentRating,
@@ -874,54 +969,141 @@ function resetForm() {
     document.getElementById('comment').value = '';
     document.getElementById('solo-tobacco-flavor').value = '';
     document.getElementById('solo-tobacco-weight').value = '';
+    if (document.getElementById('solo-pack-price')) document.getElementById('solo-pack-price').value = '';
+    if (document.getElementById('solo-pack-weight')) document.getElementById('solo-pack-weight').value = '';
     document.getElementById('mix-container').innerHTML = '';
     document.getElementById('bowl-select').value = '';
     document.getElementById('solo-tobacco-brand').value = '';
     setCoalPlacement('3 в колодке');
     if (isMixMode) toggleMixMode();
+    recalcLiveBowlCost();
+}
+const MONTH_NAMES_RU = {
+    '01': 'Январь', '02': 'Февраль', '03': 'Март', '04': 'Апрель',
+    '05': 'Май', '06': 'Июнь', '07': 'Июль', '08': 'Август',
+    '09': 'Сентябрь', '10': 'Октябрь', '11': 'Ноябрь', '12': 'Декабрь'
+};
+
+function getSessionMonthKey(s) {
+    const dStr = (s.date || '').trim();
+    const parts = dStr.split('.');
+    if (parts.length >= 2) {
+        const mm = parts[1].padStart(2, '0');
+        const yyyy = parts[2] ? parts[2].trim() : new Date(s.id || Date.now()).getFullYear().toString();
+        return `${mm}.${yyyy}`;
+    }
+    const dt = new Date(s.id || Date.now());
+    const mm = String(dt.getMonth() + 1).padStart(2, '0');
+    return `${mm}.${dt.getFullYear()}`;
 }
 
-function deleteSession(id) {
-    const modal = document.getElementById('ios-dialog-modal');
-    const titleEl = document.getElementById('ios-dialog-title');
-    const msgEl = document.getElementById('ios-dialog-msg');
-    const inputEl = document.getElementById('ios-dialog-input');
-    const cancelBtn = document.getElementById('ios-dialog-cancel');
-    const okBtn = document.getElementById('ios-dialog-ok');
-
-    if (!modal) return;
-    titleEl.innerText = 'Удалить покур?';
-    msgEl.innerText = 'Запись будет безвозвратно стерта из истории и статистики.';
-    msgEl.classList.remove('hidden');
-    inputEl.classList.add('hidden');
-    cancelBtn.classList.remove('hidden');
-
-    okBtn.onclick = () => {
-        closeIosDialog();
-        loadAllData((history) => {
-            history = history.filter(s => s.id !== id);
-            saveSessionsToStorage(history, () => {
-                renderData(history);
-            });
-        });
-    };
-
-    modal.classList.remove('hidden');
+function formatMonthKeyLabel(key) {
+    if (key === 'all') return 'За всё время';
+    const [mm, yyyy] = key.split('.');
+    const currentYear = new Date().getFullYear().toString();
+    const mName = MONTH_NAMES_RU[mm] || mm;
+    return (yyyy && yyyy !== currentYear) ? `${mName} ${yyyy}` : mName;
 }
 
-function renderHookahStats(history) {
+function setPeriodFilter(periodKey) {
+    selectedPeriod = periodKey;
+    closePeriodDropdown();
+    loadAllData((history) => renderData(history));
+}
+
+function togglePeriodDropdown(e) {
+    if (e) e.stopPropagation();
+    const menu = document.getElementById('period-popover-menu');
+    const btn = document.getElementById('period-trigger-btn');
+    if (!menu) return;
+    const isHidden = menu.classList.contains('hidden');
+    if (isHidden) {
+        menu.classList.remove('hidden');
+        if (btn) btn.classList.add('open');
+    } else {
+        closePeriodDropdown();
+    }
+}
+
+function closePeriodDropdown() {
+    const menu = document.getElementById('period-popover-menu');
+    const btn = document.getElementById('period-trigger-btn');
+    if (menu) menu.classList.add('hidden');
+    if (btn) btn.classList.remove('open');
+}
+
+function renderPeriodFilterPills(history) {
+    const menu = document.getElementById('period-popover-menu');
+    const badge = document.getElementById('stats-period-badge');
+
+    const monthKeys = [];
+    (history || []).forEach(s => {
+        const k = getSessionMonthKey(s);
+        if (!monthKeys.includes(k)) monthKeys.push(k);
+    });
+
+    if (selectedPeriod !== 'all' && !monthKeys.includes(selectedPeriod)) {
+        selectedPeriod = 'all';
+    }
+
+    if (badge) badge.innerText = formatMonthKeyLabel(selectedPeriod);
+    if (!menu) return;
+
+    const totalCount = (history || []).length;
+    let html = `
+        <button type="button" class="period-option ${selectedPeriod === 'all' ? 'active' : ''}" onclick="setPeriodFilter('all')">
+            <span>${selectedPeriod === 'all' ? '✓ ' : ''}За всё время</span>
+            <span class="period-option-count">${totalCount}</span>
+        </button>
+    `;
+
+    monthKeys.forEach(k => {
+        const count = history.filter(s => getSessionMonthKey(s) === k).length;
+        const isAct = selectedPeriod === k;
+        html += `
+            <button type="button" class="period-option ${isAct ? 'active' : ''}" onclick="setPeriodFilter('${k}')">
+                <span>${isAct ? '✓ ' : ''}${formatMonthKeyLabel(k)}</span>
+                <span class="period-option-count">${count}</span>
+            </button>
+        `;
+    });
+
+    menu.innerHTML = html;
+}
+
+function getSessionTotalCost(s) {
+    if (typeof s.sessionCost === 'number' && s.sessionCost > 0) return s.sessionCost;
+    let sum = 0;
+    (s.mix || []).forEach(m => {
+        if (typeof m.cost === 'number' && m.cost > 0) {
+            sum += m.cost;
+        } else {
+            const savedPack = brandPackDefaults[m.brand || m.name || ''];
+            const pPrice = m.packPrice || (savedPack ? savedPack.price : 0);
+            const pWeight = m.packWeight || (savedPack ? savedPack.weight : 0);
+            sum += calcSingleTobaccoCost(m.weight, pPrice, pWeight);
+        }
+    });
+    return Math.round(sum);
+}
+
+function renderHookahStats(filteredHistory) {
     const statsContainer = document.getElementById('hookah-stats-grid');
     if (!statsContainer) return;
 
-    if (!history || history.length === 0) {
+    if (!filteredHistory || filteredHistory.length === 0) {
         statsContainer.innerHTML = `
             <div class="stat-card">
                 <div class="stat-value">—</div>
                 <div class="stat-label">В дыму</div>
             </div>
             <div class="stat-card">
+                <div class="stat-value accent-cost">—</div>
+                <div class="stat-label">Потрачено на табак</div>
+            </div>
+            <div class="stat-card">
                 <div class="stat-value">—</div>
-                <div class="stat-label">Топ табак</div>
+                <div class="stat-label">Самый долгий</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value">—</div>
@@ -932,22 +1114,32 @@ function renderHookahStats(history) {
     }
 
     let totalSeconds = 0;
+    let totalSpentRub = 0;
+    let totalGramsUsed = 0;
     const bowlCounts = {};
-    const tobaccoCounts = {};
+    let longestSmokeSec = 0;
+    let longestTobaccoName = '—';
 
-    history.forEach(s => {
-        totalSeconds += (s.smokeDuration || 0);
+    filteredHistory.forEach(s => {
+        const dur = s.smokeDuration || 0;
+        totalSeconds += dur;
+        totalSpentRub += getSessionTotalCost(s);
 
         if (s.bowl && s.bowl !== 'Не указана') {
             bowlCounts[s.bowl] = (bowlCounts[s.bowl] || 0) + 1;
         }
 
+        const mixNames = [];
         (s.mix || []).forEach(m => {
+            totalGramsUsed += (parseFloat(m.weight) || 0);
             const bName = ((m.brand || m.name || '') + ' ' + (m.flavor || '')).trim();
-            if (bName && bName !== 'Без названия') {
-                tobaccoCounts[bName] = (tobaccoCounts[bName] || 0) + 1;
-            }
+            if (bName && bName !== 'Без названия') mixNames.push(bName);
         });
+
+        if (dur > longestSmokeSec && mixNames.length > 0) {
+            longestSmokeSec = dur;
+            longestTobaccoName = mixNames.join(' + ');
+        }
     });
 
     const totalHours = (totalSeconds / 3600).toFixed(1);
@@ -961,26 +1153,24 @@ function renderHookahStats(history) {
         }
     }
 
-    let topTobacco = '—';
-    let maxTobCount = 0;
-    for (const [tob, count] of Object.entries(tobaccoCounts)) {
-        if (count > maxTobCount) {
-            maxTobCount = count;
-            topTobacco = tob;
-        }
-    }
+    const costDisplay = totalSpentRub > 0 ? `${totalSpentRub.toLocaleString('ru-RU')} ₽` : '—';
+    const longestSub = longestSmokeSec > 0 ? `${longestTobaccoName} (${formatDurationHM(longestSmokeSec)})` : '—';
 
     statsContainer.innerHTML = `
         <div class="stat-card">
             <div class="stat-value">${totalHours} ч</div>
-            <div class="stat-label">В дыму</div>
+            <div class="stat-label">В дыму (${filteredHistory.length} сес.)</div>
         </div>
         <div class="stat-card">
-            <div class="stat-value" style="font-size: 0.95em; padding-top: 6px;" title="${topTobacco}">${topTobacco}</div>
-            <div class="stat-label">Топ табак</div>
+            <div class="stat-value accent-cost">${costDisplay}</div>
+            <div class="stat-label">Потрачено (${Math.round(totalGramsUsed)} г)</div>
         </div>
         <div class="stat-card">
-            <div class="stat-value" style="font-size: 0.95em; padding-top: 6px;" title="${topBowl}">${topBowl}</div>
+            <div class="stat-value" style="font-size: 0.92em; padding-top: 4px;" title="${longestSub}">${longestSub}</div>
+            <div class="stat-label">Самый долгий табак</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="font-size: 0.95em; padding-top: 4px;" title="${topBowl}">${topBowl}</div>
             <div class="stat-label">Топ чаша</div>
         </div>
     `;
@@ -992,27 +1182,39 @@ function renderData(history) {
         return;
     }
 
-    renderHookahStats(history);
+    renderPeriodFilterPills(history);
+
+    const filteredHistory = (selectedPeriod === 'all')
+        ? history
+        : history.filter(s => getSessionMonthKey(s) === selectedPeriod);
+
+    renderHookahStats(filteredHistory);
 
     const tbody = document.getElementById('history-body');
     if (!tbody) return;
     tbody.innerHTML = '';
     const tobaccoStats = {};
 
-    history.forEach(s => {
+    filteredHistory.forEach(s => {
         const tr = document.createElement('tr');
         const placementText = (s.placement === 'Пирамидка') ? 'Пирамида' : (s.placement || '3 в колодке');
+        const sessionCost = getSessionTotalCost(s);
+        const costBadgeHtml = sessionCost > 0
+            ? `<span class="cost-badge">💰 ${sessionCost} ₽</span>`
+            : '';
 
         const mixStr = (s.mix || []).map(m => {
             const b = m.brand || m.name || '';
             const f = m.flavor || '';
-            return `<span class="badge">${b} ${f} (${m.weight || 0}г)</span>`;
+            const itemCost = m.cost || Math.round(calcSingleTobaccoCost(m.weight, m.packPrice, m.packWeight));
+            const costHint = itemCost > 0 ? ` • ${itemCost}₽` : '';
+            return `<span class="badge">${b} ${f} (${m.weight || 0}г${costHint})</span>`;
         }).join(' ');
 
         const commentHtml = s.comment ? `<div style="color:var(--text-secondary); margin-top:6px; font-size:0.85em; font-style:italic;">💬 ${s.comment}</div>` : '';
 
         tr.innerHTML = `
-            <td><b>${s.date}</b><br><span style="color:#ffb340; font-weight:800;">★ ${s.rating}</span></td>
+            <td><b>${s.date}</b><span style="color:#ffb340; font-weight:800;">★ ${s.rating}</span> ${costBadgeHtml}</td>
             <td><b>${s.bowl}</b><br><span style="color:var(--text-secondary); font-size:0.85em;">🔥 ${placementText}</span></td>
             <td><div>${mixStr}</div>${commentHtml}</td>
             <td style="font-size:0.82em; white-space:nowrap;">
@@ -1031,11 +1233,12 @@ function renderData(history) {
             const key = tobName.toLowerCase();
             if (key) {
                 if (!tobaccoStats[key]) {
-                    tobaccoStats[key] = { name: tobName, count: 0, totalRating: 0, totalWeight: 0 };
+                    tobaccoStats[key] = { name: tobName, count: 0, totalRating: 0, totalWeight: 0, totalSpent: 0 };
                 }
                 tobaccoStats[key].count += 1;
                 tobaccoStats[key].totalRating += s.rating;
                 tobaccoStats[key].totalWeight += (parseFloat(m.weight) || 0);
+                tobaccoStats[key].totalSpent += Math.round(m.cost || calcSingleTobaccoCost(m.weight, m.packPrice, m.packWeight));
             }
         });
     });
@@ -1045,19 +1248,19 @@ function renderData(history) {
     const sortedTobaccos = Object.values(tobaccoStats).sort((a, b) => (b.totalRating / b.count) - (a.totalRating / a.count));
 
     if (sortedTobaccos.length === 0) {
-        analyticsDiv.innerHTML = '<p style="color: var(--text-secondary); margin:0; font-size:0.9em;">Пока нет сохраненных сессий.</p>';
+        analyticsDiv.innerHTML = '<p style="color: var(--text-secondary); margin:0; font-size:0.9em;">Нет сохраненных сессий за выбранный период.</p>';
         return;
     }
 
-    let html = '<table><thead><tr><th>Табак</th><th>Рейтинг</th><th>Сессий</th><th>Вес</th></tr></thead><tbody>';
+    let html = '<table><thead><tr><th>Табак</th><th>Рейтинг</th><th>Вес / Бюджет</th></tr></thead><tbody>';
     sortedTobaccos.forEach(t => {
         const avg = (t.totalRating / t.count).toFixed(1);
+        const spentStr = t.totalSpent > 0 ? ` • <span style="color:var(--primary); font-weight:700;">${t.totalSpent} ₽</span>` : '';
         html += `
             <tr>
-                <td><b>${t.name}</b></td>
+                <td><b>${t.name}</b> <span style="color:var(--text-secondary); font-size:0.8em;">(${t.count})</span></td>
                 <td style="color: #ffb340; font-weight: 800;">★ ${avg}</td>
-                <td>${t.count}</td>
-                <td>${t.totalWeight} г</td>
+                <td>${t.totalWeight} г${spentStr}</td>
             </tr>
         `;
     });

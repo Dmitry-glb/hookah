@@ -268,15 +268,23 @@ function calcSingleTobaccoCost(usedGrams, packPrice, packWeight) {
 
 function recalcLiveBowlCost() {
     const draft = getDraftMixFromForm();
-    let totalCost = 0;
+    let tobaccoCost = 0;
     let totalGrams = 0;
     draft.forEach(m => {
         totalGrams += (parseFloat(m.weight) || 0);
-        totalCost += calcSingleTobaccoCost(m.weight, m.packPrice, m.packWeight);
+        tobaccoCost += calcSingleTobaccoCost(m.weight, m.packPrice, m.packWeight);
     });
+
+    const coalsUsed = parseInt(document.getElementById('session-coals-used')?.value) || 0;
+    const coalCost = coalsUsed * getSingleCoalPrice();
+    const totalCost = tobaccoCost + coalCost;
+
+    const hintEl = document.getElementById('live-coal-cost-hint');
+    if (hintEl) hintEl.innerText = `+${Math.round(coalCost)} ₽ за угли`;
+
     const valEl = document.getElementById('live-bowl-cost-val');
     if (valEl) {
-        valEl.innerText = `${Math.round(totalCost)} ₽ (${totalGrams} г)`;
+        valEl.innerText = `${Math.round(totalCost)} ₽ (${totalGrams} г + ${coalsUsed} угл.)`;
     }
 }
 
@@ -663,14 +671,167 @@ function playBellSound() {
     } catch (e) { }
 }
 
+// 5 классических видов расстановки угля из гайда со встроенными схемами
+const COAL_SETUPS = [
+    {
+        id: '3 внутри',
+        title: '3 внутри',
+        desc: 'Классика (3 угля на дне калауда). Максимальный стартовый жар для прогрева и крепких табаков.',
+        svg: `<svg viewBox="0 0 120 120" width="110" height="110" style="margin:0 auto 10px;display:block;"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--text-secondary)" stroke-width="5"/><rect x="46" y="22" width="28" height="28" rx="5" fill="#FF5500"/><rect x="26" y="62" width="28" height="28" rx="5" fill="#FF5500"/><rect x="66" y="62" width="28" height="28" rx="5" fill="#FF5500"/></svg>`
+    },
+    {
+        id: '2 + 1',
+        title: '2 + 1 (На грани)',
+        desc: 'Самая популярная схема: 2 угля внутри на дне, 1 стоит ребром на бортике калауда. Идеальный баланс жара без перегрева.',
+        svg: `<svg viewBox="0 0 120 120" width="110" height="110" style="margin:0 auto 10px;display:block;"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--text-secondary)" stroke-width="5"/><rect x="28" y="54" width="28" height="28" rx="5" fill="#FF5500"/><rect x="64" y="54" width="28" height="28" rx="5" fill="#FF5500"/><rect x="46" y="6" width="28" height="18" rx="4" fill="#FF9500" stroke="#fff" stroke-width="1.5"/></svg>`
+    },
+    {
+        id: 'Чебурашка',
+        title: 'Чебурашка (1+2)',
+        desc: '1 уголь по центру на дне калауда, а 2 стоят «ушами» на бортиках по бокам. Щадящий, мягкий жар — идеально, когда чаша уже хорошо прогрета или табак боится перегрева.',
+        svg: `<svg viewBox="0 0 120 120" width="110" height="110" style="margin:0 auto 10px;display:block;"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--text-secondary)" stroke-width="5"/><rect x="46" y="46" width="28" height="28" rx="5" fill="#FF5500"/><rect x="4" y="46" width="18" height="28" rx="4" fill="#FF9500" stroke="#fff" stroke-width="1.5"/><rect x="98" y="46" width="18" height="28" rx="4" fill="#FF9500" stroke="#fff" stroke-width="1.5"/></svg>`
+    },
+    {
+        id: 'Пирамида',
+        title: 'Пирамида',
+        desc: '2 угля стоят на дне калауда, а 3-й лежит сверху на них. Мягкий и долгий жар, отлично подходит для легких и средних смесей.',
+        svg: `<svg viewBox="0 0 120 120" width="110" height="110" style="margin:0 auto 10px;display:block;"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--text-secondary)" stroke-width="5"/><rect x="28" y="48" width="28" height="28" rx="5" fill="#FF5500"/><rect x="64" y="48" width="28" height="28" rx="5" fill="#FF5500"/><rect x="46" y="36" width="28" height="28" rx="5" fill="#FF9500" stroke="#1C1C1E" stroke-width="2"/></svg>`
+    },
+    {
+        id: 'Домик',
+        title: 'Домик (2+2)',
+        desc: '4 угля: 2 на дне калауда и 2 сверху на бортиках. Мощный прогрев и долгая отдача жара для больших чаш.',
+        svg: `<svg viewBox="0 0 120 120" width="110" height="110" style="margin:0 auto 10px;display:block;"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--text-secondary)" stroke-width="5"/><rect x="30" y="46" width="26" height="26" rx="5" fill="#FF5500"/><rect x="64" y="46" width="26" height="26" rx="5" fill="#FF5500"/><rect x="22" y="14" width="26" height="16" rx="4" fill="#FF9500"/><rect x="72" y="14" width="26" height="16" rx="4" fill="#FF9500"/></svg>`
+    },
+    {
+        id: '4 внутри',
+        title: '4 внутри',
+        desc: 'Экстремальный жар: 4 угля (обычно 22 мм или отряхнутые 25 мм) плотно внутри колодки. Для жаростойких сигарных табаков.',
+        svg: `<svg viewBox="0 0 120 120" width="110" height="110" style="margin:0 auto 10px;display:block;"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--text-secondary)" stroke-width="5"/><rect x="30" y="30" width="26" height="26" rx="4" fill="#FF5500"/><rect x="64" y="30" width="26" height="26" rx="4" fill="#FF5500"/><rect x="30" y="64" width="26" height="26" rx="4" fill="#FF5500"/><rect x="64" y="64" width="26" height="26" rx="4" fill="#FF5500"/></svg>`
+    }
+];
+
+function renderCoalSelectors() {
+    ['smoking-coal-selector', 'rating-coal-selector'].forEach(containerId => {
+        const box = document.getElementById(containerId);
+        if (!box) return;
+        box.innerHTML = COAL_SETUPS.map(c => `
+            <div class="coal-chip ${currentCoalPlacement === c.id ? 'active' : ''}" onclick="setCoalPlacement('${c.id}')">
+                <span>${c.title}</span>
+                <span class="coal-help-btn" onclick="showCoalHelp('${c.id}', event)" title="Схема и описание">?</span>
+            </div>
+        `).join('');
+    });
+}
+
 function setCoalPlacement(type) {
     if (type === 'Пирамидка') type = 'Пирамида';
+    if (type === '3 в колодке') type = '3 внутри';
     currentCoalPlacement = type;
-    document.querySelectorAll('.coal-chip').forEach(el => el.classList.remove('active'));
-    if (type === '3 в колодке') document.getElementById('chip-3')?.classList.add('active');
-    if (type === '2 + 1') document.getElementById('chip-21')?.classList.add('active');
-    if (type === 'Пирамида') document.getElementById('chip-pyr')?.classList.add('active');
+    renderCoalSelectors();
     saveActiveSessionState();
+}
+
+function showCoalHelp(setupId, event) {
+    if (event) event.stopPropagation();
+    const item = COAL_SETUPS.find(c => c.id === setupId);
+    if (!item) return;
+
+    const modal = document.getElementById('ios-dialog-modal');
+    const titleEl = document.getElementById('ios-dialog-title');
+    const msgEl = document.getElementById('ios-dialog-msg');
+    const inputEl = document.getElementById('ios-dialog-input');
+    const cancelBtn = document.getElementById('ios-dialog-cancel');
+    const okBtn = document.getElementById('ios-dialog-ok');
+
+    titleEl.innerText = `🔥 ${item.title}`;
+    msgEl.innerHTML = `${item.svg}<div>${item.desc}</div>`;
+    msgEl.classList.remove('hidden');
+    inputEl.classList.add('hidden');
+    cancelBtn.classList.add('hidden');
+    okBtn.onclick = () => closeIosDialog();
+    modal.classList.remove('hidden');
+}
+
+// --- СКЛАД И СТОИМОСТЬ УГЛЕЙ ---
+let coalInventory = { size: '25', packPrice: 600, packCount: 72, stock: 0 };
+
+function loadCoalInventory() {
+    try {
+        const raw = localStorage.getItem('hookah_coal_inventory');
+        if (raw) coalInventory = { ...coalInventory, ...JSON.parse(raw) };
+    } catch (e) { }
+    updateCoalUI();
+}
+
+function saveCoalSettings() {
+    const sizeEl = document.getElementById('coal-size-select');
+    const priceEl = document.getElementById('coal-pack-price');
+    const countEl = document.getElementById('coal-pack-count');
+
+    if (sizeEl) coalInventory.size = sizeEl.value;
+    if (priceEl) coalInventory.packPrice = parseFloat(priceEl.value) || 0;
+    if (countEl) coalInventory.packCount = parseInt(countEl.value) || 72;
+
+    localStorage.setItem('hookah_coal_inventory', JSON.stringify(coalInventory));
+    updateCoalUI();
+    recalcLiveBowlCost();
+}
+
+function onCoalSizeChange() {
+    const size = document.getElementById('coal-size-select')?.value;
+    const countEl = document.getElementById('coal-pack-count');
+    if (countEl) {
+        if (size === '25') countEl.value = 72;
+        else if (size === '26') countEl.value = 64;
+        else if (size === '22') countEl.value = 96;
+    }
+    saveCoalSettings();
+}
+
+function getSingleCoalPrice() {
+    if (!coalInventory.packPrice || !coalInventory.packCount || coalInventory.packCount <= 0) return 0;
+    return coalInventory.packPrice / coalInventory.packCount;
+}
+
+function updateCoalUI() {
+    const sizeEl = document.getElementById('coal-size-select');
+    const priceEl = document.getElementById('coal-pack-price');
+    const countEl = document.getElementById('coal-pack-count');
+    const badgeEl = document.getElementById('coal-stock-badge');
+    const unitEl = document.getElementById('coal-unit-price-label');
+
+    if (sizeEl && document.activeElement !== sizeEl) sizeEl.value = coalInventory.size || '25';
+    if (priceEl && document.activeElement !== priceEl) priceEl.value = coalInventory.packPrice || '';
+    if (countEl && document.activeElement !== countEl) countEl.value = coalInventory.packCount || 72;
+
+    if (badgeEl) {
+        badgeEl.innerText = `Остаток: ${coalInventory.stock} шт.`;
+        badgeEl.style.color = coalInventory.stock <= 12 ? 'var(--danger)' : 'var(--primary)';
+    }
+    if (unitEl) {
+        const uPrice = getSingleCoalPrice();
+        unitEl.innerText = `Цена 1 угля (${coalInventory.size} мм): ${uPrice.toFixed(1)} ₽`;
+    }
+}
+
+function buyCoalPack() {
+    const addCount = parseInt(coalInventory.packCount) || 72;
+    coalInventory.stock = (parseInt(coalInventory.stock) || 0) + addCount;
+    localStorage.setItem('hookah_coal_inventory', JSON.stringify(coalInventory));
+    updateCoalUI();
+    showIosNotice('Запас пополнен! 🧱', `Добавлено +${addCount} углей. Всего дома: ${coalInventory.stock} шт.`);
+}
+
+function editCoalStockPrompt() {
+    openIosPrompt('Точный остаток углей (шт)', String(coalInventory.stock || 0), (val) => {
+        const num = parseInt(val);
+        if (!isNaN(num) && num >= 0) {
+            coalInventory.stock = num;
+            localStorage.setItem('hookah_coal_inventory', JSON.stringify(coalInventory));
+            updateCoalUI();
+        }
+    });
 }
 
 async function sendPush(title, body) {
@@ -935,7 +1096,17 @@ function saveSession() {
     const mix = getDraftMixFromForm();
 
     if (mix.length === 0) mix.push({ brand: 'Без названия', flavor: '', weight: 0, packPrice: 0, packWeight: 0, cost: 0 });
-    const sessionCost = Math.round(mix.reduce((acc, m) => acc + (m.cost || calcSingleTobaccoCost(m.weight, m.packPrice, m.packWeight)), 0));
+    const coalsUsed = parseInt(document.getElementById('session-coals-used')?.value) || 0;
+    const coalCost = Math.round(coalsUsed * getSingleCoalPrice());
+    const tobaccoCost = Math.round(mix.reduce((acc, m) => acc + (m.cost || calcSingleTobaccoCost(m.weight, m.packPrice, m.packWeight)), 0));
+    const sessionCost = tobaccoCost + coalCost;
+
+    // Списываем угли из домашнего остатка
+    if (coalsUsed > 0) {
+        coalInventory.stock = Math.max(0, (parseInt(coalInventory.stock) || 0) - coalsUsed);
+        localStorage.setItem('hookah_coal_inventory', JSON.stringify(coalInventory));
+        updateCoalUI();
+    }
 
     const now = new Date();
     const session = {
@@ -943,6 +1114,8 @@ function saveSession() {
         date: now.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }),
         bowl,
         placement: currentCoalPlacement,
+        coalsUsed,
+        coalCost,
         mix,
         sessionCost,
         actualWarmupDuration,
@@ -1124,30 +1297,32 @@ function renderHookahStats(filteredHistory) {
 
     if (!filteredHistory || filteredHistory.length === 0) {
         statsContainer.innerHTML = `
-                    <div class="stat-card">
-                        <div class="stat-value">—</div>
-                        <div class="stat-label">В дыму</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value accent-cost">—</div>
-                        <div class="stat-label">Потрачено на табак</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">—</div>
-                        <div class="stat-label">Самый долгий</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">—</div>
-                        <div class="stat-label">Топ чаша</div>
-                    </div>
-                `;
+            <div class="stat-card">
+                <div class="stat-value">—</div>
+                <div class="stat-label">В дыму</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value accent-cost">—</div>
+                <div class="stat-label">Потрачено всего</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">—</div>
+                <div class="stat-label">Чаще всего курил</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">—</div>
+                <div class="stat-label">Самый долгий / Чаша</div>
+            </div>
+        `;
         return;
     }
 
     let totalSeconds = 0;
     let totalSpentRub = 0;
     let totalGramsUsed = 0;
+    let totalCoalsUsed = 0;
     const bowlCounts = {};
+    const tobaccoFreq = {};
     let longestSmokeSec = 0;
     let longestTobaccoName = '—';
 
@@ -1155,6 +1330,7 @@ function renderHookahStats(filteredHistory) {
         const dur = s.smokeDuration || 0;
         totalSeconds += dur;
         totalSpentRub += getSessionTotalCost(s);
+        totalCoalsUsed += (parseInt(s.coalsUsed) || 0);
 
         if (s.bowl && s.bowl !== 'Не указана') {
             bowlCounts[s.bowl] = (bowlCounts[s.bowl] || 0) + 1;
@@ -1164,7 +1340,10 @@ function renderHookahStats(filteredHistory) {
         (s.mix || []).forEach(m => {
             totalGramsUsed += (parseFloat(m.weight) || 0);
             const bName = ((m.brand || m.name || '') + ' ' + (m.flavor || '')).trim();
-            if (bName && bName !== 'Без названия') mixNames.push(bName);
+            if (bName && bName !== 'Без названия') {
+                mixNames.push(bName);
+                tobaccoFreq[bName] = (tobaccoFreq[bName] || 0) + 1;
+            }
         });
 
         if (dur > longestSmokeSec && mixNames.length > 0) {
@@ -1173,8 +1352,17 @@ function renderHookahStats(filteredHistory) {
         }
     });
 
-    const totalHours = (totalSeconds / 3600).toFixed(1);
+    // Топ табак по частоте покуров за период
+    let mostSmokedTobacco = '—';
+    let maxTobCount = 0;
+    for (const [tName, count] of Object.entries(tobaccoFreq)) {
+        if (count > maxTobCount) {
+            maxTobCount = count;
+            mostSmokedTobacco = `${tName} (${count}x)`;
+        }
+    }
 
+    // Топ чаша
     let topBowl = '—';
     let maxBowlCount = 0;
     for (const [bowl, count] of Object.entries(bowlCounts)) {
@@ -1184,27 +1372,30 @@ function renderHookahStats(filteredHistory) {
         }
     }
 
+    const n = filteredHistory.length;
+    const sessionWord = (n % 10 === 1 && n % 100 !== 11) ? 'покур' : ([2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100)) ? 'покура' : 'покуров';
+    const timeFormatted = formatDurationHM(totalSeconds);
     const costDisplay = totalSpentRub > 0 ? `${totalSpentRub.toLocaleString('ru-RU')} ₽` : '—';
     const longestSub = longestSmokeSec > 0 ? `${longestTobaccoName} (${formatDurationHM(longestSmokeSec)})` : '—';
 
     statsContainer.innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-value">${totalHours} ч</div>
-                    <div class="stat-label">В дыму (${filteredHistory.length} сес.)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value accent-cost">${costDisplay}</div>
-                    <div class="stat-label">Потрачено (${Math.round(totalGramsUsed)} г)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" style="font-size: 0.92em; padding-top: 4px;" title="${longestSub}">${longestSub}</div>
-                    <div class="stat-label">Самый долгий табак</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" style="font-size: 0.95em; padding-top: 4px;" title="${topBowl}">${topBowl}</div>
-                    <div class="stat-label">Топ чаша</div>
-                </div>
-            `;
+        <div class="stat-card">
+            <div class="stat-value">${timeFormatted}</div>
+            <div class="stat-label">В дыму (${n} ${sessionWord})</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value accent-cost">${costDisplay}</div>
+            <div class="stat-label">Бюджет (${Math.round(totalGramsUsed)}г • ${totalCoalsUsed} угл.)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="font-size: 0.92em; padding-top: 4px;" title="${mostSmokedTobacco}">${mostSmokedTobacco}</div>
+            <div class="stat-label">Чаще всего курил</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="font-size: 0.88em; padding-top: 4px;" title="Рекорд: ${longestSub} | Чаша: ${topBowl}">⏳ ${longestSub}</div>
+            <div class="stat-label">Топ чаша: ${topBowl}</div>
+        </div>
+    `;
 }
 
 function renderData(history) {

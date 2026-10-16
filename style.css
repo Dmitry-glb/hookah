@@ -538,33 +538,56 @@ select:focus {
     color: var(--danger);
 }
 
-/* Segmented Control для выбора расстановки углей в финале */
+/* Segmented Control для 5 видов расстановки углей + кнопка ? */
 .coal-setup-selector {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
-    background: var(--surface-row);
-    border: 1px solid var(--glass-border);
-    padding: 4px;
-    border-radius: 14px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
     margin: 6px 0 2px;
 }
 
 .coal-chip {
-    padding: 9px 6px;
-    border-radius: 10px;
-    font-size: 13px;
+    background: var(--surface-row);
+    border: 1px solid var(--glass-border);
+    padding: 8px 10px;
+    border-radius: 12px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--text-secondary);
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .coal-chip.active {
+    background: var(--primary-soft);
+    border-color: var(--primary);
+    color: var(--primary);
+    font-weight: 800;
+}
+
+.coal-help-btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
     background: var(--glass-bg);
-    color: var(--text);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.coal-chip.active .coal-help-btn {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
 }
 
 div[style*="overflow-x: auto"] {

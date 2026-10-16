@@ -122,6 +122,17 @@
                     <span>💰 Себестоимость забивки:</span>
                     <b id="live-bowl-cost-val">0 ₽ (0 г)</b>
                 </div>
+
+                <!-- Угли на покур -->
+                <div class="pack-price-row" style="margin-top: 10px;">
+                    <span class="pack-price-label">🔥 Углей на покур:</span>
+                    <input type="number" id="session-coals-used" value="3" min="1" max="15"
+                        oninput="recalcLiveBowlCost()" style="max-width: 75px;">
+                    <span class="pack-price-label">шт.</span>
+                    <span id="live-coal-cost-hint"
+                        style="margin-left: auto; font-size: 11px; font-weight: 700; color: var(--text-secondary);">0
+                        ₽</span>
+                </div>
             </div>
 
             <div class="form-group">
@@ -169,13 +180,19 @@
                 style="font-size: 0.85em; padding: 10px; margin-bottom: 0;">✕ Отменить сессию</button>
         </div>
 
-        <!-- Шаг 3: Покур -->
+        <!-- Шаг 3: Покур (с быстрым выбором расстановки углей) -->
         <div id="smoking-controls" class="hidden">
             <div class="sub-timer-box">
                 <div style="font-size: 0.9em; color: var(--text-secondary);">Приятного дымного покура! 💨</div>
                 <div style="font-size: 0.8em; color: var(--text-secondary); margin-top: 4px;" id="active-mix-label">
                 </div>
             </div>
+
+            <div class="form-group">
+                <label>Текущая расстановка углей (жми ? для схемы)</label>
+                <div class="coal-setup-selector" id="smoking-coal-selector"></div>
+            </div>
+
             <button class="btn" style="background: var(--danger); box-shadow: 0 8px 20px rgba(255,59,48,0.3);"
                 onclick="finishSmokingSession()">🏁 Завершить покур</button>
         </div>
@@ -193,11 +210,7 @@
 
             <div class="form-group">
                 <label>Основная расстановка углей при курении</label>
-                <div class="coal-setup-selector">
-                    <div class="coal-chip active" id="chip-3" onclick="setCoalPlacement('3 в колодке')">3 в кол.</div>
-                    <div class="coal-chip" id="chip-21" onclick="setCoalPlacement('2 + 1')">2 + 1</div>
-                    <div class="coal-chip" id="chip-pyr" onclick="setCoalPlacement('Пирамида')">Пирамида</div>
-                </div>
+                <div class="coal-setup-selector" id="rating-coal-selector"></div>
             </div>
 
             <div class="form-group">
@@ -205,6 +218,44 @@
                 <textarea id="comment" rows="2" placeholder="Как вкус, жар..."></textarea>
             </div>
             <button class="btn" onclick="saveSession()">💾 Сохранить в историю</button>
+        </div>
+    </div>
+
+    <!-- Модуль: Склад углей дома -->
+    <div class="glass-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3 style="margin: 0;">🧱 Запас углей дома</h3>
+            <span id="coal-stock-badge" class="cost-badge" style="font-size: 12px; padding: 4px 10px;">Остаток: 0
+                шт.</span>
+        </div>
+
+        <div class="tobacco-entry-card" style="margin-bottom: 0;">
+            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                <span class="pack-price-label">Размер:</span>
+                <select id="coal-size-select" onchange="onCoalSizeChange()"
+                    style="height: 36px; padding: 4px 10px; font-size: 13px; flex: 1;">
+                    <option value="25">25 мм (Стандарт: 72 шт / кг)</option>
+                    <option value="26">26 мм (Крупный: 64 шт / кг)</option>
+                    <option value="22">22 мм (Малый: 96 шт / кг)</option>
+                </select>
+            </div>
+            <div class="pack-price-row" style="border-top: none; margin-top: 0; padding-top: 0;">
+                <span class="pack-price-label">Пачка:</span>
+                <input type="number" id="coal-pack-price" placeholder="Цена ₽" oninput="saveCoalSettings()">
+                <span class="pack-price-label">за</span>
+                <input type="number" id="coal-pack-count" placeholder="Штук" value="72" oninput="saveCoalSettings()">
+                <span class="pack-price-label">шт</span>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 10px;">
+                <button type="button" class="btn" onclick="buyCoalPack()"
+                    style="padding: 10px; font-size: 13px; margin: 0; flex: 2;">➕ Купил пачку (+в запас)</button>
+                <button type="button" class="btn btn-secondary" onclick="editCoalStockPrompt()"
+                    style="padding: 10px; font-size: 13px; margin: 0; flex: 1;">✏️ Остаток</button>
+            </div>
+            <div id="coal-unit-price-label"
+                style="text-align: center; font-size: 11px; color: var(--text-secondary); margin-top: 8px; font-weight: 600;">
+                Цена 1 угля: 0 ₽
+            </div>
         </div>
     </div>
 
@@ -296,12 +347,19 @@
             </div>
 
             <div class="form-group">
-                <label>Расстановка</label>
-                <select id="modal-placement">
-                    <option value="3 в колодке">3 в колодке</option>
-                    <option value="2 + 1">2 + 1</option>
-                    <option value="Пирамида">Пирамида</option>
-                </select>
+                <label>Расстановка и кол-во углей</label>
+                <div style="display: flex; gap: 8px;">
+                    <select id="modal-placement" style="flex: 2;">
+                        <option value="3 внутри">3 внутри (В колодке)</option>
+                        <option value="2 + 1">2 + 1 (На грани)</option>
+                        <option value="Чебурашка">Чебурашка (1 внутри, 2 на бортах)</option>
+                        <option value="Пирамида">Пирамида (2 внутри, 1 сверху)</option>
+                        <option value="Домик">Домик (2 внутри, 2 на бортах)</option>
+                        <option value="4 внутри">4 внутри (Макс. жар)</option>
+                    </select>
+                    <input type="number" id="modal-coals-used" placeholder="Углей шт" min="0"
+                        style="flex: 1; text-align: center;">
+                </div>
             </div>
 
             <div class="form-group">

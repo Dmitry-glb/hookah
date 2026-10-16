@@ -772,13 +772,16 @@ function restoreActiveSessionIfAny() {
             if (state.isMixMode) {
                 const container = document.getElementById('mix-container');
                 container.innerHTML = '';
-                state.mix.forEach(m => addMixRow(m.brand, m.flavor, m.weight || ''));
+                state.mix.forEach(m => addMixRow(m.brand, m.flavor, m.weight || '', m.packPrice || '', m.packWeight || ''));
             } else {
                 const m = state.mix[0];
                 document.getElementById('solo-tobacco-brand').value = m.brand || '';
                 document.getElementById('solo-tobacco-flavor').value = m.flavor || '';
                 document.getElementById('solo-tobacco-weight').value = m.weight || '';
+                document.getElementById('solo-pack-price').value = m.packPrice || '';
+                document.getElementById('solo-pack-weight').value = m.packWeight || '';
             }
+            recalcLiveBowlCost();
         }
 
         document.getElementById('setup-form').classList.add('hidden');

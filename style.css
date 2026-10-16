@@ -269,6 +269,190 @@ select:focus {
     background: var(--glass-bg);
 }
 
+/* Строка цены и веса пачки (ровная в один ряд) */
+.pack-price-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--glass-border);
+}
+
+.pack-price-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.pack-price-row input {
+    flex: 1;
+    min-width: 0;
+    height: 36px;
+    padding: 6px 10px;
+    font-size: 13px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+/* Плашка живой себестоимости чаши */
+.live-cost-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--primary-soft);
+    border: 1px solid rgba(255, 98, 26, 0.28);
+    border-radius: 14px;
+    padding: 10px 14px;
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.live-cost-bar b {
+    color: var(--primary);
+    font-weight: 800;
+    font-size: 14px;
+}
+
+/* Статистика и бюджет (Bento 2x2) + Выпадающий календарь */
+.stats-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.period-dropdown-wrap {
+    position: relative;
+}
+
+.period-trigger-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+.period-trigger-btn .chevron-icon {
+    font-size: 10px;
+    opacity: 0.7;
+    transition: transform 0.2s ease;
+}
+
+.period-trigger-btn.open .chevron-icon {
+    transform: rotate(180deg);
+}
+
+.period-popover-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 185px;
+    max-height: 260px;
+    overflow-y: auto;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 18px;
+    padding: 6px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+    z-index: 200;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.period-option {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    padding: 9px 12px;
+    border-radius: 12px;
+    font-family: var(--font-sf);
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.15s ease;
+}
+
+.period-option:hover,
+.period-option:active {
+    background: var(--surface-row);
+}
+
+.period-option.active {
+    color: var(--primary);
+    font-weight: 800;
+    background: var(--primary-soft);
+}
+
+.period-option-count {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    background: var(--surface-row);
+    padding: 2px 7px;
+    border-radius: 999px;
+}
+
+.stats-bento-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.stat-card {
+    background: var(--surface-row);
+    border: 1px solid var(--glass-border);
+    border-radius: 18px;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 78px;
+    overflow: hidden;
+}
+
+.stat-value {
+    font-size: 1.35em;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stat-value.accent-cost {
+    color: var(--primary);
+}
+
+.stat-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-top: 6px;
+}
+
+.cost-badge {
+    background: var(--primary-soft);
+    color: var(--primary);
+    border: 1px solid rgba(255, 98, 26, 0.25);
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
 .wheel-picker-box {
     display: flex;
     align-items: center;
@@ -455,6 +639,7 @@ table:has(#history-body) thead {
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-wrap: wrap;
 }
 
 #history-body td:nth-child(1) br {

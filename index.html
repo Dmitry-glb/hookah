@@ -15,7 +15,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap"
         rel="stylesheet">
 
-
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
@@ -23,8 +22,7 @@
 </head>
 
 <body>
-    <audio id="bg-audio" loop="" playsinline=""
-        src="blob:https://0rfuhjgtov5cy5804e7y1dtb4mpdg63fx96bcvh5buc6j0hs2n-h998661601.scf.usercontent.goog/a9d1a95b-c382-4591-8d00-e8a983493595"></audio>
+    <audio id="bg-audio" loop="" playsinline=""></audio>
 
     <div class="app-header">
         <h2 style="margin:0; font-size: 1.35em;">💨 DimHookah</h2>
@@ -70,7 +68,7 @@
                 <!-- Соло забивка -->
                 <div id="solo-container" class="tobacco-entry-card">
                     <div class="select-with-add" style="margin-bottom: 8px;">
-                        <select id="solo-tobacco-brand">
+                        <select id="solo-tobacco-brand" onchange="onBrandSelectChange(this)">
                             <option value="" disabled="" selected="">Бренд</option>
                             <option value="Наш">Наш</option>
                             <option value="Adalya">Adalya</option>
@@ -102,7 +100,15 @@
                     </div>
                     <div style="display: flex; gap: 8px;">
                         <input type="text" id="solo-tobacco-flavor" placeholder="Вкус" style="flex: 2;">
-                        <input type="number" id="solo-tobacco-weight" placeholder="Грамм" style="flex: 1;">
+                        <input type="number" id="solo-tobacco-weight" placeholder="Грамм в чашу"
+                            oninput="recalcLiveBowlCost()" style="flex: 1.2;">
+                    </div>
+                    <div class="pack-price-row">
+                        <span class="pack-price-label">🏷️ Пачка:</span>
+                        <input type="number" id="solo-pack-price" placeholder="Цена ₽" oninput="onPackInfoInput(this)">
+                        <span class="pack-price-label">за</span>
+                        <input type="number" id="solo-pack-weight" placeholder="Грамм" oninput="onPackInfoInput(this)">
+                        <span class="pack-price-label">г</span>
                     </div>
                 </div>
 
@@ -110,6 +116,12 @@
                 <div id="mix-container" class="hidden"></div>
                 <button type="button" id="add-mix-btn" class="btn btn-secondary hidden" onclick="addMixRow()"
                     style="padding: 10px; font-size: 0.85em; margin-top: 6px;">+ Добавить табак в микс</button>
+
+                <!-- Живой расчет стоимости чаши -->
+                <div class="live-cost-bar">
+                    <span>💰 Себестоимость забивки:</span>
+                    <b id="live-bowl-cost-val">0 ₽ (0 г)</b>
+                </div>
             </div>
 
             <div class="form-group">
@@ -157,7 +169,7 @@
                 style="font-size: 0.85em; padding: 10px; margin-bottom: 0;">✕ Отменить сессию</button>
         </div>
 
-        <!-- Шаг 3: Покур (Чистый экран без лишних переключателей) -->
+        <!-- Шаг 3: Покур -->
         <div id="smoking-controls" class="hidden">
             <div class="sub-timer-box">
                 <div style="font-size: 0.9em; color: var(--text-secondary);">Приятного дымного покура! 💨</div>
@@ -194,6 +206,23 @@
             </div>
             <button class="btn" onclick="saveSession()">💾 Сохранить в историю</button>
         </div>
+    </div>
+
+    <!-- Статистика и бюджет (Карта побед + Календарь месяцев) -->
+    <div class="glass-panel" style="overflow: visible;">
+        <div class="stats-header-row">
+            <h3 style="margin: 0;">🏅 Статистика и бюджет</h3>
+            <div class="period-dropdown-wrap" id="period-dropdown-wrap">
+                <button type="button" class="pill-btn period-trigger-btn" id="period-trigger-btn"
+                    onclick="togglePeriodDropdown(event)">
+                    <span>📅</span>
+                    <span id="stats-period-badge">За всё время</span>
+                    <span class="chevron-icon">▾</span>
+                </button>
+                <div id="period-popover-menu" class="period-popover-menu hidden"></div>
+            </div>
+        </div>
+        <div id="hookah-stats-grid" class="stats-bento-grid"></div>
     </div>
 
     <!-- Рейтинг табаков -->
@@ -330,13 +359,6 @@
             </div>
         </div>
     </div>
-
-
-
-
-
-
-
 
     <script src="app.js"></script>
 </body>

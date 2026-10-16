@@ -807,11 +807,23 @@ function updateCoalUI() {
 
     if (badgeEl) {
         badgeEl.innerText = `Остаток: ${coalInventory.stock} шт.`;
-        badgeEl.style.color = coalInventory.stock <= 12 ? 'var(--danger)' : 'var(--primary)';
+        badgeEl.style.color = coalInventory.stock <= 6 ? 'var(--danger)' : 'var(--primary)';
     }
     if (unitEl) {
         const uPrice = getSingleCoalPrice();
         unitEl.innerText = `Цена 1 угля (${coalInventory.size} мм): ${uPrice.toFixed(1)} ₽`;
+    }
+    // Баннер перед стартом сессии, если осталось <= 6 углей
+    const lowBanner = document.getElementById('low-coal-banner');
+    const lowVal = document.getElementById('low-coal-count-val');
+    if (lowBanner && lowVal) {
+        const stockNum = parseInt(coalInventory.stock) || 0;
+        lowVal.innerText = stockNum;
+        if (stockNum <= 6) {
+            lowBanner.classList.remove('hidden');
+        } else {
+            lowBanner.classList.add('hidden');
+        }
     }
 }
 
@@ -1132,8 +1144,40 @@ function saveSession() {
             resetForm();
             populateSelects();
             renderData(history);
+            showSaveSuccessOverlay();
         });
     });
+}
+
+let successOverlayTimer = null;
+
+function showSaveSuccessOverlay() {
+    const overlay = document.getElementById('save-success-overlay');
+    const coalAlert = document.getElementById('post-save-coal-alert');
+    if (!overlay) return;
+
+    const remaining = parseInt(coalInventory.stock) || 0;
+
+    if (coalAlert) {
+        if (remaining <= 6) {
+            coalAlert.innerHTML = `⚠️ <b>Внимание по углям!</b><br>В остатке всего <b>${remaining} шт.</b> — не забудь купить новую пачку к следующему покуру!`;
+            coalAlert.classList.remove('hidden');
+        } else {
+            coalAlert.classList.add('hidden');
+        }
+    }
+
+    overlay.classList.remove('hidden');
+    overlay.onclick = () => {
+        clearTimeout(successOverlayTimer);
+        overlay.classList.add('hidden');
+    };
+
+    clearTimeout(successOverlayTimer);
+    // Если углей мало — держим окно 4.2 сек, чтобы точно заметил; если всё ок — 2.2 сек
+    successOverlayTimer = setTimeout(() => {
+        overlay.classList.add('hidden');
+    }, remaining <= 6 ? 4200 : 2200);
 }
 
 function resetForm() {

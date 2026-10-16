@@ -166,6 +166,13 @@
                 </div>
             </div>
 
+            <!-- Предупреждение о малом запасе углей -->
+            <div id="low-coal-banner" class="low-coal-banner hidden"
+                onclick="document.getElementById('coal-pack-price')?.scrollIntoView({behavior: 'smooth'})">
+                <span>⚠️ <b>Угли на исходе!</b> Осталось: <span id="low-coal-count-val">0</span> шт. Пора докупить
+                    пачку.</span>
+            </div>
+
             <button class="btn" onclick="startWarmupSession()">🚀 Начать прогрев чаши</button>
         </div>
 
@@ -415,6 +422,16 @@
                     style="margin:0; padding: 11px;">Отмена</button>
                 <button type="button" id="ios-dialog-ok" class="btn" style="margin:0; padding: 11px;">ОК</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Экран успешного сохранения с анимацией -->
+    <div id="save-success-overlay" class="save-success-overlay hidden">
+        <div class="save-success-card">
+            <div class="success-check-circle">✓</div>
+            <h3 style="margin: 0 0 6px 0; font-size: 1.25em;">Успешно сохранено!</h3>
+            <p style="margin: 0; color: var(--text-secondary); font-size: 0.92em;">До скорой дымной встречи 💨</p>
+            <div id="post-save-coal-alert" class="post-save-coal-alert hidden"></div>
         </div>
     </div>
 

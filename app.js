@@ -11,10 +11,10 @@ let audioCtx;
 let swRegistration = null;
 let silentAudioUrl = null;
 let alarmAudioUrl = null;
-let selectedPeriod = 'all';
-let brandPackDefaults = {};
+let selectedPeriod = 'all'; // 'all' или ключ месяца 'MM.YYYY' (или 'MM')
+let brandPackDefaults = {}; // Авто-память цены и граммовки пачки для каждого бренда
 
-// Тема оформления (auto | light | dark)
+// Режимы темы: 'auto' (по системе телефона) | 'light' | 'dark'
 let currentThemeMode = localStorage.getItem('hookah_theme_mode') || 'auto';
 const systemDarkMedia = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -53,6 +53,59 @@ systemDarkMedia.addEventListener('change', () => {
     if (currentThemeMode === 'auto') applyTheme();
 });
 
+// Кастомные диалоги в стиле iOS 27 (работают везде без блокировок)
+function openIosPrompt(title, placeholder, callback) {
+    const modal = document.getElementById('ios-dialog-modal');
+    const titleEl = document.getElementById('ios-dialog-title');
+    const msgEl = document.getElementById('ios-dialog-msg');
+    const inputEl = document.getElementById('ios-dialog-input');
+    const cancelBtn = document.getElementById('ios-dialog-cancel');
+    const okBtn = document.getElementById('ios-dialog-ok');
+
+    if (!modal) return;
+    titleEl.innerText = title;
+    msgEl.classList.add('hidden');
+    inputEl.classList.remove('hidden');
+    inputEl.placeholder = placeholder || '';
+    inputEl.value = '';
+    cancelBtn.classList.remove('hidden');
+
+    okBtn.onclick = () => {
+        const val = inputEl.value.trim();
+        closeIosDialog();
+        if (val && callback) callback(val);
+    };
+
+    modal.classList.remove('hidden');
+    setTimeout(() => inputEl.focus(), 60);
+}
+
+function showIosNotice(title, message) {
+    const modal = document.getElementById('ios-dialog-modal');
+    const titleEl = document.getElementById('ios-dialog-title');
+    const msgEl = document.getElementById('ios-dialog-msg');
+    const inputEl = document.getElementById('ios-dialog-input');
+    const cancelBtn = document.getElementById('ios-dialog-cancel');
+    const okBtn = document.getElementById('ios-dialog-ok');
+
+    if (!modal) return;
+    titleEl.innerText = title;
+    msgEl.innerText = message;
+    msgEl.classList.remove('hidden');
+    inputEl.classList.add('hidden');
+    cancelBtn.classList.add('hidden');
+
+    okBtn.onclick = () => closeIosDialog();
+    modal.classList.remove('hidden');
+}
+
+function closeIosDialog() {
+    const modal = document.getElementById('ios-dialog-modal');
+    const inputEl = document.getElementById('ios-dialog-input');
+    if (inputEl) inputEl.blur();
+    if (modal) modal.classList.add('hidden');
+}
+
 const DEFAULT_BRANDS = [
     'Adalya', 'Afzal', 'Banger', 'Black Burn', 'Bonche',
     'Brusko', 'Burn', 'Chabacco', 'Daily Hookah', 'Darkside',
@@ -86,6 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Закрытие выпадающего списка месяцев при клике вне его
     document.addEventListener('click', (e) => {
         const wrap = document.getElementById('period-dropdown-wrap');
         if (wrap && !wrap.contains(e.target)) {
@@ -115,7 +169,10 @@ function updatePushButtonState() {
 
 async function requestPushPermission() {
     if (!('Notification' in window)) {
-        alert('📲 Чтобы работали пуши на iPhone:\n1. Нажми «Поделиться» внизу Safari.\n2. Выбери «На экран Домой».\n3. Открой DimHookah с иконки на рабочем столе!');
+        showIosNotice(
+            'Установка на iPhone 📲',
+            'Чтобы работали пуши:\n1. Нажми «Поделиться» внизу Safari.\n2. Выбери «На экран Домой».\n3. Открой DimHookah с иконки на рабочем столе!'
+        );
         return;
     }
     try {
@@ -125,7 +182,7 @@ async function requestPushPermission() {
             playBellSound();
             sendPush('Уведомления включены! 🔥', 'Теперь DimHookah предупредит, когда чаша прогреется.');
         } else {
-            alert('Уведомления запрещены в настройках телефона.');
+            showIosNotice('Пуши отключены', 'Разреши уведомления для DimHookah в настройках телефона.');
         }
     } catch (e) { }
 }
@@ -312,7 +369,7 @@ function deleteSelectedBowl(targetSelectId = 'bowl-select') {
     const target = document.getElementById(targetSelectId);
     const val = target ? target.value : '';
     if (!val) {
-        showIosNotice('Чаша не выбрана', 'Сначала выбери чашу в выпадающем списке.');
+        showIosNotice('Чаша не выбрана', 'Сначала выбери чашу в выпадающем списке, чтобы удалить её.');
         return;
     }
     savedBowls = savedBowls.filter(b => b !== val);
@@ -346,7 +403,7 @@ function deleteSelectedBrand(targetSelectOrElem) {
         : targetSelectOrElem;
     const val = el ? el.value : '';
     if (!val) {
-        showIosNotice('Бренд не выбран', 'Сначала выбери бренд в списке.');
+        showIosNotice('Бренд не выбран', 'Сначала выбери бренд табака в списке, чтобы удалить его.');
         return;
     }
     savedBrands = savedBrands.filter(b => b !== val);
@@ -357,58 +414,6 @@ function deleteSelectedBrand(targetSelectOrElem) {
         el.value = '';
     }
     populateSelects();
-}
-
-function openIosPrompt(title, placeholder, callback) {
-    const modal = document.getElementById('ios-dialog-modal');
-    const titleEl = document.getElementById('ios-dialog-title');
-    const msgEl = document.getElementById('ios-dialog-msg');
-    const inputEl = document.getElementById('ios-dialog-input');
-    const cancelBtn = document.getElementById('ios-dialog-cancel');
-    const okBtn = document.getElementById('ios-dialog-ok');
-
-    if (!modal) return;
-    titleEl.innerText = title;
-    msgEl.classList.add('hidden');
-    inputEl.classList.remove('hidden');
-    inputEl.placeholder = placeholder || '';
-    inputEl.value = '';
-    cancelBtn.classList.remove('hidden');
-
-    okBtn.onclick = () => {
-        const val = inputEl.value.trim();
-        closeIosDialog();
-        if (val && callback) callback(val);
-    };
-
-    modal.classList.remove('hidden');
-    setTimeout(() => inputEl.focus(), 60);
-}
-
-function showIosNotice(title, message) {
-    const modal = document.getElementById('ios-dialog-modal');
-    const titleEl = document.getElementById('ios-dialog-title');
-    const msgEl = document.getElementById('ios-dialog-msg');
-    const inputEl = document.getElementById('ios-dialog-input');
-    const cancelBtn = document.getElementById('ios-dialog-cancel');
-    const okBtn = document.getElementById('ios-dialog-ok');
-
-    if (!modal) return;
-    titleEl.innerText = title;
-    msgEl.innerText = message;
-    msgEl.classList.remove('hidden');
-    inputEl.classList.add('hidden');
-    cancelBtn.classList.add('hidden');
-
-    okBtn.onclick = () => closeIosDialog();
-    modal.classList.remove('hidden');
-}
-
-function closeIosDialog() {
-    const modal = document.getElementById('ios-dialog-modal');
-    const inputEl = document.getElementById('ios-dialog-input');
-    if (inputEl) inputEl.blur();
-    if (modal) modal.classList.add('hidden');
 }
 
 function toggleMixMode() {
@@ -450,24 +455,24 @@ function addMixRow(brand = '', flavor = '', weight = '', packPrice = '', packWei
     const card = document.createElement('div');
     card.className = 'tobacco-entry-card mix-item';
     card.innerHTML = `
-        <div class="select-with-add" style="margin-bottom: 8px;">
-            <select class="tobacco-brand-select" onchange="onBrandSelectChange(this)">${getBrandOptionsHtml(brand)}</select>
-            <button type="button" class="btn-plus" onclick="addNewBrandPrompt(this.previousElementSibling)">+</button>
-            <button type="button" class="btn-minus" onclick="deleteSelectedBrand(this.previousElementSibling.previousElementSibling)">−</button>
-            <button type="button" class="btn-danger" style="height: 44px; width: 44px;" onclick="this.closest('.mix-item').remove(); recalcLiveBowlCost();">✕</button>
-        </div>
-        <div style="display: flex; gap: 8px;">
-            <input type="text" class="tobacco-flavor" placeholder="Вкус" value="${flavor}" style="flex: 2;">
-            <input type="number" class="tobacco-weight" placeholder="Грамм в чашу" value="${weight}" oninput="recalcLiveBowlCost()" style="flex: 1.2;">
-        </div>
-        <div class="pack-price-row">
-            <span class="pack-price-label">🏷️ Пачка:</span>
-            <input type="number" class="tobacco-pack-price" placeholder="Цена ₽" value="${packPrice}" oninput="onPackInfoInput(this)">
-            <span class="pack-price-label">за</span>
-            <input type="number" class="tobacco-pack-weight" placeholder="Грамм" value="${packWeight}" oninput="onPackInfoInput(this)">
-            <span class="pack-price-label">г</span>
-        </div>
-    `;
+                <div class="select-with-add" style="margin-bottom: 8px;">
+                    <select class="tobacco-brand-select" onchange="onBrandSelectChange(this)">${getBrandOptionsHtml(brand)}</select>
+                    <button type="button" class="btn-plus" onclick="addNewBrandPrompt(this.previousElementSibling)">+</button>
+                    <button type="button" class="btn-minus" onclick="deleteSelectedBrand(this.previousElementSibling.previousElementSibling)">−</button>
+                    <button type="button" class="btn-danger" style="height: 44px; width: 44px;" onclick="this.closest('.mix-item').remove(); recalcLiveBowlCost();">✕</button>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" class="tobacco-flavor" placeholder="Вкус" value="${flavor}" style="flex: 2;">
+                    <input type="number" class="tobacco-weight" placeholder="Грамм в чашу" value="${weight}" oninput="recalcLiveBowlCost()" style="flex: 1.2;">
+                </div>
+                <div class="pack-price-row">
+                    <span class="pack-price-label">🏷️ Пачка:</span>
+                    <input type="number" class="tobacco-pack-price" placeholder="Цена ₽" value="${packPrice}" oninput="onPackInfoInput(this)">
+                    <span class="pack-price-label">за</span>
+                    <input type="number" class="tobacco-pack-weight" placeholder="Грамм" value="${packWeight}" oninput="onPackInfoInput(this)">
+                    <span class="pack-price-label">г</span>
+                </div>
+            `;
     container.appendChild(card);
     recalcLiveBowlCost();
 }
@@ -582,9 +587,7 @@ async function startKeepAliveAudio(titleText, subtitleText) {
     const audioEl = document.getElementById('bg-audio');
     try {
         if (audioEl) {
-            if (audioEl.src !== silentAudioUrl) {
-                audioEl.src = silentAudioUrl;
-            }
+            if (audioEl.src !== silentAudioUrl) audioEl.src = silentAudioUrl;
             audioEl.volume = 0.05;
             if (audioEl.paused) await audioEl.play();
         }
@@ -672,25 +675,21 @@ function setCoalPlacement(type) {
 
 async function sendPush(title, body) {
     if (navigator.vibrate) {
-        try { navigator.vibrate([300, 150, 300, 150, 400]); } catch (e) { }
+        try { navigator.vibrate([300, 150, 300]); } catch (e) { }
     }
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
-
     try {
         if (swRegistration && swRegistration.showNotification) {
             await swRegistration.showNotification(title, {
                 body: body,
                 icon: 'icon.png',
-                vibrate: [300, 150, 300],
                 tag: 'dimhookah-warmup',
                 renotify: true
             });
         } else {
             new Notification(title, { body, icon: 'icon.png' });
         }
-    } catch (e) {
-        try { new Notification(title, { body }); } catch (err) { }
-    }
+    } catch (e) { }
 }
 
 function getDraftMixFromForm() {
@@ -792,6 +791,7 @@ function restoreActiveSessionIfAny() {
             updateWarmupTimer();
         } else if (state.stage === 'smoking') {
             document.getElementById('status-title').innerText = '💨 Идет покур';
+            document.getElementById('active-mix-label').innerText = getCurrentMixSummaryText();
             document.getElementById('smoking-controls').classList.remove('hidden');
             clearInterval(timerInterval);
             timerInterval = setInterval(updateSmokingTimer, 1000);
@@ -876,6 +876,7 @@ function startSmokingFromWarmup() {
 
     document.getElementById('warmup-box').classList.remove('alarm-active');
     document.getElementById('status-title').innerText = '💨 Идет покур';
+    document.getElementById('active-mix-label').innerText = getCurrentMixSummaryText();
     document.getElementById('warmup-controls').classList.add('hidden');
     document.getElementById('smoking-controls').classList.remove('hidden');
 
@@ -908,15 +909,13 @@ function finishSmokingSession() {
 }
 
 function cancelActiveSession() {
-    if (confirm('Отменить текущую сессию?')) {
-        clearInterval(timerInterval);
-        stopKeepAliveAudio();
-        document.getElementById('warmup-box').classList.remove('alarm-active');
-        document.getElementById('warmup-controls').classList.add('hidden');
-        document.getElementById('smoking-controls').classList.add('hidden');
-        saveActiveSessionState('idle');
-        resetForm();
-    }
+    clearInterval(timerInterval);
+    stopKeepAliveAudio();
+    document.getElementById('warmup-box').classList.remove('alarm-active');
+    document.getElementById('warmup-controls').classList.add('hidden');
+    document.getElementById('smoking-controls').classList.add('hidden');
+    saveActiveSessionState('idle');
+    resetForm();
 }
 
 function setRating(val) {
@@ -969,8 +968,8 @@ function resetForm() {
     document.getElementById('comment').value = '';
     document.getElementById('solo-tobacco-flavor').value = '';
     document.getElementById('solo-tobacco-weight').value = '';
-    if (document.getElementById('solo-pack-price')) document.getElementById('solo-pack-price').value = '';
-    if (document.getElementById('solo-pack-weight')) document.getElementById('solo-pack-weight').value = '';
+    document.getElementById('solo-pack-price').value = '';
+    document.getElementById('solo-pack-weight').value = '';
     document.getElementById('mix-container').innerHTML = '';
     document.getElementById('bowl-select').value = '';
     document.getElementById('solo-tobacco-brand').value = '';
@@ -978,6 +977,35 @@ function resetForm() {
     if (isMixMode) toggleMixMode();
     recalcLiveBowlCost();
 }
+
+function deleteSession(id) {
+    const modal = document.getElementById('ios-dialog-modal');
+    const titleEl = document.getElementById('ios-dialog-title');
+    const msgEl = document.getElementById('ios-dialog-msg');
+    const inputEl = document.getElementById('ios-dialog-input');
+    const cancelBtn = document.getElementById('ios-dialog-cancel');
+    const okBtn = document.getElementById('ios-dialog-ok');
+
+    if (!modal) return;
+    titleEl.innerText = 'Удалить покур?';
+    msgEl.innerText = 'Запись будет безвозвратно стерта из истории и статистики.';
+    msgEl.classList.remove('hidden');
+    inputEl.classList.add('hidden');
+    cancelBtn.classList.remove('hidden');
+
+    okBtn.onclick = () => {
+        closeIosDialog();
+        loadAllData((history) => {
+            history = history.filter(s => s.id !== id);
+            saveSessionsToStorage(history, () => {
+                renderData(history);
+            });
+        });
+    };
+
+    modal.classList.remove('hidden');
+}
+
 const MONTH_NAMES_RU = {
     '01': 'Январь', '02': 'Февраль', '03': 'Март', '04': 'Апрель',
     '05': 'Май', '06': 'Июнь', '07': 'Июль', '08': 'Август',
@@ -1051,21 +1079,21 @@ function renderPeriodFilterPills(history) {
 
     const totalCount = (history || []).length;
     let html = `
-        <button type="button" class="period-option ${selectedPeriod === 'all' ? 'active' : ''}" onclick="setPeriodFilter('all')">
-            <span>${selectedPeriod === 'all' ? '✓ ' : ''}За всё время</span>
-            <span class="period-option-count">${totalCount}</span>
-        </button>
-    `;
+                <button type="button" class="period-option ${selectedPeriod === 'all' ? 'active' : ''}" onclick="setPeriodFilter('all')">
+                    <span>${selectedPeriod === 'all' ? '✓ ' : ''}За всё время</span>
+                    <span class="period-option-count">${totalCount}</span>
+                </button>
+            `;
 
     monthKeys.forEach(k => {
         const count = history.filter(s => getSessionMonthKey(s) === k).length;
         const isAct = selectedPeriod === k;
         html += `
-            <button type="button" class="period-option ${isAct ? 'active' : ''}" onclick="setPeriodFilter('${k}')">
-                <span>${isAct ? '✓ ' : ''}${formatMonthKeyLabel(k)}</span>
-                <span class="period-option-count">${count}</span>
-            </button>
-        `;
+                    <button type="button" class="period-option ${isAct ? 'active' : ''}" onclick="setPeriodFilter('${k}')">
+                        <span>${isAct ? '✓ ' : ''}${formatMonthKeyLabel(k)}</span>
+                        <span class="period-option-count">${count}</span>
+                    </button>
+                `;
     });
 
     menu.innerHTML = html;
@@ -1093,23 +1121,23 @@ function renderHookahStats(filteredHistory) {
 
     if (!filteredHistory || filteredHistory.length === 0) {
         statsContainer.innerHTML = `
-            <div class="stat-card">
-                <div class="stat-value">—</div>
-                <div class="stat-label">В дыму</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value accent-cost">—</div>
-                <div class="stat-label">Потрачено на табак</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">—</div>
-                <div class="stat-label">Самый долгий</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">—</div>
-                <div class="stat-label">Топ чаша</div>
-            </div>
-        `;
+                    <div class="stat-card">
+                        <div class="stat-value">—</div>
+                        <div class="stat-label">В дыму</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value accent-cost">—</div>
+                        <div class="stat-label">Потрачено на табак</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">—</div>
+                        <div class="stat-label">Самый долгий</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">—</div>
+                        <div class="stat-label">Топ чаша</div>
+                    </div>
+                `;
         return;
     }
 
@@ -1157,23 +1185,23 @@ function renderHookahStats(filteredHistory) {
     const longestSub = longestSmokeSec > 0 ? `${longestTobaccoName} (${formatDurationHM(longestSmokeSec)})` : '—';
 
     statsContainer.innerHTML = `
-        <div class="stat-card">
-            <div class="stat-value">${totalHours} ч</div>
-            <div class="stat-label">В дыму (${filteredHistory.length} сес.)</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value accent-cost">${costDisplay}</div>
-            <div class="stat-label">Потрачено (${Math.round(totalGramsUsed)} г)</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value" style="font-size: 0.92em; padding-top: 4px;" title="${longestSub}">${longestSub}</div>
-            <div class="stat-label">Самый долгий табак</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value" style="font-size: 0.95em; padding-top: 4px;" title="${topBowl}">${topBowl}</div>
-            <div class="stat-label">Топ чаша</div>
-        </div>
-    `;
+                <div class="stat-card">
+                    <div class="stat-value">${totalHours} ч</div>
+                    <div class="stat-label">В дыму (${filteredHistory.length} сес.)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value accent-cost">${costDisplay}</div>
+                    <div class="stat-label">Потрачено (${Math.round(totalGramsUsed)} г)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="font-size: 0.92em; padding-top: 4px;" title="${longestSub}">${longestSub}</div>
+                    <div class="stat-label">Самый долгий табак</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="font-size: 0.95em; padding-top: 4px;" title="${topBowl}">${topBowl}</div>
+                    <div class="stat-label">Топ чаша</div>
+                </div>
+            `;
 }
 
 function renderData(history) {
@@ -1214,18 +1242,18 @@ function renderData(history) {
         const commentHtml = s.comment ? `<div style="color:var(--text-secondary); margin-top:6px; font-size:0.85em; font-style:italic;">💬 ${s.comment}</div>` : '';
 
         tr.innerHTML = `
-            <td><b>${s.date}</b><span style="color:#ffb340; font-weight:800;">★ ${s.rating}</span> ${costBadgeHtml}</td>
-            <td><b>${s.bowl}</b><br><span style="color:var(--text-secondary); font-size:0.85em;">🔥 ${placementText}</span></td>
-            <td><div>${mixStr}</div>${commentHtml}</td>
-            <td style="font-size:0.82em; white-space:nowrap;">
-                🔥 ${formatDurationHM(s.actualWarmupDuration)} &nbsp;•&nbsp;
-                💨 <b>${formatDurationHM(s.smokeDuration)}</b>
-            </td>
-            <td style="white-space: nowrap;">
-                <button class="btn-edit" onclick="openFullEditModal(${s.id})">✏️</button>
-                <button class="btn-danger" onclick="deleteSession(${s.id})">✕</button>
-            </td>
-        `;
+                    <td><b>${s.date}</b><span style="color:#ffb340; font-weight:800;">★ ${s.rating}</span> ${costBadgeHtml}</td>
+                    <td><b>${s.bowl}</b><br><span style="color:var(--text-secondary); font-size:0.85em;">🔥 ${placementText}</span></td>
+                    <td><div>${mixStr}</div>${commentHtml}</td>
+                    <td style="font-size:0.82em; white-space:nowrap;">
+                        🔥 ${formatDurationHM(s.actualWarmupDuration)} &nbsp;•&nbsp;
+                        💨 <b>${formatDurationHM(s.smokeDuration)}</b>
+                    </td>
+                    <td style="white-space: nowrap;">
+                        <button class="btn-edit" onclick="openFullEditModal(${s.id})">✏️</button>
+                        <button class="btn-danger" onclick="deleteSession(${s.id})">✕</button>
+                    </td>
+                `;
         tbody.appendChild(tr);
 
         (s.mix || []).forEach(m => {
@@ -1257,34 +1285,45 @@ function renderData(history) {
         const avg = (t.totalRating / t.count).toFixed(1);
         const spentStr = t.totalSpent > 0 ? ` • <span style="color:var(--primary); font-weight:700;">${t.totalSpent} ₽</span>` : '';
         html += `
-            <tr>
-                <td><b>${t.name}</b> <span style="color:var(--text-secondary); font-size:0.8em;">(${t.count})</span></td>
-                <td style="color: #ffb340; font-weight: 800;">★ ${avg}</td>
-                <td>${t.totalWeight} г${spentStr}</td>
-            </tr>
-        `;
+                    <tr>
+                        <td><b>${t.name}</b> <span style="color:var(--text-secondary); font-size:0.8em;">(${t.count})</span></td>
+                        <td style="color: #ffb340; font-weight: 800;">★ ${avg}</td>
+                        <td>${t.totalWeight} г${spentStr}</td>
+                    </tr>
+                `;
     });
     html += '</tbody></table>';
     analyticsDiv.innerHTML = html;
 }
 
-function addModalMixRow(brand = '', flavor = '', weight = '') {
+function addModalMixRow(brand = '', flavor = '', weight = '', packPrice = '', packWeight = '') {
     if (brand && !savedBrands.includes(brand)) savedBrands.push(brand);
+    if (brand && (!packPrice || !packWeight) && brandPackDefaults[brand]) {
+        packPrice = brandPackDefaults[brand].price || '';
+        packWeight = brandPackDefaults[brand].weight || '';
+    }
     const container = document.getElementById('modal-mix-container');
     const card = document.createElement('div');
     card.className = 'tobacco-entry-card modal-mix-item';
     card.innerHTML = `
-        <div class="select-with-add" style="margin-bottom: 8px;">
-            <select class="tobacco-brand-select">${getBrandOptionsHtml(brand)}</select>
-            <button type="button" class="btn-plus" onclick="addNewBrandPrompt(this.previousElementSibling)">+</button>
-            <button type="button" class="btn-minus" onclick="deleteSelectedBrand(this.previousElementSibling.previousElementSibling)">−</button>
-            <button type="button" class="btn-danger" style="height: 44px; width: 44px;" onclick="this.closest('.modal-mix-item').remove()">✕</button>
-        </div>
-        <div style="display: flex; gap: 8px;">
-            <input type="text" class="modal-tobacco-flavor" placeholder="Вкус" value="${flavor}" style="flex: 2.2;">
-            <input type="number" class="modal-tobacco-weight" placeholder="Грамм" value="${weight}" style="flex: 1;">
-        </div>
-    `;
+                <div class="select-with-add" style="margin-bottom: 8px;">
+                    <select class="tobacco-brand-select" onchange="onBrandSelectChange(this)">${getBrandOptionsHtml(brand)}</select>
+                    <button type="button" class="btn-plus" onclick="addNewBrandPrompt(this.previousElementSibling)">+</button>
+                    <button type="button" class="btn-minus" onclick="deleteSelectedBrand(this.previousElementSibling.previousElementSibling)">−</button>
+                    <button type="button" class="btn-danger" style="height: 44px; width: 44px;" onclick="this.closest('.modal-mix-item').remove()">✕</button>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" class="modal-tobacco-flavor" placeholder="Вкус" value="${flavor}" style="flex: 2;">
+                    <input type="number" class="modal-tobacco-weight" placeholder="Грамм" value="${weight}" style="flex: 1.2;">
+                </div>
+                <div class="pack-price-row">
+                    <span class="pack-price-label">🏷️ Пачка:</span>
+                    <input type="number" class="modal-pack-price" placeholder="Цена ₽" value="${packPrice}" oninput="onPackInfoInput(this)">
+                    <span class="pack-price-label">за</span>
+                    <input type="number" class="modal-pack-weight" placeholder="Грамм" value="${packWeight}" oninput="onPackInfoInput(this)">
+                    <span class="pack-price-label">г</span>
+                </div>
+            `;
     container.appendChild(card);
 }
 
@@ -1325,7 +1364,7 @@ function openFullEditModal(id) {
         const mixContainer = document.getElementById('modal-mix-container');
         mixContainer.innerHTML = '';
         (s.mix || []).forEach(m => {
-            addModalMixRow(m.brand || m.name || '', m.flavor || '', m.weight || 0);
+            addModalMixRow(m.brand || m.name || '', m.flavor || '', m.weight || 0, m.packPrice || '', m.packWeight || '');
         });
         if ((s.mix || []).length === 0) addModalMixRow();
 
@@ -1362,9 +1401,14 @@ function saveEditedSession() {
                     const brand = item.querySelector('.tobacco-brand-select').value.trim();
                     const flavor = item.querySelector('.modal-tobacco-flavor').value.trim();
                     const weight = parseFloat(item.querySelector('.modal-tobacco-weight').value) || 0;
-                    if (brand || flavor) updatedMix.push({ brand, flavor, weight });
+                    const packPrice = parseFloat(item.querySelector('.modal-pack-price')?.value) || 0;
+                    const packWeight = parseFloat(item.querySelector('.modal-pack-weight')?.value) || 0;
+                    const cost = Math.round(calcSingleTobaccoCost(weight, packPrice, packWeight));
+                    if (brand && packPrice > 0 && packWeight > 0) saveBrandPackDefault(brand, packPrice, packWeight);
+                    if (brand || flavor) updatedMix.push({ brand, flavor, weight, packPrice, packWeight, cost });
                 });
-                s.mix = updatedMix.length > 0 ? updatedMix : [{ brand: 'Без названия', flavor: '', weight: 0 }];
+                s.mix = updatedMix.length > 0 ? updatedMix : [{ brand: 'Без названия', flavor: '', weight: 0, packPrice: 0, packWeight: 0, cost: 0 }];
+                s.sessionCost = Math.round(s.mix.reduce((acc, m) => acc + (m.cost || 0), 0));
             }
             return s;
         });

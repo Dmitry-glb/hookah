@@ -1799,3 +1799,140 @@ function importFromCSV(event) {
     };
     reader.readAsText(file, 'UTF-8');
 }
+
+// --- РУЧНОЕ ДОБАВЛЕНИЕ СЕССИИ ЗАДНИМ ЧИСЛОМ ---
+function openManualAddModal() {
+    const dateInput = document.getElementById('manual-date-input');
+    if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+
+    const bSelect = document.getElementById('manual-bowl-select');
+    if (bSelect) bSelect.innerHTML = getBowlOptionsHtml();
+
+    const brandSelect = document.getElementById('manual-brand-select');
+    if (brandSelect) brandSelect.innerHTML = getBrandOptionsHtml();
+
+    document.getElementById('manual-add-modal').classList.remove('hidden');
+}
+
+function saveManualSession() {
+    const dateVal = document.getElementById('manual-date-input').value;
+    const bowl = document.getElementById('manual-bowl-select').value || 'Не указана';
+    const brand = document.getElementById('manual-brand-select').value || 'Без названия';
+    const flavor = document.getElementById('manual-flavor-input').value.trim();
+    const weight = parseFloat(document.getElementById('manual-weight-input').value) || 18;
+    const durMins = parseInt(document.getElementById('manual-duration-input').value) || 60;
+    const rating = parseInt(document.getElementById('manual-rating-select').value) || 5;
+    const comment = document.getElementById('manual-comment-input').value.trim();
+
+    if (!dateVal) {
+        showIosNotice('Ошибка', 'Укажи дату покура.');
+        return;
+    }
+
+    const [yyyy, mm, dd] = dateVal.split('-');
+    const formattedDate = `${dd}.${mm}.${yyyy}`;
+
+    const savedPack = brandPackDefaults[brand];
+    const itemCost = Math.round(calcSingleTobaccoCost(weight, savedPack?.price, savedPack?.weight));
+
+    const session = {
+        id: Date.now(),
+        date: formattedDate,
+        bowl,
+        placement: '3 внутри',
+        coalsUsed: 3,
+        coalCost: Math.round(3 * getSingleCoalPrice()),
+        mix: [{ brand, flavor, weight, packPrice: savedPack?.price || 0, packWeight: savedPack?.weight || 0, cost: itemCost }],
+        sessionCost: itemCost + Math.round(3 * getSingleCoalPrice()),
+        actualWarmupDuration: 300,
+        smokeDuration: durMins * 60,
+        rating,
+        comment
+    };
+
+    loadAllData((history) => {
+        history.unshift(session);
+        syncCatalogFromHistory(history);
+        saveSessionsToStorage(history, () => {
+            document.getElementById('manual-add-modal').classList.add('hidden');
+            renderData(history);
+            showSaveSuccessOverlay();
+        });
+    });
+}
+
+// --- РУЛЕТКА ВКУСОВ ИЗ FLAVORS.JSON ---
+let cachedFlavors = [];
+let currentRolledFlavor = null;
+
+async function openFlavorRouletteModal() {
+    const modal = document.getElementById('roulette-modal');
+    if (!modal) return;
+
+    if (cachedFlavors.length === 0) {
+        try {
+            const res = await fetch('flavors.json');
+            cachedFlavors = await res.json();
+        } catch (e) {
+            cachedFlavors = [];
+        }
+    }
+
+    const select = document.getElementById('roulette-brand-filter');
+    if (select) {
+        const brands = Array.from(new Set(cachedFlavors.map(f => f.brand))).sort();
+        select.innerHTML = '<option value="all">🌐 Все бренды (хиты рынка)</option>' +
+            brands.map(b => `<option value="${b}">${b}</option>`).join('');
+    }
+
+    modal.classList.remove('hidden');
+}
+
+function spinFlavorRoulette() {
+    if (cachedFlavors.length === 0) {
+        showIosNotice('База пуста', 'Файл flavors.json не найден или пуст.');
+        return;
+    }
+
+    const brandFilter = document.getElementById('roulette-brand-filter').value;
+    let pool = cachedFlavors;
+    if (brandFilter !== 'all') {
+        pool = cachedFlavors.filter(f => f.brand.toLowerCase() === brandFilter.toLowerCase());
+    }
+
+    if (pool.length === 0) {
+        showIosNotice('Нет вкусов', 'Для этого бренда пока нет позиций в базе.');
+        return;
+    }
+
+    currentRolledFlavor = pool[Math.floor(Math.random() * pool.length)];
+
+    document.getElementById('roulette-res-brand').innerText = `${currentRolledFlavor.brand} • ★ ${currentRolledFlavor.rating} (${currentRolledFlavor.reviews_count} отзывов)`;
+    document.getElementById('roulette-res-name').innerText = currentRolledFlavor.name;
+    document.getElementById('roulette-res-desc').innerText = currentRolledFlavor.description || 'Популярный моно-вкус с высоким народным рейтингом.';
+    document.getElementById('roulette-apply-btn').classList.remove('hidden');
+}
+
+function applyRouletteFlavor() {
+    if (!currentRolledFlavor) return;
+
+    if (isMixMode) {
+        addMixRow(currentRolledFlavor.brand, currentRolledFlavor.name, '12');
+    } else {
+        const brandSel = document.getElementById('solo-tobacco-brand');
+        const flavorInput = document.getElementById('solo-tobacco-flavor');
+        const weightInput = document.getElementById('solo-tobacco-weight');
+
+        if (brandSel) {
+            if (!savedBrands.includes(currentRolledFlavor.brand)) savedBrands.push(currentRolledFlavor.brand);
+            populateSelects();
+            brandSel.value = currentRolledFlavor.brand;
+            onBrandSelectChange(brandSel);
+        }
+        if (flavorInput) flavorInput.value = currentRolledFlavor.name;
+        if (weightInput && !weightInput.value) weightInput.value = '18';
+    }
+
+    document.getElementById('roulette-modal').classList.add('hidden');
+    recalcLiveBowlCost();
+}

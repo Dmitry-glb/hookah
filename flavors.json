@@ -1,0 +1,74 @@
+[
+    {
+        "brand": "Musthave",
+        "name": "Pinkman",
+        "category": "Фрукты",
+        "rating": 4.9,
+        "reviews_count": 1450,
+        "description": "Легендарный розовый грейпфрут с клубничным сиропом и малиной."
+    },
+    {
+        "brand": "Musthave",
+        "name": "Pineapple Rings",
+        "category": "Фрукты",
+        "rating": 4.8,
+        "reviews_count": 980,
+        "description": "Сладкие консервированные кольца ананаса."
+    },
+    {
+        "brand": "Darkside",
+        "name": "Lemonblast",
+        "category": "Кислые",
+        "rating": 4.8,
+        "reviews_count": 1310,
+        "description": "Яркий и сочный натуральный лимон."
+    },
+    {
+        "brand": "Darkside",
+        "name": "Supernova",
+        "category": "Холодок",
+        "rating": 4.9,
+        "reviews_count": 1850,
+        "description": "Ультра-мощный кулер без вкуса и запаха."
+    },
+    {
+        "brand": "Blackburn",
+        "name": "Shock Operand",
+        "category": "Кислые",
+        "rating": 4.6,
+        "reviews_count": 870,
+        "description": "Ультра-кислая черная смородина."
+    },
+    {
+        "brand": "Element",
+        "name": "Фейхоа",
+        "category": "Пряные",
+        "rating": 4.7,
+        "reviews_count": 760,
+        "description": "Травянистая терпкая садовая фейхоа."
+    },
+    {
+        "brand": "Наш",
+        "name": "Малина",
+        "category": "Ягоды",
+        "rating": 4.7,
+        "reviews_count": 520,
+        "description": "Ароматная спелая малина на сигарном листе."
+    },
+    {
+        "brand": "Северный",
+        "name": "Брусничный Морс",
+        "category": "Ягоды",
+        "rating": 4.6,
+        "reviews_count": 490,
+        "description": "Кисло-сладкий освежающий северный морс."
+    },
+    {
+        "brand": "Deus",
+        "name": "Punky Island",
+        "category": "Тропики",
+        "rating": 4.8,
+        "reviews_count": 610,
+        "description": "Маракуйя, гуава и спелое манго."
+    }
+]

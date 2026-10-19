@@ -1,1 +1,1512 @@
-[]
+[
+  {
+    "brand": "База",
+    "name": "Сливочное масло",
+    "category": "Популярное",
+    "rating": 5,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/baza/polegche/slivochnoye-maslo",
+    "collection": "Полегче"
+  },
+  {
+    "brand": "Сливочное масло",
+    "name": "База",
+    "category": "Популярное",
+    "rating": 5,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/baza",
+    "collection": "Полегче"
+  },
+  {
+    "brand": "Сливочное масло",
+    "name": "Полегче",
+    "category": "Популярное",
+    "rating": 5,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/baza/polegche",
+    "collection": "База"
+  },
+  {
+    "brand": "Догма",
+    "name": "Удмуртский сбор",
+    "category": "Популярное",
+    "rating": 5,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/dogma/100-sigarnyy-pank/udmurtskiy-sbor",
+    "collection": "100% сигарный панк"
+  },
+  {
+    "brand": "Удмуртский сбор",
+    "name": "плавленный сырок",
+    "category": "Популярное",
+    "rating": 5,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/6847",
+    "collection": "Догма"
+  },
+  {
+    "brand": "Северный",
+    "name": "Виноград-мята",
+    "category": "Популярное",
+    "rating": 5,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/severnyy/professional/vinograd-myata",
+    "collection": "Professional"
+  },
+  {
+    "brand": "Виноград-мята",
+    "name": "Professional",
+    "category": "Популярное",
+    "rating": 5,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/severnyy/professional",
+    "collection": "Северный"
+  },
+  {
+    "brand": "Виноград-мята",
+    "name": "Ванёк1991",
+    "category": "Популярное",
+    "rating": 5,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/9003",
+    "collection": "Северный"
+  },
+  {
+    "brand": "Bonche",
+    "name": "Honey Мед",
+    "category": "Популярное",
+    "rating": 4.8,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/bonche/notes-ex-5/honey",
+    "collection": "Notes (ex. 5%)"
+  },
+  {
+    "brand": "Honey Мед",
+    "name": "Bonche",
+    "category": "Популярное",
+    "rating": 4.8,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/bonche",
+    "collection": "Notes (ex. 5%)"
+  },
+  {
+    "brand": "Honey Мед",
+    "name": "Notes (ex. 5%)",
+    "category": "Популярное",
+    "rating": 4.8,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/bonche/notes-ex-5",
+    "collection": "Bonche"
+  },
+  {
+    "brand": "Honey Мед",
+    "name": "Кабан Свин",
+    "category": "Популярное",
+    "rating": 4.8,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/11561",
+    "collection": "Bonche"
+  },
+  {
+    "brand": "Bonche",
+    "name": "Ginger Имбирь",
+    "category": "Популярное",
+    "rating": 4.8,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/bonche/notes-ex-5/ginger",
+    "collection": "Notes (ex. 5%)"
+  },
+  {
+    "brand": "Ginger Имбирь",
+    "name": "TreyGod",
+    "category": "Популярное",
+    "rating": 4.8,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/11482",
+    "collection": "Bonche"
+  },
+  {
+    "brand": "Palitra",
+    "name": "Pumpkin Yogurt Тыквенный йогурт",
+    "category": "Популярное",
+    "rating": 4.8,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/palitra/palitra-main/pumpkin-yogurt",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Pumpkin Yogurt Тыквенный йогурт",
+    "name": "Palitra",
+    "category": "Популярное",
+    "rating": 4.8,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/palitra",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Pumpkin Yogurt Тыквенный йогурт",
+    "name": "Основная",
+    "category": "Популярное",
+    "rating": 4.8,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/palitra/palitra-main",
+    "collection": "Palitra"
+  },
+  {
+    "brand": "Pumpkin Yogurt Тыквенный йогурт",
+    "name": "zxcshad0w",
+    "category": "Популярное",
+    "rating": 4.8,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/3625",
+    "collection": "Palitra"
+  },
+  {
+    "brand": "Bonche",
+    "name": "Bergamot Бергамот",
+    "category": "Популярное",
+    "rating": 4.8,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/bonche/notes-ex-5/bergamot",
+    "collection": "Notes (ex. 5%)"
+  },
+  {
+    "brand": "Bonche",
+    "name": "Dark Chocolate Темный шоколад",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/bonche/main/dark-chocolate",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Dark Chocolate Темный шоколад",
+    "name": "Основная",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/bonche/main",
+    "collection": "Bonche"
+  },
+  {
+    "brand": "Догма",
+    "name": "Башкирский мёд",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/dogma/eksperimentalnaya-lineyka/bashkirskiy-med",
+    "collection": "Экспериментальная линейка"
+  },
+  {
+    "brand": "Башкирский мёд",
+    "name": "Никитос",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/9831",
+    "collection": "Догма"
+  },
+  {
+    "brand": "Северный",
+    "name": "Север",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/severnyy/main/sever",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Север",
+    "name": "Северный",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/severnyy",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Север",
+    "name": "Основная",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/severnyy/main",
+    "collection": "Северный"
+  },
+  {
+    "brand": "Север",
+    "name": "Иван Иванов",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/5409",
+    "collection": "Северный"
+  },
+  {
+    "brand": "Догма",
+    "name": "Лемон дропс",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/dogma/100-sigarnyy-pank/lemon-drops",
+    "collection": "100% сигарный панк"
+  },
+  {
+    "brand": "Лемон дропс",
+    "name": "100% сигарный панк",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/dogma/100-sigarnyy-pank",
+    "collection": "Догма"
+  },
+  {
+    "brand": "Лемон дропс",
+    "name": "Воздушная шляпа",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/11234",
+    "collection": "Догма"
+  },
+  {
+    "brand": "Trofimoff’s",
+    "name": "Finlandia Vanila Ванильная Финляндия",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/trofimoffs/terror/finlandia-vanila",
+    "collection": "Terror"
+  },
+  {
+    "brand": "Finlandia Vanila Ванильная Финляндия",
+    "name": "Trofimoff’s",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/trofimoffs",
+    "collection": "Terror"
+  },
+  {
+    "brand": "Finlandia Vanila Ванильная Финляндия",
+    "name": "Terror",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/trofimoffs/terror",
+    "collection": "Trofimoff’s"
+  },
+  {
+    "brand": "Finlandia Vanila Ванильная Финляндия",
+    "name": "Deep house",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/9766",
+    "collection": "Trofimoff’s"
+  },
+  {
+    "brand": "Bonche",
+    "name": "Coffee Кофе",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/bonche/main/coffee",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Coffee Кофе",
+    "name": "_Максим_",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/11368",
+    "collection": "Bonche"
+  },
+  {
+    "brand": "Deus",
+    "name": "Catmint",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/deus/deus-main/catmint",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Catmint",
+    "name": "Deus",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/deus",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Catmint",
+    "name": "Основная",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/deus/deus-main",
+    "collection": "Deus"
+  },
+  {
+    "brand": "Catmint",
+    "name": "Мария Юрьевна",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/11287",
+    "collection": "Deus"
+  },
+  {
+    "brand": "Догма",
+    "name": "Пушкин",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/dogma/100-sigarnyy-pank/pushkin",
+    "collection": "100% сигарный панк"
+  },
+  {
+    "brand": "Пушкин",
+    "name": "Roma",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/9888",
+    "collection": "Догма"
+  },
+  {
+    "brand": "Trofimoff’s",
+    "name": "Sri Lanka Элитарный чай",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/trofimoffs/burley/sri-lanka",
+    "collection": "Burley"
+  },
+  {
+    "brand": "Sri Lanka Элитарный чай",
+    "name": "Burley",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/trofimoffs/burley",
+    "collection": "Trofimoff’s"
+  },
+  {
+    "brand": "Sri Lanka Элитарный чай",
+    "name": "Iv",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/8479",
+    "collection": "Trofimoff’s"
+  },
+  {
+    "brand": "Bonche",
+    "name": "Caramel Карамель",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/bonche/notes-ex-5/caramel",
+    "collection": "Notes (ex. 5%)"
+  },
+  {
+    "brand": "Caramel Карамель",
+    "name": "ssoroka",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/11407",
+    "collection": "Bonche"
+  },
+  {
+    "brand": "Spectrum",
+    "name": "Epic Mint Мощная мята",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/spectrum/classic-line/epic-mint",
+    "collection": "Classic Line"
+  },
+  {
+    "brand": "Epic Mint Мощная мята",
+    "name": "Spectrum",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/spectrum",
+    "collection": "Classic Line"
+  },
+  {
+    "brand": "Epic Mint Мощная мята",
+    "name": "Classic Line",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/spectrum/classic-line",
+    "collection": "Spectrum"
+  },
+  {
+    "brand": "Epic Mint Мощная мята",
+    "name": "Romchesku",
+    "category": "Популярное",
+    "rating": 4.7,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/5207",
+    "collection": "Spectrum"
+  },
+  {
+    "brand": "DARKSIDE",
+    "name": "Supernova Супернова",
+    "category": "Популярное",
+    "rating": 4.6,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/darkside/core/supernova",
+    "collection": "Core"
+  },
+  {
+    "brand": "Supernova Супернова",
+    "name": "DeskelTV",
+    "category": "Популярное",
+    "rating": 4.6,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/11375",
+    "collection": "DARKSIDE"
+  },
+  {
+    "brand": "MUSTHAVE",
+    "name": "Earl Grey Эрл Грей",
+    "category": "Популярное",
+    "rating": 4.6,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/musthave/main/earl-grey",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Earl Grey Эрл Грей",
+    "name": "MUSTHAVE",
+    "category": "Популярное",
+    "rating": 4.6,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/musthave",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Earl Grey Эрл Грей",
+    "name": "Основная",
+    "category": "Популярное",
+    "rating": 4.6,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/musthave/main",
+    "collection": "MUSTHAVE"
+  },
+  {
+    "brand": "Earl Grey Эрл Грей",
+    "name": "kk_bu",
+    "category": "Популярное",
+    "rating": 4.6,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/10267",
+    "collection": "MUSTHAVE"
+  },
+  {
+    "brand": "Северный",
+    "name": "Белый чай",
+    "category": "Популярное",
+    "rating": 4.6,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/severnyy/main/belyy-chay",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Белый чай",
+    "name": "ZmeeeD",
+    "category": "Популярное",
+    "rating": 4.6,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/10110",
+    "collection": "Северный"
+  },
+  {
+    "brand": "Trofimoff’s",
+    "name": "Ambiente Хлопок и перец",
+    "category": "Популярное",
+    "rating": 4.6,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/trofimoffs/burley/ambiente",
+    "collection": "Burley"
+  },
+  {
+    "brand": "Ambiente Хлопок и перец",
+    "name": "Александр Титов",
+    "category": "Популярное",
+    "rating": 4.6,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/5604",
+    "collection": "Trofimoff’s"
+  },
+  {
+    "brand": "Spectrum",
+    "name": "Ландыш виноград Lily grape",
+    "category": "Популярное",
+    "rating": 4.3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/spectrum/medium-line/landysh-vinograd",
+    "collection": "Medium Line"
+  },
+  {
+    "brand": "Ландыш виноград Lily grape",
+    "name": "Medium Line",
+    "category": "Популярное",
+    "rating": 4.3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/spectrum/medium-line",
+    "collection": "Spectrum"
+  },
+  {
+    "brand": "Ландыш виноград Lily grape",
+    "name": "Iv_an",
+    "category": "Популярное",
+    "rating": 4.3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/10412",
+    "collection": "Spectrum"
+  },
+  {
+    "brand": "Element",
+    "name": "Мятный виноград Grape Mint",
+    "category": "Популярное",
+    "rating": 4.3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/element/zemlya/myatnyy-vinograd",
+    "collection": "Земля"
+  },
+  {
+    "brand": "Мятный виноград Grape Mint",
+    "name": "Element",
+    "category": "Популярное",
+    "rating": 4.3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/element",
+    "collection": "Земля"
+  },
+  {
+    "brand": "Мятный виноград Grape Mint",
+    "name": "Земля",
+    "category": "Популярное",
+    "rating": 4.3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/element/zemlya",
+    "collection": "Element"
+  },
+  {
+    "brand": "Мятный виноград Grape Mint",
+    "name": "Пётр Павлов",
+    "category": "Популярное",
+    "rating": 4.3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/10024",
+    "collection": "Element"
+  },
+  {
+    "brand": "Табак Шпаковского",
+    "name": "Evening mix Вечерний микс",
+    "category": "Популярное",
+    "rating": 4.3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/tabak-shpakovskogo/tabak-shpakovskogo-main/evening-mix",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Evening mix Вечерний микс",
+    "name": "Табак Шпаковского",
+    "category": "Популярное",
+    "rating": 4.3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/tabak-shpakovskogo",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Evening mix Вечерний микс",
+    "name": "Основная",
+    "category": "Популярное",
+    "rating": 4.3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/tabak-shpakovskogo/tabak-shpakovskogo-main",
+    "collection": "Табак Шпаковского"
+  },
+  {
+    "brand": "Evening mix Вечерний микс",
+    "name": "true_Junglist",
+    "category": "Популярное",
+    "rating": 4.3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/6659",
+    "collection": "Табак Шпаковского"
+  },
+  {
+    "brand": "JOY.",
+    "name": "Виноградно-тропический шейк",
+    "category": "Популярное",
+    "rating": 4.3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/joy/main/vinogradno-tropicheskiy-sheyk",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Виноградно-тропический шейк",
+    "name": "Kvench",
+    "category": "Популярное",
+    "rating": 4.3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/2027",
+    "collection": "JOY."
+  },
+  {
+    "brand": "DARKSIDE",
+    "name": "Crystal Grape Кристал Грейп",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/darkside/core/crystal-grape",
+    "collection": "Core"
+  },
+  {
+    "brand": "Crystal Grape Кристал Грейп",
+    "name": "Артём Крылов",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/8368",
+    "collection": "DARKSIDE"
+  },
+  {
+    "brand": "MUSTHAVE",
+    "name": "Смородина, апельсин и виноград",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/musthave/main/smorodina-apelsin-i-vinograd",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Смородина, апельсин и виноград",
+    "name": "KyniBal",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/11524",
+    "collection": "MUSTHAVE"
+  },
+  {
+    "brand": "Duft",
+    "name": "Grape Fizz Виноград",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/duft/duft-solo/grape-fizz",
+    "collection": "Duft Solo"
+  },
+  {
+    "brand": "Grape Fizz Виноград",
+    "name": "Duft",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/duft",
+    "collection": "Duft Solo"
+  },
+  {
+    "brand": "Grape Fizz Виноград",
+    "name": "Duft Solo",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/duft/duft-solo",
+    "collection": "Duft"
+  },
+  {
+    "brand": "Grape Fizz Виноград",
+    "name": "Gendalfini",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/7981",
+    "collection": "Duft"
+  },
+  {
+    "brand": "Satyr",
+    "name": "Bom-Byao",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/satyr/aroma-collection/bom-byao",
+    "collection": "Aroma Collection"
+  },
+  {
+    "brand": "Bom-Byao",
+    "name": "Aroma Collection",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/satyr/aroma-collection",
+    "collection": "Satyr"
+  },
+  {
+    "brand": "Догма",
+    "name": "Чурчхела",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/dogma/100-sigarnyy-pank/churchkhela",
+    "collection": "100% сигарный панк"
+  },
+  {
+    "brand": "Чурчхела",
+    "name": "Deiiks",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/11182",
+    "collection": "Догма"
+  },
+  {
+    "brand": "Rustpunk",
+    "name": "Манго шардоне",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/rustpunk/main/mango-shardone",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Манго шардоне",
+    "name": "Rustpunk",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/rustpunk",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Манго шардоне",
+    "name": "Основная",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/rustpunk/main",
+    "collection": "Rustpunk"
+  },
+  {
+    "brand": "Манго шардоне",
+    "name": "Volchkov_Roman",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/2628",
+    "collection": "Rustpunk"
+  },
+  {
+    "brand": "Khan Burley",
+    "name": "Grapes Виноград",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/khan-burley/khan-burley-main/grapes",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Grapes Виноград",
+    "name": "Khan Burley",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/khan-burley",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Grapes Виноград",
+    "name": "Основная",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/khan-burley/khan-burley-main",
+    "collection": "Khan Burley"
+  },
+  {
+    "brand": "Grapes Виноград",
+    "name": "xxvi",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/7980",
+    "collection": "Khan Burley"
+  },
+  {
+    "brand": "Mr. Brew",
+    "name": "Isabella Brew Виноград Изабелла",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/mr-brew/main/isabella-brew",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Isabella Brew Виноград Изабелла",
+    "name": "Mr. Brew",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/mr-brew",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Isabella Brew Виноград Изабелла",
+    "name": "Основная",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/mr-brew/main",
+    "collection": "Mr. Brew"
+  },
+  {
+    "brand": "Isabella Brew Виноград Изабелла",
+    "name": "Scorpio",
+    "category": "Популярное",
+    "rating": 4.2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/6641",
+    "collection": "Mr. Brew"
+  },
+  {
+    "brand": "Muassel",
+    "name": "Wind Of Change Ветер перемен",
+    "category": "Популярное",
+    "rating": 4.1,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/muassel/medium/wind-of-change",
+    "collection": "Medium"
+  },
+  {
+    "brand": "Wind Of Change Ветер перемен",
+    "name": "Muassel",
+    "category": "Популярное",
+    "rating": 4.1,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/muassel",
+    "collection": "Medium"
+  },
+  {
+    "brand": "Wind Of Change Ветер перемен",
+    "name": "Medium",
+    "category": "Популярное",
+    "rating": 4.1,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/muassel/medium",
+    "collection": "Muassel"
+  },
+  {
+    "brand": "Wind Of Change Ветер перемен",
+    "name": "Туман в Квартире",
+    "category": "Популярное",
+    "rating": 4.1,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/7972",
+    "collection": "Muassel"
+  },
+  {
+    "brand": "MUSTHAVE",
+    "name": "Araram Арарам",
+    "category": "Популярное",
+    "rating": 4.1,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/musthave/main/araram",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Araram Арарам",
+    "name": "Прокурочная у Лияны",
+    "category": "Популярное",
+    "rating": 4.1,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/8197",
+    "collection": "MUSTHAVE"
+  },
+  {
+    "brand": "Trofimoff’s",
+    "name": "Ruby Grapes Рубиновый виноград",
+    "category": "Популярное",
+    "rating": 4.1,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/trofimoffs/burley/ruby-grapes",
+    "collection": "Burley"
+  },
+  {
+    "brand": "Ruby Grapes Рубиновый виноград",
+    "name": "Tobi152",
+    "category": "Популярное",
+    "rating": 4.1,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/11430",
+    "collection": "Trofimoff’s"
+  },
+  {
+    "brand": "Догма",
+    "name": "Крымская лаванда",
+    "category": "Популярное",
+    "rating": 4,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/dogma/eksperimentalnaya-lineyka/krymskaya-lavanda",
+    "collection": "Экспериментальная линейка"
+  },
+  {
+    "brand": "Крымская лаванда",
+    "name": "Догма",
+    "category": "Популярное",
+    "rating": 4,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/dogma",
+    "collection": "Экспериментальная линейка"
+  },
+  {
+    "brand": "Крымская лаванда",
+    "name": "Экспериментальная линейка",
+    "category": "Популярное",
+    "rating": 4,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/dogma/eksperimentalnaya-lineyka",
+    "collection": "Догма"
+  },
+  {
+    "brand": "Крымская лаванда",
+    "name": "Mikhail S",
+    "category": "Популярное",
+    "rating": 4,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/11579",
+    "collection": "Догма"
+  },
+  {
+    "brand": "Palitra",
+    "name": "Пол-литра",
+    "category": "Популярное",
+    "rating": 4,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/palitra/palitra-main/pol-litra",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Пол-литра",
+    "name": "Кирилл Хасанов",
+    "category": "Популярное",
+    "rating": 4,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/11135",
+    "collection": "Palitra"
+  },
+  {
+    "brand": "Sebero",
+    "name": "Juicy Shake Джуси шейк",
+    "category": "Популярное",
+    "rating": 4,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/sebero/sebero-arctic-mix/juicy-shake",
+    "collection": "Sebero Arctic Mix"
+  },
+  {
+    "brand": "Juicy Shake Джуси шейк",
+    "name": "Sebero",
+    "category": "Популярное",
+    "rating": 4,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/sebero",
+    "collection": "Sebero Arctic Mix"
+  },
+  {
+    "brand": "Juicy Shake Джуси шейк",
+    "name": "Sebero Arctic Mix",
+    "category": "Популярное",
+    "rating": 4,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/sebero/sebero-arctic-mix",
+    "collection": "Sebero"
+  },
+  {
+    "brand": "Juicy Shake Джуси шейк",
+    "name": "Gsders",
+    "category": "Популярное",
+    "rating": 4,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/11518",
+    "collection": "Sebero"
+  },
+  {
+    "brand": "Serbetli",
+    "name": "Banana Strawberry",
+    "category": "Популярное",
+    "rating": 3.4,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/serbetli/main/banana-strawberry",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Banana Strawberry",
+    "name": "Serbetli",
+    "category": "Популярное",
+    "rating": 3.4,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/serbetli",
+    "collection": "Основная"
+  },
+  {
+    "brand": "Banana Strawberry",
+    "name": "Основная",
+    "category": "Популярное",
+    "rating": 3.4,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/serbetli/main",
+    "collection": "Serbetli"
+  },
+  {
+    "brand": "Banana Strawberry",
+    "name": "Monyda",
+    "category": "Популярное",
+    "rating": 3.4,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/5743",
+    "collection": "Serbetli"
+  },
+  {
+    "brand": "Satyr",
+    "name": "Smena Смена",
+    "category": "Популярное",
+    "rating": 3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/satyr/exclusive-collection/smena",
+    "collection": "Exclusive Collection"
+  },
+  {
+    "brand": "Smena Смена",
+    "name": "Satyr",
+    "category": "Популярное",
+    "rating": 3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/satyr",
+    "collection": "Exclusive Collection"
+  },
+  {
+    "brand": "Smena Смена",
+    "name": "Exclusive Collection",
+    "category": "Популярное",
+    "rating": 3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/satyr/exclusive-collection",
+    "collection": "Satyr"
+  },
+  {
+    "brand": "Smena Смена",
+    "name": "GRANDMASTER THE OHM",
+    "category": "Популярное",
+    "rating": 3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/8858",
+    "collection": "Satyr"
+  },
+  {
+    "brand": "База",
+    "name": "Замша",
+    "category": "Популярное",
+    "rating": 3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/baza/pokrepche/zamsha",
+    "collection": "Покрепче"
+  },
+  {
+    "brand": "Замша",
+    "name": "Покрепче",
+    "category": "Популярное",
+    "rating": 3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/baza/pokrepche",
+    "collection": "База"
+  },
+  {
+    "brand": "Замша",
+    "name": "Gekon",
+    "category": "Популярное",
+    "rating": 3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/7617",
+    "collection": "База"
+  },
+  {
+    "brand": "Nаш",
+    "name": "Виноград",
+    "category": "Популярное",
+    "rating": 3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/nash/cigar-product/vinograd",
+    "collection": "Cigar Product"
+  },
+  {
+    "brand": "Виноград",
+    "name": "Nаш",
+    "category": "Популярное",
+    "rating": 3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/nash",
+    "collection": "Cigar Product"
+  },
+  {
+    "brand": "Виноград",
+    "name": "Cigar Product",
+    "category": "Популярное",
+    "rating": 3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/nash/cigar-product",
+    "collection": "Nаш"
+  },
+  {
+    "brand": "Виноград",
+    "name": "Vlastelin",
+    "category": "Популярное",
+    "rating": 3,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/6535",
+    "collection": "Nаш"
+  },
+  {
+    "brand": "Tangiers",
+    "name": "Cane Mint Тростниковая мята",
+    "category": "Популярное",
+    "rating": 2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/tangiers/tangiers-noir/cane-mint",
+    "collection": "Tangiers Noir"
+  },
+  {
+    "brand": "Cane Mint Тростниковая мята",
+    "name": "Tangiers",
+    "category": "Популярное",
+    "rating": 2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/tangiers",
+    "collection": "Tangiers Noir"
+  },
+  {
+    "brand": "Cane Mint Тростниковая мята",
+    "name": "Tangiers Noir",
+    "category": "Популярное",
+    "rating": 2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/tangiers/tangiers-noir",
+    "collection": "Tangiers"
+  },
+  {
+    "brand": "Cane Mint Тростниковая мята",
+    "name": "hennessyxo1337",
+    "category": "Популярное",
+    "rating": 2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/8018",
+    "collection": "Tangiers"
+  },
+  {
+    "brand": "DARKSIDE",
+    "name": "Virgin Peach 2.0 Вирджин пич 2.0",
+    "category": "Популярное",
+    "rating": 2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/darkside/core/virgin-peach-20",
+    "collection": "Core"
+  },
+  {
+    "brand": "Virgin Peach 2.0 Вирджин пич 2.0",
+    "name": "DARKSIDE",
+    "category": "Популярное",
+    "rating": 2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/darkside",
+    "collection": "Core"
+  },
+  {
+    "brand": "Virgin Peach 2.0 Вирджин пич 2.0",
+    "name": "Core",
+    "category": "Популярное",
+    "rating": 2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/darkside/core",
+    "collection": "DARKSIDE"
+  },
+  {
+    "brand": "Virgin Peach 2.0 Вирджин пич 2.0",
+    "name": "Stervellina",
+    "category": "Популярное",
+    "rating": 2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/8160",
+    "collection": "DARKSIDE"
+  },
+  {
+    "brand": "JOY.",
+    "name": "28. Виноградный чай",
+    "category": "Популярное",
+    "rating": 2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/joy/main/28-vinogradnyy-chay",
+    "collection": "Основная"
+  },
+  {
+    "brand": "28. Виноградный чай",
+    "name": "JOY.",
+    "category": "Популярное",
+    "rating": 2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/joy",
+    "collection": "Основная"
+  },
+  {
+    "brand": "28. Виноградный чай",
+    "name": "Основная",
+    "category": "Популярное",
+    "rating": 2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/joy/main",
+    "collection": "JOY."
+  },
+  {
+    "brand": "28. Виноградный чай",
+    "name": "Curakoooo",
+    "category": "Популярное",
+    "rating": 2,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/2096",
+    "collection": "JOY."
+  },
+  {
+    "brand": "Сарма",
+    "name": "Зима",
+    "category": "Популярное",
+    "rating": 1,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/sarma/klassicheskaya/zima",
+    "collection": "Классическая"
+  },
+  {
+    "brand": "Зима",
+    "name": "Сарма",
+    "category": "Популярное",
+    "rating": 1,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/sarma",
+    "collection": "Классическая"
+  },
+  {
+    "brand": "Зима",
+    "name": "Классическая",
+    "category": "Популярное",
+    "rating": 1,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/sarma/klassicheskaya",
+    "collection": "Сарма"
+  },
+  {
+    "brand": "Зима",
+    "name": "Maks Novikoff",
+    "category": "Популярное",
+    "rating": 1,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/7016",
+    "collection": "Сарма"
+  },
+  {
+    "brand": "Chabacco",
+    "name": "Виноградные леденцы Grape drops",
+    "category": "Популярное",
+    "rating": 1,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/chabacco/chabacco-mix/vinogradnyye-ledentsy",
+    "collection": "Chabacco MIX"
+  },
+  {
+    "brand": "Виноградные леденцы Grape drops",
+    "name": "Chabacco",
+    "category": "Популярное",
+    "rating": 1,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/chabacco",
+    "collection": "Chabacco MIX"
+  },
+  {
+    "brand": "Виноградные леденцы Grape drops",
+    "name": "Chabacco MIX",
+    "category": "Популярное",
+    "rating": 1,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/tobaccos/chabacco/chabacco-mix",
+    "collection": "Chabacco"
+  },
+  {
+    "brand": "Виноградные леденцы Grape drops",
+    "name": "SvetaGromova",
+    "category": "Популярное",
+    "rating": 1,
+    "reviews_count": null,
+    "description": "Источник: HTReviews",
+    "source_url": "https://htreviews.org/profile/10387",
+    "collection": "Chabacco"
+  }
+]

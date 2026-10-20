@@ -1,55 +1,48 @@
-// --- БАЗОВЫЕ КАТАЛОГИ ---
+// --- БАЗОВЫЕ КАТАЛОГИ (БЕЗ РУССКИХ ДУБЛЕЙ В СКОБКАХ) ---
 const DEFAULT_BOWLS = [
-    "Космобоул Турка",
-    "Космобоул мини",
-    "Фокс убивашка",
-    "Фанел"
+    "Cosmobowl Turkish",
+    "Cosmobowl Killer",
+    "Облако Phunnel M",
+    "Торнадо Убивашка",
+    "SmokeLab Mummy",
+    "Grynbowls Традишка",
+    "UPG Малая",
+    "Werkbund Zeus",
+    "Japona Hookah Mummy",
+    "Moon Phunnel",
+    "ST Классика",
+    "Fox Турка",
+    "Solaris"
 ];
 
 const DEFAULT_BRANDS = [
-    "Musthave (Мастхэв)",
-    "Darkside (Дарксайд)",
-    "Blackburn (Блэкберн)",
+    "Musthave",
+    "Darkside",
+    "Blackburn",
     "Наш",
     "Северный",
-    "Deus (Деус)",
-    "Bonche (Бонч)",
-    "Overdose (Овердос)",
-    "Chabacco (Чабакко)",
-    "Tangiers (Танжирс)",
-    "Element (Элемент)",
-    "Sebero (Себеро)",
-    "Spectrum (Спектрум)",
-    "Satyr (Сатир)",
-    "Duft (Дафт)",
-    "Banger (Бэнгер)",
-    "Burn (Бёрн)",
-    "Daily Hookah (Дейли Хука)",
-    "Starline (Старлайн)",
-    "Trofimoff's (Трофимоффс)",
-    "Jam (Джем)",
-    "Brusko (Бруско)"
+    "Deus",
+    "Bonche",
+    "Overdose",
+    "Chabacco",
+    "Tangiers",
+    "Element",
+    "Sebero",
+    "Spectrum",
+    "Satyr",
+    "Duft",
+    "Banger",
+    "Burn",
+    "Daily Hookah",
+    "Starline",
+    "Trofimoff's",
+    "Jam",
+    "Brusko"
 ];
-
-// Дефолтные цены и фасовки пачек (₽ / г) для удобного автозаполнения
-const DEFAULT_BRAND_PACKS = {
-    "Musthave (Мастхэв)": { price: 280, weight: 25 },
-    "Darkside (Дарксайд)": { price: 360, weight: 30 },
-    "Blackburn (Блэкберн)": { price: 330, weight: 25 },
-    "Наш": { price: 420, weight: 40 },
-    "Северный": { price: 420, weight: 40 },
-    "Deus (Деус)": { price: 265, weight: 30 },
-    "Bonche (Бонч)": { price: 850, weight: 30 },
-    "Overdose (Овердос)": { price: 350, weight: 25 },
-    "Chabacco (Чабакко)": { price: 220, weight: 25 },
-    "Tangiers (Танжирс)": { price: 1050, weight: 50 },
-    "Element (Элемент)": { price: 280, weight: 25 },
-    "Sebero (Себеро)": { price: 300, weight: 25 }
-};
 
 let savedBowls = [];
 let savedBrands = [];
-let brandPackDefaults = {};
+let brandPackDefaults = {}; // Заполняется только тем, что вводит сам пользователь
 let coalInventory = { packSize: 72, packPrice: 700, remaining: 72 };
 let currentAnalyticsPeriod = 'all';
 
@@ -69,7 +62,12 @@ let audioCtx = null;
 let silentAudioUrl = null;
 let lockedScrollY = 0;
 
-// --- ЖЕЛЕЗОБЕТОННАЯ БЛОКИРОВКА СКРОЛЛА ФОНА ПОД МОДАЛКАМИ (ДЛЯ IOS SAFARI) ---
+// Очистка старых названий брендов от перевода в скобках: "Musthave (Мастхэв)" -> "Musthave"
+function stripRussianBrackets(name) {
+    return (name || '').replace(/\s*\([^)]*\)\s*$/g, '').trim();
+}
+
+// --- БЛОКИРОВКА СКРОЛЛА ФОНА ПОД МОДАЛКАМИ (IOS SAFARI FIX) ---
 function syncBodyScrollLock() {
     const anyModalOpen = Array.from(document.querySelectorAll('.modal-backdrop'))
         .some(el => !el.classList.contains('hidden'));
@@ -93,7 +91,7 @@ function handleBackdropClick(event, modalId) {
     if (event.target && event.target.id === modalId) {
         if (modalId === 'edit-modal') closeEditModal();
         else if (modalId === 'manual-add-modal') closeManualAddModal();
-        else if (modalId === 'roulette-modal') closeRouletteModal();
+        else if (modalId === 'brand-manager-modal') closeBrandManagerModal();
     }
 }
 
@@ -185,7 +183,7 @@ function applyThemeMode(mode) {
     }
 }
 
-// --- ЗВУК, ОПОВЕЩЕНИЯ И ЭКРАН БЛОКИРОВКИ ---
+// --- ЗВУК В СТИЛЕ IOS 27 (AMBIENT GLASS MARIMBA CHIME) И ФОНОВОЕ АУДИО ---
 function initAudio() {
     if (!audioCtx) {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -266,25 +264,66 @@ function updateLockScreenMetadata(title, artist) {
     }
 }
 
-function playBeep() {
+// Кристальный перелив в стиле iOS 27 (Glass Marimba Chord)
+function playIos27Chime() {
     try {
         initAudio();
         if (!audioCtx) return;
         const now = audioCtx.currentTime;
-        for (let i = 0; i < 4; i++) {
+
+        // Ноты стеклянного аккорда Cmaj9 (C5, E5, G5, B5, D6, G6) — два мягких каскада
+        const notes = [
+            { freq: 523.25, delay: 0.00, dur: 0.85 },
+            { freq: 659.25, delay: 0.11, dur: 0.85 },
+            { freq: 783.99, delay: 0.22, dur: 0.90 },
+            { freq: 987.77, delay: 0.33, dur: 1.05 },
+            { freq: 1174.66, delay: 0.45, dur: 1.30 },
+            // Второй каскад через паузу
+            { freq: 523.25, delay: 1.35, dur: 0.85 },
+            { freq: 659.25, delay: 1.46, dur: 0.85 },
+            { freq: 783.99, delay: 1.57, dur: 0.90 },
+            { freq: 1174.66, delay: 1.68, dur: 1.15 },
+            { freq: 1567.98, delay: 1.82, dur: 1.60 }
+        ];
+
+        notes.forEach(n => {
+            const start = now + n.delay;
+
+            // Основной теплый тон (sine)
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(880, now + i * 0.32);
-            gain.gain.setValueAtTime(0.35, now + i * 0.32);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.32 + 0.24);
+            osc.frequency.setValueAtTime(n.freq, start);
+
+            gain.gain.setValueAtTime(0.0001, start);
+            gain.gain.linearRampToValueAtTime(0.26, start + 0.018);
+            gain.gain.exponentialRampToValueAtTime(0.0001, start + n.dur);
+
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-            osc.start(now + i * 0.32);
-            osc.stop(now + i * 0.32 + 0.25);
-        }
+            osc.start(start);
+            osc.stop(start + n.dur + 0.05);
+
+            // Стеклянный обертон на октаву выше (triangle)
+            const harmonic = audioCtx.createOscillator();
+            const hGain = audioCtx.createGain();
+            harmonic.type = 'triangle';
+            harmonic.frequency.setValueAtTime(n.freq * 2, start);
+
+            hGain.gain.setValueAtTime(0.0001, start);
+            hGain.gain.linearRampToValueAtTime(0.06, start + 0.012);
+            hGain.gain.exponentialRampToValueAtTime(0.0001, start + n.dur * 0.55);
+
+            harmonic.connect(hGain);
+            hGain.connect(audioCtx.destination);
+            harmonic.start(start);
+            harmonic.stop(start + n.dur);
+        });
     } catch (e) { }
-    if (navigator.vibrate) navigator.vibrate([350, 150, 350, 150, 400]);
+
+    if (navigator.vibrate) {
+        navigator.vibrate([120, 80, 120, 80, 280]);
+    }
 }
 
 function showBannerToast(msg) {
@@ -292,7 +331,7 @@ function showBannerToast(msg) {
     if (!toast) return;
     toast.innerText = msg;
     toast.classList.remove('hidden');
-    setTimeout(() => toast.classList.add('hidden'), 4000);
+    setTimeout(() => toast.classList.add('hidden'), 3800);
 }
 
 function sendPush(title, body) {
@@ -301,7 +340,7 @@ function sendPush(title, body) {
         try {
             if (navigator.serviceWorker && navigator.serviceWorker.ready) {
                 navigator.serviceWorker.ready.then(reg => {
-                    reg.showNotification(title, { body, icon: 'icon.png', vibrate: [200, 100, 200] });
+                    reg.showNotification(title, { body, icon: 'icon.png', vibrate: [150, 80, 200] });
                 });
             } else {
                 new Notification(title, { body, icon: 'icon.png' });
@@ -370,20 +409,42 @@ function loadAllData(callback) {
 
 // --- КАТАЛОГИ ЧАШ, БРЕНДОВ, ЦЕН ПАЧЕК И СКЛАДА УГЛЕЙ ---
 function initCatalogs() {
-    const storedBowls = JSON.parse(localStorage.getItem('hookah_bowls') || '[]');
-    const storedBrands = JSON.parse(localStorage.getItem('hookah_brands') || '[]');
+    const storedBowls = JSON.parse(localStorage.getItem('hookah_bowls') || 'null');
+    const storedBrands = JSON.parse(localStorage.getItem('hookah_brands') || 'null');
     const storedPacks = JSON.parse(localStorage.getItem('hookah_brand_packs') || '{}');
     const storedCoals = JSON.parse(localStorage.getItem('hookah_coal_inventory') || 'null');
 
-    savedBowls = Array.from(new Set([...DEFAULT_BOWLS, ...storedBowls]));
-    savedBrands = Array.from(new Set([...DEFAULT_BRANDS, ...storedBrands]));
-    brandPackDefaults = { ...DEFAULT_BRAND_PACKS, ...storedPacks };
+    savedBowls = Array.isArray(storedBowls) && storedBowls.length > 0
+        ? Array.from(new Set(storedBowls))
+        : [...DEFAULT_BOWLS];
 
+    // Очищаем сохраненные бренды от старых русских переводов в скобках
+    const rawBrands = Array.isArray(storedBrands) && storedBrands.length > 0
+        ? storedBrands
+        : DEFAULT_BRANDS;
+    savedBrands = Array.from(new Set(rawBrands.map(stripRussianBrackets).filter(Boolean)));
+
+    // Переносим сохраненные пользователем цены пачек на чистые названия брендов
+    brandPackDefaults = {};
+    if (storedPacks && typeof storedPacks === 'object') {
+        Object.keys(storedPacks).forEach(k => {
+            const cleanKey = stripRussianBrackets(k);
+            if (storedPacks[k] && (storedPacks[k].price || storedPacks[k].weight)) {
+                brandPackDefaults[cleanKey] = storedPacks[k];
+            }
+        });
+    }
+
+    // Защита от NaN при остатке 0 углей
     if (storedCoals && typeof storedCoals === 'object') {
+        const parsedSize = Number(storedCoals.packSize);
+        const parsedPrice = Number(storedCoals.packPrice);
+        const parsedRem = Number(storedCoals.remaining);
+
         coalInventory = {
-            packSize: parseInt(storedCoals.packSize) || 72,
-            packPrice: parseFloat(storedCoals.packPrice) || 700,
-            remaining: parseInt(storedCoals.remaining) ?? 72
+            packSize: Number.isFinite(parsedSize) && parsedSize > 0 ? Math.round(parsedSize) : 72,
+            packPrice: Number.isFinite(parsedPrice) && parsedPrice >= 0 ? parsedPrice : 700,
+            remaining: Number.isFinite(parsedRem) && parsedRem >= 0 ? Math.round(parsedRem) : 72
         };
     }
 
@@ -401,20 +462,23 @@ function getBowlOptionsHtml(selectedVal = '') {
 }
 
 function getBrandOptionsHtml(selectedVal = '') {
-    const options = savedBrands.map(b => `<option value="${b}" ${b === selectedVal ? 'selected' : ''}>${b}</option>`).join('');
+    const cleanSelected = stripRussianBrackets(selectedVal);
+    const options = savedBrands.map(b => `<option value="${b}" ${b === cleanSelected ? 'selected' : ''}>${b}</option>`).join('');
     return `${options}<option value="__custom__">➕ Другой бренд...</option>`;
 }
 
 function populateSelects() {
     const bowlSelect = document.getElementById('bowl-select');
     if (bowlSelect) {
-        const currentVal = bowlSelect.value;
+        const currentVal = bowlSelect.value && savedBowls.includes(bowlSelect.value) ? bowlSelect.value : savedBowls[0];
         bowlSelect.innerHTML = getBowlOptionsHtml(currentVal);
     }
 
     const soloBrand = document.getElementById('solo-tobacco-brand');
     if (soloBrand) {
-        const currentBrand = soloBrand.value && soloBrand.value !== '__custom__' ? soloBrand.value : savedBrands[0];
+        const currentBrand = soloBrand.value && soloBrand.value !== '__custom__' && savedBrands.includes(soloBrand.value)
+            ? soloBrand.value
+            : savedBrands[0];
         soloBrand.innerHTML = getBrandOptionsHtml(currentBrand);
         fillPackInputsForBrand('solo', soloBrand.value);
     }
@@ -427,15 +491,15 @@ function fillPackInputsForBrand(mode, brandName, rowEl = null) {
         const priceEl = document.getElementById('solo-pack-price');
         const weightEl = document.getElementById('solo-pack-weight');
         if (priceEl && weightEl) {
-            priceEl.value = pack ? pack.price : '';
-            weightEl.value = pack ? pack.weight : '';
+            priceEl.value = pack && pack.price ? pack.price : '';
+            weightEl.value = pack && pack.weight ? pack.weight : '';
         }
     } else if (rowEl) {
         const priceEl = rowEl.querySelector('.mix-pack-price');
         const weightEl = rowEl.querySelector('.mix-pack-weight');
         if (priceEl && weightEl) {
-            priceEl.value = pack ? pack.price : '';
-            weightEl.value = pack ? pack.weight : '';
+            priceEl.value = pack && pack.price ? pack.price : '';
+            weightEl.value = pack && pack.weight ? pack.weight : '';
         }
     }
 }
@@ -445,9 +509,9 @@ function onPackInfoChange(mode, inputEl = null) {
         const brandSel = document.getElementById('solo-tobacco-brand');
         const customBrand = document.getElementById('solo-custom-brand');
         const brand = brandSel.value === '__custom__' ? customBrand.value.trim() : brandSel.value;
-        const price = parseFloat(document.getElementById('solo-pack-price').value);
-        const weight = parseFloat(document.getElementById('solo-pack-weight').value);
-        if (brand && price > 0 && weight > 0) {
+        const price = parseFloat(document.getElementById('solo-pack-price').value) || 0;
+        const weight = parseFloat(document.getElementById('solo-pack-weight').value) || 0;
+        if (brand) {
             brandPackDefaults[brand] = { price, weight };
             localStorage.setItem('hookah_brand_packs', JSON.stringify(brandPackDefaults));
         }
@@ -457,9 +521,9 @@ function onPackInfoChange(mode, inputEl = null) {
             const sel = card.querySelector('.brand-select');
             const custom = card.querySelector('.custom-brand-input');
             const brand = sel.value === '__custom__' ? custom.value.trim() : sel.value;
-            const price = parseFloat(card.querySelector('.mix-pack-price').value);
-            const weight = parseFloat(card.querySelector('.mix-pack-weight').value);
-            if (brand && price > 0 && weight > 0) {
+            const price = parseFloat(card.querySelector('.mix-pack-price').value) || 0;
+            const weight = parseFloat(card.querySelector('.mix-pack-weight').value) || 0;
+            if (brand) {
                 brandPackDefaults[brand] = { price, weight };
                 localStorage.setItem('hookah_brand_packs', JSON.stringify(brandPackDefaults));
             }
@@ -468,6 +532,7 @@ function onPackInfoChange(mode, inputEl = null) {
     recalcLiveBowlCost();
 }
 
+// --- ДОБАВЛЕНИЕ И УДАЛЕНИЕ ЧАШ ---
 function toggleQuickAddBowl() {
     const box = document.getElementById('quick-bowl-box');
     box.classList.toggle('hidden');
@@ -490,6 +555,96 @@ function addCustomBowl() {
     input.value = '';
     document.getElementById('quick-bowl-box').classList.add('hidden');
     showBannerToast(`Чаша «${name}» добавлена`);
+}
+
+async function deleteSelectedBowl() {
+    const select = document.getElementById('bowl-select');
+    const target = select?.value;
+    if (!target) return;
+
+    if (savedBowls.length <= 1) {
+        showIosNotice('Нельзя удалить', 'В списке должна оставаться хотя бы одна чаша.');
+        return;
+    }
+
+    const ok = await showIosConfirm('Удалить чашу?', `Убрать чашу «${target}» из твоего списка?`, 'Удалить', true);
+    if (!ok) return;
+
+    savedBowls = savedBowls.filter(b => b !== target);
+    localStorage.setItem('hookah_bowls', JSON.stringify(savedBowls));
+    populateSelects();
+    showBannerToast(`Чаша «${target}» удалена`);
+}
+
+// --- ДОБАВЛЕНИЕ И УДАЛЕНИЕ БРЕНДОВ ТАБАКА ---
+function toggleQuickAddBrand() {
+    const box = document.getElementById('quick-brand-box');
+    box.classList.toggle('hidden');
+    if (!box.classList.contains('hidden')) {
+        document.getElementById('new-brand-input').focus();
+    }
+}
+
+function addCustomBrandFromBar() {
+    const input = document.getElementById('new-brand-input');
+    const name = stripRussianBrackets(input.value);
+    if (!name) return;
+
+    if (!savedBrands.includes(name)) {
+        savedBrands.unshift(name);
+        localStorage.setItem('hookah_brands', JSON.stringify(savedBrands));
+    }
+    populateSelects();
+    const soloBrand = document.getElementById('solo-tobacco-brand');
+    if (soloBrand) {
+        soloBrand.value = name;
+        fillPackInputsForBrand('solo', name);
+    }
+    input.value = '';
+    document.getElementById('quick-brand-box').classList.add('hidden');
+    showBannerToast(`Бренд «${name}» добавлен`);
+}
+
+function openBrandManagerModal() {
+    renderBrandManagerList();
+    document.getElementById('brand-manager-modal').classList.remove('hidden');
+    syncBodyScrollLock();
+}
+
+function closeBrandManagerModal() {
+    document.getElementById('brand-manager-modal').classList.add('hidden');
+    syncBodyScrollLock();
+}
+
+function renderBrandManagerList() {
+    const listEl = document.getElementById('brand-manager-list');
+    if (!listEl) return;
+
+    listEl.innerHTML = savedBrands.map(b => `
+        <div class="brand-chip-item">
+            <span>${b}</span>
+            <button type="button" class="brand-chip-del" onclick="removeBrandFromCatalog('${b.replace(/'/g, "\\'")}')">✕</button>
+        </div>
+    `).join('');
+}
+
+function removeBrandFromCatalog(brandName) {
+    if (savedBrands.length <= 1) {
+        showBannerToast('Оставь хотя бы 1 бренд в списке!');
+        return;
+    }
+    savedBrands = savedBrands.filter(b => b !== brandName);
+    localStorage.setItem('hookah_brands', JSON.stringify(savedBrands));
+    renderBrandManagerList();
+    populateSelects();
+}
+
+function resetDefaultBrands() {
+    savedBrands = Array.from(new Set([...DEFAULT_BRANDS, ...savedBrands]));
+    localStorage.setItem('hookah_brands', JSON.stringify(savedBrands));
+    renderBrandManagerList();
+    populateSelects();
+    showBannerToast('Базовые бренды восстановлены');
 }
 
 function onBrandSelectChange(selectEl) {
@@ -523,17 +678,19 @@ function onManualBrandChange(selectEl) {
 }
 
 function ensureBrandSaved(brandName) {
-    const clean = (brandName || '').trim();
+    const clean = stripRussianBrackets(brandName);
     if (clean && clean !== '__custom__' && !savedBrands.includes(clean)) {
         savedBrands.push(clean);
         localStorage.setItem('hookah_brands', JSON.stringify(savedBrands));
     }
 }
 
-// --- КАЛЬКУЛЯТОР СЕБЕСТОИМОСТИ И СКЛАД УГЛЕЙ ---
+// --- КАЛЬКУЛЯТОР СЕБЕСТОИМОСТИ И СКЛАД УГЛЕЙ (БЕЗ NaN) ---
 function getSingleCoalPrice() {
-    if (!coalInventory.packSize || coalInventory.packSize <= 0) return 0;
-    return coalInventory.packPrice / coalInventory.packSize;
+    const size = Number(coalInventory.packSize);
+    const price = Number(coalInventory.packPrice);
+    if (!Number.isFinite(size) || size <= 0 || !Number.isFinite(price) || price < 0) return 0;
+    return price / size;
 }
 
 function calcSingleTobaccoCost(grams, packPrice, packWeight) {
@@ -580,6 +737,11 @@ function recalcLiveBowlCost() {
 
 function renderCoalInventoryUI() {
     const oneCoal = getSingleCoalPrice();
+    const safeRemaining = Number.isFinite(Number(coalInventory.remaining))
+        ? Math.max(0, Math.round(Number(coalInventory.remaining)))
+        : 0;
+    coalInventory.remaining = safeRemaining;
+
     const infoEl = document.getElementById('coal-price-info');
     const remEl = document.getElementById('coal-stock-remaining');
     const badgeEl = document.getElementById('coal-low-badge');
@@ -588,10 +750,10 @@ function renderCoalInventoryUI() {
         infoEl.innerText = `1 уголь ≈ ${oneCoal.toFixed(1)} ₽ (Пачка ${coalInventory.packSize} шт = ${coalInventory.packPrice} ₽)`;
     }
     if (remEl) {
-        remEl.innerText = coalInventory.remaining;
+        remEl.innerText = String(safeRemaining);
     }
     if (badgeEl) {
-        badgeEl.classList.toggle('hidden', coalInventory.remaining > 12);
+        badgeEl.classList.toggle('hidden', safeRemaining > 12);
     }
 
     const sizeInput = document.getElementById('coal-pack-size-input');
@@ -599,7 +761,7 @@ function renderCoalInventoryUI() {
     const stockInput = document.getElementById('coal-current-stock-input');
     if (sizeInput) sizeInput.value = coalInventory.packSize;
     if (priceInput) priceInput.value = coalInventory.packPrice;
-    if (stockInput) stockInput.value = coalInventory.remaining;
+    if (stockInput) stockInput.value = safeRemaining;
 }
 
 function toggleCoalSettings() {
@@ -607,64 +769,78 @@ function toggleCoalSettings() {
 }
 
 function saveCoalInventorySettings() {
-    const size = parseInt(document.getElementById('coal-pack-size-input').value) || 72;
-    const price = parseFloat(document.getElementById('coal-pack-price-input').value) || 700;
-    const rem = parseInt(document.getElementById('coal-current-stock-input').value);
+    const rawSize = Number(document.getElementById('coal-pack-size-input').value);
+    const rawPrice = Number(document.getElementById('coal-pack-price-input').value);
+    const rawRemStr = document.getElementById('coal-current-stock-input').value.trim();
+    const rawRem = rawRemStr === '' ? 0 : Number(rawRemStr);
 
-    coalInventory.packSize = Math.max(1, size);
-    coalInventory.packPrice = Math.max(0, price);
-    coalInventory.remaining = isNaN(rem) ? coalInventory.packSize : Math.max(0, rem);
+    coalInventory.packSize = Number.isFinite(rawSize) && rawSize >= 1 ? Math.round(rawSize) : 72;
+    coalInventory.packPrice = Number.isFinite(rawPrice) && rawPrice >= 0 ? rawPrice : 700;
+    coalInventory.remaining = Number.isFinite(rawRem) && rawRem >= 0 ? Math.round(rawRem) : 0;
 
     localStorage.setItem('hookah_coal_inventory', JSON.stringify(coalInventory));
     renderCoalInventoryUI();
     recalcLiveBowlCost();
     document.getElementById('coal-settings-panel').classList.add('hidden');
-    showBannerToast('Настройки углей сохранены');
+    showBannerToast('Настройки склада углей сохранены');
 }
 
 function buyNewCoalPack() {
-    coalInventory.remaining += coalInventory.packSize;
+    const currentRem = Number.isFinite(Number(coalInventory.remaining)) ? Number(coalInventory.remaining) : 0;
+    const packSz = Number.isFinite(Number(coalInventory.packSize)) && Number(coalInventory.packSize) > 0 ? Number(coalInventory.packSize) : 72;
+    coalInventory.remaining = Math.max(0, Math.round(currentRem + packSz));
     localStorage.setItem('hookah_coal_inventory', JSON.stringify(coalInventory));
     renderCoalInventoryUI();
-    showBannerToast(`+${coalInventory.packSize} углей добавлено на склад!`);
+    showBannerToast(`+${packSz} углей добавлено на склад!`);
 }
 
 function consumeCoalsFromStock(count) {
-    const c = parseInt(count) || 0;
-    coalInventory.remaining = Math.max(0, coalInventory.remaining - c);
+    const c = Number(count);
+    const used = Number.isFinite(c) && c > 0 ? Math.round(c) : 0;
+    const currentRem = Number.isFinite(Number(coalInventory.remaining)) ? Number(coalInventory.remaining) : 0;
+    coalInventory.remaining = Math.max(0, Math.round(currentRem - used));
     localStorage.setItem('hookah_coal_inventory', JSON.stringify(coalInventory));
     renderCoalInventoryUI();
 }
 
-// --- ПЕРЕКЛЮЧАТЕЛЬ СОЛО / МИКС ---
-function toggleMixMode() {
-    const toggle = document.getElementById('mix-mode-toggle');
-    isMixMode = toggle.checked;
+// --- ПЕРЕКЛЮЧАТЕЛЬ СОЛО / МИКС ПО КЛИКУ НА ПЛАШКУ ---
+function toggleMixMode(forceState = null) {
+    isMixMode = typeof forceState === 'boolean' ? forceState : !isMixMode;
 
     const soloContainer = document.getElementById('solo-container');
     const mixContainer = document.getElementById('mix-container');
     const modeLabel = document.getElementById('mode-label');
+    const modeSubLabel = document.getElementById('mode-sub-label');
+    const modeBtn = document.getElementById('mode-toggle-btn');
+    const pillBadge = document.getElementById('mode-pill-badge');
 
     if (isMixMode) {
         soloContainer.classList.add('hidden');
         mixContainer.classList.remove('hidden');
-        modeLabel.innerText = 'Режим: Микс (Несколько вкусов)';
+        modeLabel.innerText = '🧪 Режим: Микс (Несколько вкусов)';
+        if (modeSubLabel) modeSubLabel.innerText = 'Нажми, чтобы вернуться в режим Соло';
+        if (pillBadge) pillBadge.innerText = 'Микс ⇄';
+        if (modeBtn) modeBtn.classList.add('mix-active');
+
         const list = document.getElementById('mix-rows-list');
         if (list.children.length === 0) {
-            addMixRow(savedBrands[0], '', 12);
+            addMixRow(savedBrands[0], '', 10);
             addMixRow(savedBrands[1] || savedBrands[0], '', 8);
         }
     } else {
         soloContainer.classList.remove('hidden');
         mixContainer.classList.add('hidden');
-        modeLabel.innerText = 'Режим: Соло (1 табак)';
+        modeLabel.innerText = '🍂 Режим: Соло (1 табак)';
+        if (modeSubLabel) modeSubLabel.innerText = 'Нажми, чтобы переключить в режим Микса';
+        if (pillBadge) pillBadge.innerText = 'Соло ⇄';
+        if (modeBtn) modeBtn.classList.remove('mix-active');
     }
     recalcLiveBowlCost();
 }
 
 function addMixRow(brand = '', flavor = '', weight = '') {
     const list = document.getElementById('mix-rows-list');
-    const selectedBrand = brand || savedBrands[0];
+    const selectedBrand = stripRussianBrackets(brand) || savedBrands[0];
     const pack = brandPackDefaults[selectedBrand] || { price: '', weight: '' };
 
     const card = document.createElement('div');
@@ -682,11 +858,11 @@ function addMixRow(brand = '', flavor = '', weight = '') {
         <div class="pack-price-row">
             <div class="pack-input-wrap">
                 <span>Пачка ₽:</span>
-                <input type="number" class="mix-pack-price" placeholder="280" value="${pack.price}" min="0" oninput="onPackInfoChange('mix', this)">
+                <input type="number" class="mix-pack-price" placeholder="Цена" value="${pack.price || ''}" min="0" oninput="onPackInfoChange('mix', this)">
             </div>
             <div class="pack-input-wrap">
                 <span>Вес (г):</span>
-                <input type="number" class="mix-pack-weight" placeholder="25" value="${pack.weight}" min="1" oninput="onPackInfoChange('mix', this)">
+                <input type="number" class="mix-pack-weight" placeholder="Грамм" value="${pack.weight || ''}" min="1" oninput="onPackInfoChange('mix', this)">
             </div>
         </div>
     `;
@@ -708,7 +884,7 @@ function getDraftMixFromForm() {
     if (!isMixMode) {
         const brandSelect = document.getElementById('solo-tobacco-brand');
         const customBrand = document.getElementById('solo-custom-brand').value.trim();
-        const brand = brandSelect.value === '__custom__' ? (customBrand || 'Свой табак') : brandSelect.value;
+        const brand = stripRussianBrackets(brandSelect.value === '__custom__' ? (customBrand || 'Свой табак') : brandSelect.value);
         const flavor = document.getElementById('solo-tobacco-flavor').value.trim();
         const weight = parseFloat(document.getElementById('solo-tobacco-weight').value) || 0;
         const packPrice = parseFloat(document.getElementById('solo-pack-price').value) || 0;
@@ -716,13 +892,17 @@ function getDraftMixFromForm() {
         const cost = Math.round(calcSingleTobaccoCost(weight, packPrice, packWeight));
 
         ensureBrandSaved(brand);
+        if (brand && packPrice > 0 && packWeight > 0) {
+            brandPackDefaults[brand] = { price: packPrice, weight: packWeight };
+            localStorage.setItem('hookah_brand_packs', JSON.stringify(brandPackDefaults));
+        }
         return [{ brand, flavor, weight, packPrice, packWeight, cost }];
     } else {
         const items = [];
         document.querySelectorAll('#mix-rows-list .tobacco-card-box').forEach(card => {
             const sel = card.querySelector('.brand-select');
             const custom = card.querySelector('.custom-brand-input').value.trim();
-            const brand = sel.value === '__custom__' ? (custom || 'Свой табак') : sel.value;
+            const brand = stripRussianBrackets(sel.value === '__custom__' ? (custom || 'Свой табак') : sel.value);
             const flavor = card.querySelector('.flavor-input').value.trim();
             const weight = parseFloat(card.querySelector('.weight-input').value) || 0;
             const packPrice = parseFloat(card.querySelector('.mix-pack-price').value) || 0;
@@ -730,6 +910,10 @@ function getDraftMixFromForm() {
             const cost = Math.round(calcSingleTobaccoCost(weight, packPrice, packWeight));
 
             ensureBrandSaved(brand);
+            if (brand && packPrice > 0 && packWeight > 0) {
+                brandPackDefaults[brand] = { price: packPrice, weight: packWeight };
+                localStorage.setItem('hookah_brand_packs', JSON.stringify(brandPackDefaults));
+            }
             if (brand || flavor || weight > 0) {
                 items.push({ brand, flavor, weight, packPrice, packWeight, cost });
             }
@@ -741,7 +925,8 @@ function getDraftMixFromForm() {
 function formatMixText(mixArray) {
     if (!Array.isArray(mixArray) || mixArray.length === 0) return 'Табак не указан';
     return mixArray.map(item => {
-        const namePart = item.flavor ? `${item.brand} (${item.flavor})` : item.brand;
+        const cleanB = stripRussianBrackets(item.brand);
+        const namePart = item.flavor ? `${cleanB} (${item.flavor})` : cleanB;
         const weightPart = item.weight ? ` <span class="mix-tag">${item.weight}г</span>` : '';
         return `${namePart}${weightPart}`;
     }).join(' + ');
@@ -750,16 +935,16 @@ function formatMixText(mixArray) {
 function formatMixPlainText(mixArray) {
     if (!Array.isArray(mixArray) || mixArray.length === 0) return 'Без названия';
     return mixArray.map(item => {
-        const namePart = item.flavor ? `${item.brand} ${item.flavor}` : item.brand;
+        const cleanB = stripRussianBrackets(item.brand);
+        const namePart = item.flavor ? `${cleanB} ${item.flavor}` : cleanB;
         const weightPart = item.weight ? ` (${item.weight}г)` : '';
         return `${namePart}${weightPart}`;
     }).join(' + ');
 }
 
-// --- БЫСТРЫЕ ПРЕСЕТЫ ПРОГРЕВА ---
-function setWarmupPreset(min, sec) {
+// --- БЫСТРЫЕ ПРЕСЕТЫ ПРОГРЕВА (ТОЛЬКО МИНУТЫ) ---
+function setWarmupPreset(min) {
     document.getElementById('warmup-min').value = min;
-    document.getElementById('warmup-sec').value = sec;
 }
 
 // --- СОХРАНЕНИЕ И ВОССТАНОВЛЕНИЕ АКТИВНОЙ СЕССИИ ---
@@ -773,7 +958,7 @@ function saveActiveSessionState(stage) {
         activeCoalsUsed,
         alarmAlreadyPlayed,
         bowl: document.getElementById('bowl-select')?.value || '',
-        placement: document.getElementById('coal-placement')?.value || '',
+        placement: document.getElementById('coal-placement')?.value || '2 внутри, 1 на ребре (Пирамида)',
         mix: getDraftMixFromForm()
     };
     localStorage.setItem('hookah_active_session', JSON.stringify(state));
@@ -799,7 +984,9 @@ function restoreActiveSessionIfAny() {
         alarmAlreadyPlayed = !!state.alarmAlreadyPlayed;
 
         if (state.bowl) document.getElementById('bowl-select').value = state.bowl;
-        if (state.placement) document.getElementById('coal-placement').value = state.placement;
+        if (state.placement && document.getElementById('coal-placement')) {
+            document.getElementById('coal-placement').value = state.placement;
+        }
 
         const coalCounterEl = document.getElementById('active-coals-count');
         if (coalCounterEl) coalCounterEl.innerText = activeCoalsUsed;
@@ -853,11 +1040,10 @@ function startWarmupSession() {
     }
 
     const mins = parseInt(document.getElementById('warmup-min').value) || 0;
-    const secs = parseInt(document.getElementById('warmup-sec').value) || 0;
-    const totalSeconds = (mins * 60) + secs;
+    const totalSeconds = mins * 60;
 
     if (totalSeconds <= 0) {
-        showIosNotice("Время прогрева", "Укажи корректное время прогрева чаши!");
+        showIosNotice("Время прогрева", "Укажи количество минут для прогрева чаши!");
         return;
     }
 
@@ -903,7 +1089,7 @@ function updateWarmupTimer() {
 
         if (!alarmAlreadyPlayed) {
             alarmAlreadyPlayed = true;
-            playBeep();
+            playIos27Chime();
             sendPush("Кальян готов! 💨", "Чаша прогрелась, пора раскуривать!");
             saveActiveSessionState('warmup');
         }
@@ -967,11 +1153,13 @@ function updateSmokingTimer() {
 
     if (elapsedSmoke >= 3600 && elapsedSmoke < 5400 && !smokeReminder60Sent) {
         smokeReminder60Sent = true;
+        playIos27Chime();
         sendPush('Идет 2-й час покура 💨', 'Кальян ещё курится или пора завершить сессию?');
     }
 
     if (elapsedSmoke >= 5400 && !smokeReminder90Sent) {
         smokeReminder90Sent = true;
+        playIos27Chime();
         sendPush('Покур идет уже 1.5 часа ⏳', 'Не забудь остановить таймер в DimHookah, чтобы не испортить статистику!');
     }
 
@@ -1072,7 +1260,7 @@ function saveCompletedSession() {
 
     const mix = (savedState && savedState.mix) ? savedState.mix : getDraftMixFromForm();
     const bowl = (savedState && savedState.bowl) ? savedState.bowl : document.getElementById('bowl-select').value;
-    const placement = (savedState && savedState.placement) ? savedState.placement : document.getElementById('coal-placement').value;
+    const placement = document.getElementById('coal-placement')?.value || '2 внутри, 1 на ребре (Пирамида)';
     const coalsUsed = activeCoalsUsed || 3;
 
     const tobaccoCost = mix.reduce((acc, item) => acc + (item.cost || 0), 0);
@@ -1215,7 +1403,7 @@ function renderAnalyticsAndAchievements(allSessions) {
             const w = parseFloat(item.weight) || 0;
             totalGrams += w;
             if (item.brand) {
-                const shortBrand = item.brand.split(' (')[0];
+                const shortBrand = stripRussianBrackets(item.brand);
                 brandFreq[shortBrand] = (brandFreq[shortBrand] || 0) + 1;
             }
         });
@@ -1236,7 +1424,7 @@ function renderAnalyticsAndAchievements(allSessions) {
 
 function getNormalizedMix(session) {
     if (Array.isArray(session.mix) && session.mix.length > 0) return session.mix;
-    if (session.tobacco) return [{ brand: session.tobacco, flavor: '', weight: 0, cost: 0 }];
+    if (session.tobacco) return [{ brand: stripRussianBrackets(session.tobacco), flavor: '', weight: 0, cost: 0 }];
     return [];
 }
 
@@ -1310,8 +1498,9 @@ function syncCatalogFromHistory(sessions) {
             changed = true;
         }
         getNormalizedMix(s).forEach(m => {
-            if (m.brand && m.brand !== '__custom__' && !savedBrands.includes(m.brand)) {
-                savedBrands.push(m.brand);
+            const cleanB = stripRussianBrackets(m.brand);
+            if (cleanB && cleanB !== '__custom__' && !savedBrands.includes(cleanB)) {
+                savedBrands.push(cleanB);
                 changed = true;
             }
         });
@@ -1330,26 +1519,32 @@ function repeatSession(sessionId) {
         if (!target) return;
 
         document.getElementById('bowl-select').value = target.bowl;
-        if (target.placement) document.getElementById('coal-placement').value = target.placement;
+        if (target.placement && document.getElementById('coal-placement')) {
+            document.getElementById('coal-placement').value = target.placement;
+        }
         if (target.coalsUsed) document.getElementById('start-coals-input').value = target.coalsUsed;
 
         const mixArr = getNormalizedMix(target);
-        const toggle = document.getElementById('mix-mode-toggle');
 
         if (mixArr.length <= 1) {
-            toggle.checked = false;
-            toggleMixMode();
+            toggleMixMode(false);
             const first = mixArr[0] || { brand: savedBrands[0], flavor: '', weight: 18 };
-            document.getElementById('solo-tobacco-brand').value = first.brand;
+            const cleanB = stripRussianBrackets(first.brand);
+            ensureBrandSaved(cleanB);
+            populateSelects();
+            document.getElementById('solo-tobacco-brand').value = cleanB;
             document.getElementById('solo-tobacco-flavor').value = first.flavor || '';
             document.getElementById('solo-tobacco-weight').value = first.weight || 18;
-            fillPackInputsForBrand('solo', first.brand);
+            fillPackInputsForBrand('solo', cleanB);
         } else {
-            toggle.checked = true;
-            toggleMixMode();
+            toggleMixMode(true);
             const list = document.getElementById('mix-rows-list');
             list.innerHTML = '';
-            mixArr.forEach(m => addMixRow(m.brand, m.flavor, m.weight));
+            mixArr.forEach(m => {
+                const cleanB = stripRussianBrackets(m.brand);
+                ensureBrandSaved(cleanB);
+                addMixRow(cleanB, m.flavor, m.weight);
+            });
         }
 
         recalcLiveBowlCost();
@@ -1393,7 +1588,7 @@ function openEditModal(sessionId) {
         const container = document.getElementById('edit-mix-rows');
         container.innerHTML = '';
         const mixArr = getNormalizedMix(target);
-        mixArr.forEach(m => addEditMixRow(m.brand, m.flavor, m.weight));
+        mixArr.forEach(m => addEditMixRow(stripRussianBrackets(m.brand), m.flavor, m.weight));
 
         document.getElementById('edit-modal').classList.remove('hidden');
         syncBodyScrollLock();
@@ -1431,7 +1626,7 @@ function saveEditedSession() {
 
     const newMix = [];
     document.querySelectorAll('#edit-mix-rows .tobacco-row').forEach(row => {
-        const brand = row.querySelector('.brand-select').value;
+        const brand = stripRussianBrackets(row.querySelector('.brand-select').value);
         const flavor = row.querySelector('.flavor-input').value.trim();
         const weight = parseFloat(row.querySelector('.weight-input').value) || 0;
         const pack = brandPackDefaults[brand] || { price: 0, weight: 0 };
@@ -1502,11 +1697,12 @@ function saveManualSession() {
     const bowl = document.getElementById('manual-bowl-select').value || 'Не указана';
     const brandSelectVal = document.getElementById('manual-brand-select').value;
     const customBrandVal = document.getElementById('manual-custom-brand')?.value.trim();
-    const brand = brandSelectVal === '__custom__' ? (customBrandVal || 'Свой табак') : (brandSelectVal || 'Без бренда');
+    const brand = stripRussianBrackets(brandSelectVal === '__custom__' ? (customBrandVal || 'Свой табак') : (brandSelectVal || 'Без бренда'));
     const flavor = document.getElementById('manual-flavor-input').value.trim();
     const weight = parseFloat(document.getElementById('manual-weight-input').value) || 18;
     const durMins = parseInt(document.getElementById('manual-duration-input').value) || 60;
     const coalsUsed = parseInt(document.getElementById('manual-coals-input')?.value) || 3;
+    const placement = document.getElementById('manual-placement-select')?.value || '2 внутри, 1 на ребре (Пирамида)';
     const rating = parseInt(document.getElementById('manual-rating-select').value) || 5;
     const comment = document.getElementById('manual-comment-input').value.trim();
 
@@ -1529,7 +1725,7 @@ function saveManualSession() {
         id: Date.now(),
         date: formattedDate,
         bowl,
-        placement: '3 внутри',
+        placement,
         coalsUsed,
         coalCost,
         mix: [{
@@ -1556,160 +1752,6 @@ function saveManualSession() {
             showSaveSuccessOverlay();
         });
     });
-}
-
-// --- РУЛЕТКА ВКУСОВ ИЗ FLAVORS.JSON ---
-const FALLBACK_FLAVORS = [
-    { brand: "Musthave", name: "Pinkman", category: "Ягоды", rating: 4.9, reviews_count: 1450, description: "Розовый грейпфрут с клубничным сиропом и спелой малиной." },
-    { brand: "Darkside", name: "Lemonblast", category: "Цитрусы", rating: 4.8, reviews_count: 1310, description: "Эталонный натуральный лимон с яркой сочной кислинкой." },
-    { brand: "Blackburn", name: "Chupa Graper", category: "Ягоды", rating: 4.8, reviews_count: 640, description: "Леденцовый чупа-чупс с соком тёмного винограда." },
-    { brand: "Deus", name: "Punky Island", category: "Тропики", rating: 4.8, reviews_count: 610, description: "Взрывное трио спелой маракуйи, гуавы и манго." }
-];
-
-let cachedFlavors = [];
-let currentRolledFlavor = null;
-
-async function openFlavorRouletteModal() {
-    const modal = document.getElementById('roulette-modal');
-    if (!modal) return;
-
-    if (cachedFlavors.length === 0) {
-        try {
-            const res = await fetch('flavors.json', { cache: 'no-cache' });
-            if (res.ok) {
-                const data = await res.json();
-                if (Array.isArray(data) && data.length > 0) {
-                    cachedFlavors = data;
-                }
-            }
-        } catch (e) {
-            console.warn('Не удалось загрузить внешний flavors.json, используем встроенный резерв:', e);
-        }
-        if (cachedFlavors.length === 0) {
-            cachedFlavors = FALLBACK_FLAVORS;
-        }
-    }
-
-    const brandSelect = document.getElementById('roulette-brand-filter');
-    if (brandSelect) {
-        const currentB = brandSelect.value || 'all';
-        const brands = Array.from(new Set(cachedFlavors.map(f => (f.brand || '').trim()))).filter(Boolean).sort();
-        brandSelect.innerHTML = '<option value="all">🌐 Все бренды</option>' +
-            brands.map(b => `<option value="${b}">${b}</option>`).join('');
-        if (brands.includes(currentB)) brandSelect.value = currentB;
-    }
-
-    const catSelect = document.getElementById('roulette-cat-filter');
-    if (catSelect) {
-        const currentC = catSelect.value || 'all';
-        const cats = Array.from(new Set(cachedFlavors.map(f => (f.category || '').trim()))).filter(Boolean).sort();
-        catSelect.innerHTML = '<option value="all">✨ Любой</option>' +
-            cats.map(c => `<option value="${c}">${c}</option>`).join('');
-        if (cats.includes(currentC)) catSelect.value = currentC;
-    }
-
-    modal.classList.remove('hidden');
-    syncBodyScrollLock();
-
-    if (!currentRolledFlavor) {
-        spinFlavorRoulette();
-    }
-}
-
-function closeRouletteModal() {
-    const modal = document.getElementById('roulette-modal');
-    if (modal) modal.classList.add('hidden');
-    syncBodyScrollLock();
-}
-
-function spinFlavorRoulette() {
-    if (!cachedFlavors || cachedFlavors.length === 0) {
-        cachedFlavors = FALLBACK_FLAVORS;
-    }
-
-    const brandFilter = document.getElementById('roulette-brand-filter')?.value || 'all';
-    const catFilter = document.getElementById('roulette-cat-filter')?.value || 'all';
-
-    let pool = cachedFlavors.filter(f => {
-        const matchBrand = brandFilter === 'all' || (f.brand && f.brand.toLowerCase() === brandFilter.toLowerCase());
-        const matchCat = catFilter === 'all' || (f.category && f.category.toLowerCase() === catFilter.toLowerCase());
-        return matchBrand && matchCat;
-    });
-
-    if (pool.length === 0) {
-        showBannerToast('По этим фильтрам нет вкусов, крутим из всех!');
-        pool = cachedFlavors;
-    }
-
-    if (pool.length > 1 && currentRolledFlavor) {
-        const withoutCurrent = pool.filter(f => f.name !== currentRolledFlavor.name || f.brand !== currentRolledFlavor.brand);
-        if (withoutCurrent.length > 0) pool = withoutCurrent;
-    }
-
-    currentRolledFlavor = pool[Math.floor(Math.random() * pool.length)];
-
-    const card = document.getElementById('roulette-result-card');
-    if (card) {
-        card.classList.add('spin-anim');
-        setTimeout(() => card.classList.remove('spin-anim'), 180);
-    }
-
-    const brandEl = document.getElementById('roulette-res-brand');
-    const catEl = document.getElementById('roulette-res-cat');
-    const nameEl = document.getElementById('roulette-res-name');
-    const descEl = document.getElementById('roulette-res-desc');
-    const applyBtn = document.getElementById('roulette-apply-btn');
-
-    if (brandEl) {
-        const rev = currentRolledFlavor.reviews_count ? ` (${currentRolledFlavor.reviews_count} отз.)` : '';
-        brandEl.innerText = `${currentRolledFlavor.brand} • ★ ${currentRolledFlavor.rating || 4.7}${rev}`;
-    }
-    if (catEl) {
-        if (currentRolledFlavor.category) {
-            catEl.innerText = currentRolledFlavor.category;
-            catEl.classList.remove('hidden');
-        } else {
-            catEl.classList.add('hidden');
-        }
-    }
-    if (nameEl) nameEl.innerText = currentRolledFlavor.name;
-    if (descEl) descEl.innerText = currentRolledFlavor.description || 'Проверенный топовый вкус с высоким рейтингом.';
-    if (applyBtn) applyBtn.classList.remove('hidden');
-}
-
-function findMatchingBrandInCatalog(shortBrand) {
-    const clean = (shortBrand || '').trim().toLowerCase();
-    const match = savedBrands.find(b => b.toLowerCase().startsWith(clean));
-    if (match) return match;
-    ensureBrandSaved(shortBrand);
-    populateSelects();
-    return shortBrand;
-}
-
-function applyRouletteFlavor() {
-    if (!currentRolledFlavor) return;
-
-    const matchedBrand = findMatchingBrandInCatalog(currentRolledFlavor.brand);
-
-    if (isMixMode) {
-        addMixRow(matchedBrand, currentRolledFlavor.name, 10);
-        showBannerToast(`Добавлено в микс: ${currentRolledFlavor.brand} — ${currentRolledFlavor.name}`);
-    } else {
-        const brandSel = document.getElementById('solo-tobacco-brand');
-        const flavorInput = document.getElementById('solo-tobacco-flavor');
-        const weightInput = document.getElementById('solo-tobacco-weight');
-
-        if (brandSel) {
-            brandSel.value = matchedBrand;
-            onBrandSelectChange(brandSel);
-        }
-        if (flavorInput) flavorInput.value = currentRolledFlavor.name;
-        if (weightInput && !weightInput.value) weightInput.value = '18';
-        showBannerToast(`Выбран вкус: ${currentRolledFlavor.brand} — ${currentRolledFlavor.name}`);
-    }
-
-    closeRouletteModal();
-    recalcLiveBowlCost();
 }
 
 // --- ЭКСПОРТ В ЗАМЕТКИ IPHONE И JSON БЕКАП ---
@@ -1753,7 +1795,7 @@ function fallbackShareText(text) {
 function exportHistoryData() {
     loadAllData(sessions => {
         const backup = {
-            version: 3,
+            version: 4,
             exportedAt: new Date().toISOString(),
             bowls: savedBowls,
             brands: savedBrands,
@@ -1787,7 +1829,8 @@ function importHistoryData(event) {
                 localStorage.setItem('hookah_bowls', JSON.stringify(savedBowls));
             }
             if (parsed.brands) {
-                savedBrands = Array.from(new Set([...savedBrands, ...parsed.brands]));
+                const cleaned = parsed.brands.map(stripRussianBrackets).filter(Boolean);
+                savedBrands = Array.from(new Set([...savedBrands, ...cleaned]));
                 localStorage.setItem('hookah_brands', JSON.stringify(savedBrands));
             }
             if (parsed.brandPacks) {
@@ -1795,7 +1838,11 @@ function importHistoryData(event) {
                 localStorage.setItem('hookah_brand_packs', JSON.stringify(brandPackDefaults));
             }
             if (parsed.coalInventory) {
-                coalInventory = parsed.coalInventory;
+                coalInventory = {
+                    packSize: Number(parsed.coalInventory.packSize) || 72,
+                    packPrice: Number(parsed.coalInventory.packPrice) || 700,
+                    remaining: Number.isFinite(Number(parsed.coalInventory.remaining)) ? Number(parsed.coalInventory.remaining) : 72
+                };
                 localStorage.setItem('hookah_coal_inventory', JSON.stringify(coalInventory));
             }
 

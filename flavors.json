@@ -1,35 +1,91 @@
 [
   {
-    "brand": "Musthave",
-    "name": "Pinkman",
-    "category": "Фрукты",
-    "rating": 4.9,
-    "reviews_count": 1450,
-    "description": "Розовый грейпфрут, спелая малина и клубничный джем."
+    "brand": "Blackburn",
+    "name": "Space Guava",
+    "category": "Тропики",
+    "rating": 4.7,
+    "reviews_count": 510,
+    "description": "Сочная тропическая гуава с лёгкой терпкостью и сладким послевкусием."
   },
   {
-    "brand": "Musthave",
-    "name": "Pineapple Rings",
-    "category": "Фрукты",
+    "brand": "Blackburn",
+    "name": "Chupa Graper",
+    "category": "Ягоды",
     "rating": 4.8,
-    "reviews_count": 980,
-    "description": "Сладкие консервированные ананасовые кольца."
+    "reviews_count": 640,
+    "description": "Леденцовый чупа-чупс с насыщенным соком тёмного винограда."
   },
   {
-    "brand": "Musthave",
-    "name": "Rocketman",
+    "brand": "Blackburn",
+    "name": "Red Alert",
+    "category": "Ягоды",
+    "rating": 4.8,
+    "reviews_count": 590,
+    "description": "Яркий микс спелой садовой клубники и сладкого арбуза."
+  },
+  {
+    "brand": "Blackburn",
+    "name": "Shock",
+    "category": "Кислые",
+    "rating": 4.7,
+    "reviews_count": 870,
+    "description": "Экстремально кислая шипучка для любителей бодрящих забивок."
+  },
+  {
+    "brand": "Bonche",
+    "name": "Dark Chocolate",
     "category": "Десерты",
+    "rating": 4.9,
+    "reviews_count": 310,
+    "description": "Благородный горький шоколад на плотном сигарном листе."
+  },
+  {
+    "brand": "Chabacco",
+    "name": "Бельгийские вафли",
+    "category": "Десерты",
+    "rating": 4.7,
+    "reviews_count": 420,
+    "description": "Хрустящие горячие вафли со сливочным маслом и кленовым сиропом."
+  },
+  {
+    "brand": "Chabacco",
+    "name": "Помело",
+    "category": "Цитрусы",
     "rating": 4.8,
-    "reviews_count": 890,
-    "description": "Клубнично-кививый сорбет с мятой."
+    "reviews_count": 530,
+    "description": "Свежий сочный цитрус с лёгкой благородной горчинкой цедры."
+  },
+  {
+    "brand": "Chabacco",
+    "name": "Северная бузина",
+    "category": "Ягоды",
+    "rating": 4.7,
+    "reviews_count": 340,
+    "description": "Кисло-сладкая таёжная ягода с освежающим травянистым оттенком."
+  },
+  {
+    "brand": "Darkside",
+    "name": "Baja Blue",
+    "category": "Ягоды",
+    "rating": 4.7,
+    "reviews_count": 540,
+    "description": "Сладкая черника, тёмный виноград и лёгкий освежающий ментол."
   },
   {
     "brand": "Darkside",
     "name": "Lemonblast",
-    "category": "Кислые",
+    "category": "Цитрусы",
     "rating": 4.8,
     "reviews_count": 1310,
-    "description": "Яркий кислый сок спелого лимона."
+    "description": "Эталонный натуральный лимон с яркой сочной кислинкой."
+  },
+  {
+    "brand": "Darkside",
+    "name": "Red Alert",
+    "category": "Фрукты",
+    "rating": 4.7,
+    "reviews_count": 920,
+    "description": "Освежающий сладкий арбуз с ягодными нотами."
   },
   {
     "brand": "Darkside",
@@ -37,71 +93,103 @@
     "category": "Холодок",
     "rating": 4.9,
     "reviews_count": 1850,
-    "description": "Ультимативный ледяной кулер без постороннего привкуса."
-  },
-  {
-    "brand": "Darkside",
-    "name": "Baja Blue",
-    "category": "Ягоды",
-    "rating": 4.7,
-    "reviews_count": 740,
-    "description": "Спелая черника с легким ментоловым послевкусием."
+    "description": "Легендарный мощный кулер без постороннего привкуса для любого микса."
   },
   {
     "brand": "Deus",
     "name": "Punky Island",
     "category": "Тропики",
     "rating": 4.8,
-    "reviews_count": 620,
-    "description": "Тропический микс маракуйи, гуавы и спелого манго."
+    "reviews_count": 610,
+    "description": "Взрывное трио спелой маракуйи, гуавы и медового манго."
   },
   {
-    "brand": "Deus",
-    "name": "Pineapple",
+    "brand": "Element",
+    "name": "Water (Вода)",
+    "category": "Напитки",
+    "rating": 4.6,
+    "reviews_count": 480,
+    "description": "Освежающий зеленый лимонад с сочной мякотью кактуса."
+  },
+  {
+    "brand": "Element",
+    "name": "Earth (Земля)",
+    "category": "Фрукты",
+    "rating": 4.7,
+    "reviews_count": 390,
+    "description": "Терпкий натуральный гранатовый сок с лёгкой кислинкой."
+  },
+  {
+    "brand": "Element",
+    "name": "Фейхоа",
+    "category": "Фрукты",
+    "rating": 4.7,
+    "reviews_count": 760,
+    "description": "Ароматная садовая фейхоа с землянично-травянистым профилем."
+  },
+  {
+    "brand": "Musthave",
+    "name": "Apple Drops",
     "category": "Фрукты",
     "rating": 4.8,
-    "reviews_count": 510,
-    "description": "Натуральный сладкий ананас повышенной крепости."
+    "reviews_count": 620,
+    "description": "Кисло-сладкие леденцы с насыщенным соком зелёного яблока."
   },
   {
-    "brand": "Deus",
-    "name": "Orange",
-    "category": "Цитрус",
+    "brand": "Musthave",
+    "name": "Pineapple Rings",
+    "category": "Тропики",
+    "rating": 4.8,
+    "reviews_count": 980,
+    "description": "Сладкие кольца консервированного ананаса в сиропе."
+  },
+  {
+    "brand": "Musthave",
+    "name": "Pinkman",
+    "category": "Ягоды",
+    "rating": 4.9,
+    "reviews_count": 1450,
+    "description": "Бестселлер: розовый грейпфрут с клубничным сиропом и спелой малиной."
+  },
+  {
+    "brand": "Musthave",
+    "name": "Rocketman",
+    "category": "Напитки",
     "rating": 4.7,
-    "reviews_count": 480,
-    "description": "Плотный сочный апельсин с цедрой."
+    "reviews_count": 890,
+    "description": "Освежающая клубничная содовая с долькой грейпфрута и киви."
   },
   {
-    "brand": "Blackburn",
-    "name": "Shock Operand",
-    "category": "Кислые",
-    "rating": 4.7,
-    "reviews_count": 870,
-    "description": "Ультра-кислая натуральная черная смородина."
+    "brand": "Overdose",
+    "name": "Pineapple",
+    "category": "Тропики",
+    "rating": 4.9,
+    "reviews_count": 410,
+    "description": "Сверхъяркий натуральный ананас с высокой крепостью."
   },
   {
-    "brand": "Blackburn",
-    "name": "Ice Baby",
+    "brand": "Sebero",
+    "name": "Ice Pear",
+    "category": "Фрукты",
+    "rating": 4.6,
+    "reviews_count": 290,
+    "description": "Сладкая дюшесная груша с мягким сливочным холодком."
+  },
+  {
+    "brand": "Sebero",
+    "name": "Черника",
     "category": "Ягоды",
     "rating": 4.8,
-    "reviews_count": 940,
-    "description": "Свежий сладкий ягодный сорбет."
+    "reviews_count": 510,
+    "description": "Натуральная лесная черника с мягкой бархатистой сладостью."
   },
   {
     "brand": "Наш",
     "name": "Малина",
     "category": "Ягоды",
     "rating": 4.7,
-    "reviews_count": 530,
-    "description": "Настоящая лесная малина на плотной сигарной основе."
-  },
-  {
-    "brand": "Наш",
-    "name": "Земляника",
-    "category": "Ягоды",
-    "rating": 4.6,
-    "reviews_count": 410,
-    "description": "Нежная садовая земляника с приятной сладостью."
+    "reviews_count": 520,
+    "description": "Насыщенная садовая малина на немытом табачном листе."
   },
   {
     "brand": "Северный",
@@ -109,38 +197,6 @@
     "category": "Ягоды",
     "rating": 4.6,
     "reviews_count": 490,
-    "description": "Освежающий кисло-сладкий традиционный морс."
-  },
-  {
-    "brand": "Северный",
-    "name": "Купеческий Персик",
-    "category": "Фрукты",
-    "rating": 4.7,
-    "reviews_count": 430,
-    "description": "Мягкий сладкий южный персик."
-  },
-  {
-    "brand": "Element",
-    "name": "Фейхоа",
-    "category": "Пряные",
-    "rating": 4.7,
-    "reviews_count": 760,
-    "description": "Терпкая травянистая зеленая фейхоа."
-  },
-  {
-    "brand": "Bonche",
-    "name": "Maracuja",
-    "category": "Тропики",
-    "rating": 4.9,
-    "reviews_count": 580,
-    "description": "Истинная кислая тропическая маракуйя на дорогом сигарном листе."
-  },
-  {
-    "brand": "Overdose",
-    "name": "Pineapple",
-    "category": "Тропики",
-    "rating": 4.8,
-    "reviews_count": 420,
-    "description": "Сладкий термоядерный ананас с высокой крепостью."
+    "description": "Домашний таёжный брусничный морс с благородной кислинкой."
   }
 ]

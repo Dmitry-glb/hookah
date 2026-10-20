@@ -1,548 +1,557 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="dark">
+<html lang="ru">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>DimHookah</title>
+
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="DimHookah">
-    <meta name="theme-color" content="#000000" id="meta-theme-color">
-    <title>DimHookah — Cupertino Ceramic iOS 27</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap"
-        rel="stylesheet">
+    <meta name="theme-color" content="#F4F4F8" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#09090C" media="(prefers-color-scheme: dark)">
 
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
-    <link rel="icon" type="image/png" href="icon.png">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <audio id="bg-audio" loop="" playsinline=""></audio>
+    <!-- Фоновый аудио-трек для удержания PWA активным и вывода таймера на экран блокировки / Dynamic Island -->
+    <audio id="bg-audio" loop playsinline style="display:none;"></audio>
 
-    <div class="app-header">
-        <h2 style="margin:0; font-size: 1.35em;">💨 DimHookah</h2>
-        <div class="header-actions">
-            <button id="theme-toggle-btn" class="pill-btn" onclick="cycleThemeMode()" title="Сменить тему оформления">🌗
-                Авто</button>
-            <button id="push-perm-btn" class="pill-btn" onclick="requestPushPermission()">
-                🔔 Пуши
-            </button>
+    <!-- Высплывающий мини-тост поверх экрана -->
+    <div id="toast-notification" class="toast-banner hidden"></div>
+
+    <!-- iOS-анимация сохранения сессии -->
+    <div id="save-success-overlay" class="save-overlay hidden">
+        <div class="save-overlay-card">
+            <div class="save-check-circle">✓</div>
+            <div class="save-overlay-title">Сессия сохранена</div>
+            <div class="save-overlay-sub">Добавлено в историю и статистику</div>
         </div>
     </div>
 
-    <!-- Основная панель сессии -->
-    <div class="glass-panel">
-        <h3 id="status-title"
-            style="color: var(--text-secondary); text-align: center; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
-            Новая сессия</h3>
-        <div class="timer-display" id="timer">00:00</div>
-
-        <!-- Шаг 1: Заполнение чаши -->
-        <div id="setup-form">
-            <div class="form-group">
-                <label>Чаша</label>
-                <div class="select-with-add">
-                    <select id="bowl-select">
-                        <option value="" disabled="" selected="">Выбери чашу...</option>
-                    </select>
-                    <button type="button" class="btn-plus" onclick="addNewBowlPrompt('bowl-select')"
-                        title="Добавить чашу">+</button>
-                    <button type="button" class="btn-minus" onclick="deleteSelectedBowl('bowl-select')"
-                        title="Удалить выбранную чашу">−</button>
+    <div class="container">
+        <!-- Компактная шапка -->
+        <header class="app-header">
+            <div class="brand-row">
+                <img src="icon.png" alt="DimHookah" class="app-logo" onerror="this.style.display='none'">
+                <div>
+                    <h1>DimHookah</h1>
+                    <div class="app-subtitle">Умный трекер кальянных сессий</div>
                 </div>
             </div>
-
-            <!-- Блок табака (Соло / Микс) -->
-            <div class="form-group">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <label style="margin:0;">Табак</label>
-                    <button type="button" class="pill-btn" id="mix-toggle-btn" onclick="toggleMixMode()"
-                        style="font-size: 0.75em; padding: 4px 10px;">Режим: Соло</button>
-                    <button type="button" class="pill-btn" onclick="openFlavorRouletteModal()"
-                        style="background: var(--primary-soft); color: var(--primary); border-color: var(--primary); font-size: 0.75em; padding: 4px 10px;">🎲
-                        Рулетка вкусов</button>
-                </div>
-
-                <!-- Соло забивка -->
-                <div id="solo-container" class="tobacco-entry-card">
-                    <div class="select-with-add" style="margin-bottom: 8px;">
-                        <select id="solo-tobacco-brand" onchange="onBrandSelectChange(this)">
-                            <option value="" disabled="" selected="">Бренд</option>
-                            <option value="Наш">Наш</option>
-                            <option value="Adalya">Adalya</option>
-                            <option value="Afzal">Afzal</option>
-                            <option value="Banger">Banger</option>
-                            <option value="Black Burn">Black Burn</option>
-                            <option value="Bonche">Bonche</option>
-                            <option value="Brusko">Brusko</option>
-                            <option value="Burn">Burn</option>
-                            <option value="Chabacco">Chabacco</option>
-                            <option value="Daily Hookah">Daily Hookah</option>
-                            <option value="Darkside">Darkside</option>
-                            <option value="Deus">Deus</option>
-                            <option value="Duft">Duft</option>
-                            <option value="Element">Element</option>
-                            <option value="Jent">Jent</option>
-                            <option value="Musthave">Musthave</option>
-                            <option value="Overdose">Overdose</option>
-                            <option value="Satyr">Satyr</option>
-                            <option value="Sebero">Sebero</option>
-                            <option value="Spectrum">Spectrum</option>
-                            <option value="Tangiers">Tangiers</option>
-                            <option value="Trofimoff's">Trofimoff's</option>
-                        </select>
-                        <button type="button" class="btn-plus" onclick="addNewBrandPrompt('solo-tobacco-brand')"
-                            title="Добавить бренд">+</button>
-                        <button type="button" class="btn-minus" onclick="deleteSelectedBrand('solo-tobacco-brand')"
-                            title="Удалить выбранный бренд">−</button>
-                    </div>
-                    <div style="display: flex; gap: 8px;">
-                        <input type="text" id="solo-tobacco-flavor" placeholder="Вкус" style="flex: 2;">
-                        <input type="number" id="solo-tobacco-weight" placeholder="Грамм в чашу"
-                            oninput="recalcLiveBowlCost()" style="flex: 1.2;">
-                    </div>
-                    <div class="pack-price-row">
-                        <span class="pack-price-label">🏷️ Пачка:</span>
-                        <input type="number" id="solo-pack-price" placeholder="Цена ₽" oninput="onPackInfoInput(this)">
-                        <span class="pack-price-label">за</span>
-                        <input type="number" id="solo-pack-weight" placeholder="Грамм" oninput="onPackInfoInput(this)">
-                        <span class="pack-price-label">г</span>
-                    </div>
-                </div>
-
-                <!-- Мульти-микс забивка -->
-                <div id="mix-container" class="hidden"></div>
-                <button type="button" id="add-mix-btn" class="btn btn-secondary hidden" onclick="addMixRow()"
-                    style="padding: 10px; font-size: 0.85em; margin-top: 6px;">+ Добавить табак в микс</button>
-
-                <!-- Живой расчет стоимости чаши -->
-                <div class="live-cost-bar">
-                    <span>💰 Себестоимость забивки:</span>
-                    <b id="live-bowl-cost-val">0 ₽ (0 г)</b>
-                </div>
-
-                <!-- Угли на покур -->
-                <div class="pack-price-row" style="margin-top: 10px;">
-                    <span class="pack-price-label">🔥 Углей на покур:</span>
-                    <input type="number" id="session-coals-used" value="3" min="1" max="15"
-                        oninput="recalcLiveBowlCost()" style="max-width: 75px;">
-                    <span class="pack-price-label">шт.</span>
-                    <span id="live-coal-cost-hint"
-                        style="margin-left: auto; font-size: 11px; font-weight: 700; color: var(--text-secondary);">0
-                        ₽</span>
-                </div>
+            <div class="theme-switcher" id="theme-switcher">
+                <button type="button" class="theme-btn" data-theme="light" onclick="setThemeMode('light')"
+                    title="Светлая">☀️</button>
+                <button type="button" class="theme-btn" data-theme="dark" onclick="setThemeMode('dark')"
+                    title="Тёмная">🌙</button>
+                <button type="button" class="theme-btn" data-theme="auto" onclick="setThemeMode('auto')"
+                    title="Авто">⚙️</button>
             </div>
+        </header>
 
-            <div class="form-group">
-                <label>Время прогрева чаши</label>
-                <div class="wheel-picker-box" style="justify-content: center;">
-                    <div class="wheel-col" style="flex: none; width: 140px;">
-                        <select id="warmup-min">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5" selected="">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                            <option value="11">11</option>
-                            <option value="12">12</option>
-                            <option value="13">13</option>
-                            <option value="14">14</option>
-                            <option value="15">15</option>
-                            <option value="16">16</option>
-                            <option value="17">17</option>
-                            <option value="18">18</option>
-                            <option value="19">19</option>
-                            <option value="20">20</option>
-                        </select>
-                        <span style="color: var(--text-secondary); font-weight: 600;">мин</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Предупреждение о малом запасе углей -->
-            <div id="low-coal-banner" class="low-coal-banner hidden"
-                onclick="document.getElementById('coal-pack-price')?.scrollIntoView({behavior: 'smooth'})">
-                <span>⚠️ <b>Угли на исходе!</b> Осталось: <span id="low-coal-count-val">0</span> шт. Пора докупить
-                    пачку.</span>
-            </div>
-
-            <button class="btn" onclick="startWarmupSession()">🚀 Начать прогрев чаши</button>
-        </div>
-
-        <!-- Шаг 2: Прогрев чаши -->
-        <div id="warmup-controls" class="hidden">
-            <div class="sub-timer-box" id="warmup-box">
-                <div style="font-size: 0.85em; color: var(--text-secondary);">Осталось греть:</div>
-                <div class="sub-timer-display" id="warmup-countdown">05:00</div>
-            </div>
-            <button class="btn btn-success" onclick="startSmokingFromWarmup()">💨 Чаша прогрета — Начать покур!</button>
-            <button class="btn btn-secondary" onclick="cancelActiveSession()"
-                style="font-size: 0.85em; padding: 10px; margin-bottom: 0;">✕ Отменить сессию</button>
-        </div>
-
-        <!-- Шаг 3: Покур (с быстрым выбором расстановки углей) -->
-        <div id="smoking-controls" class="hidden">
-            <div class="sub-timer-box">
-                <div style="font-size: 0.9em; color: var(--text-secondary);">Приятного дымного покура! 💨</div>
-                <div style="font-size: 0.8em; color: var(--text-secondary); margin-top: 4px;" id="active-mix-label">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Текущая расстановка углей (жми ? для схемы)</label>
-                <div class="coal-setup-selector" id="smoking-coal-selector"></div>
-            </div>
-
-            <button class="btn" style="background: var(--danger); box-shadow: 0 8px 20px rgba(255,59,48,0.3);"
-                onclick="finishSmokingSession()">🏁 Завершить покур</button>
-        </div>
-
-        <!-- Шаг 4: Финал — Оценка и выбор основной расстановки углей -->
-        <div id="rating-form" class="hidden">
-            <h3 style="text-align: center; margin-bottom: 4px;">Оцените покур</h3>
-            <div class="stars">
-                <span class="star active" onclick="setRating(1)">★</span>
-                <span class="star active" onclick="setRating(2)">★</span>
-                <span class="star active" onclick="setRating(3)">★</span>
-                <span class="star active" onclick="setRating(4)">★</span>
-                <span class="star active" onclick="setRating(5)">★</span>
-            </div>
-
-            <div class="form-group">
-                <label>Основная расстановка углей при курении</label>
-                <div class="coal-setup-selector" id="rating-coal-selector"></div>
-            </div>
-
-            <div class="form-group">
-                <label>Комментарий</label>
-                <textarea id="comment" rows="2" placeholder="Как вкус, жар..."></textarea>
-            </div>
-            <button class="btn" onclick="saveSession()">💾 Сохранить в историю</button>
-        </div>
-    </div>
-
-    <!-- Модуль: Склад углей дома -->
-    <div class="glass-panel">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <h3 style="margin: 0;">🧱 Запас углей дома</h3>
-            <span id="coal-stock-badge" class="cost-badge" style="font-size: 12px; padding: 4px 10px;">Остаток: 0
-                шт.</span>
-        </div>
-
-        <div class="tobacco-entry-card" style="margin-bottom: 0;">
-            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
-                <span class="pack-price-label">Размер:</span>
-                <select id="coal-size-select" onchange="onCoalSizeChange()"
-                    style="height: 36px; padding: 4px 10px; font-size: 13px; flex: 1;">
-                    <option value="25">25 мм (Стандарт: 72 шт / кг)</option>
-                    <option value="26">26 мм (Крупный: 64 шт / кг)</option>
-                    <option value="22">22 мм (Малый: 96 шт / кг)</option>
-                </select>
-            </div>
-            <div class="pack-price-row" style="border-top: none; margin-top: 0; padding-top: 0;">
-                <span class="pack-price-label">Пачка:</span>
-                <input type="number" id="coal-pack-price" placeholder="Цена ₽" oninput="saveCoalSettings()">
-                <span class="pack-price-label">за</span>
-                <input type="number" id="coal-pack-count" placeholder="Штук" value="72" oninput="saveCoalSettings()">
-                <span class="pack-price-label">шт</span>
-            </div>
-            <div style="display: flex; gap: 8px; margin-top: 10px;">
-                <button type="button" class="btn" onclick="buyCoalPack()"
-                    style="padding: 10px; font-size: 13px; margin: 0; flex: 2;">➕ Купил пачку (+в запас)</button>
-                <button type="button" class="btn btn-secondary" onclick="editCoalStockPrompt()"
-                    style="padding: 10px; font-size: 13px; margin: 0; flex: 1;">✏️ Остаток</button>
-            </div>
-            <div id="coal-unit-price-label"
-                style="text-align: center; font-size: 11px; color: var(--text-secondary); margin-top: 8px; font-weight: 600;">
-                Цена 1 угля: 0 ₽
-            </div>
-        </div>
-    </div>
-
-    <!-- Статистика и бюджет (Карта побед + Календарь месяцев) -->
-    <div class="glass-panel" style="overflow: visible;">
-        <div class="stats-header-row">
-            <h3 style="margin: 0;">🏅 Статистика и бюджет</h3>
-            <div class="period-dropdown-wrap" id="period-dropdown-wrap">
-                <button type="button" class="pill-btn period-trigger-btn" id="period-trigger-btn"
-                    onclick="togglePeriodDropdown(event)">
-                    <span>📅</span>
-                    <span id="stats-period-badge">За всё время</span>
-                    <span class="chevron-icon">▾</span>
+        <!-- Настройка сессии -->
+        <div class="card" id="setup-form">
+            <div class="section-header-row">
+                <h2>Новая сессия</h2>
+                <button type="button" class="pill-btn accent-pill" onclick="openFlavorRouletteModal()">
+                    🎲 Рулетка вкусов
                 </button>
-                <div id="period-popover-menu" class="period-popover-menu hidden"></div>
             </div>
-        </div>
-        <div id="hookah-stats-grid" class="stats-bento-grid"></div>
-    </div>
 
-    <!-- Рейтинг табаков -->
-    <div class="glass-panel">
-        <h3>🏆 Рейтинг табаков</h3>
-        <div id="analytics-content">
-            <p style="color: var(--text-secondary); margin:0; font-size:0.9em;">Пока нет сохраненных сессий.</p>
-        </div>
-    </div>
-
-    <!-- История -->
-    <div class="glass-panel">
-        <div style="margin-bottom: 12px;">
-            <h3 style="margin:0 0 10px 0;">📅 История</h3>
-            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                <button class="pill-btn" onclick="openManualAddModal()"
-                    style="background: var(--primary); color: #fff; border-color: var(--primary);">➕ Добавить
-                    сессию</button>
-                <button class="pill-btn" onclick="exportToNotes()">📋 Заметки</button>
-                <button class="pill-btn" onclick="exportToCSV()">📊 Экспорт</button>
-                <button class="pill-btn" onclick="document.getElementById('csv-file-input').click()"
-                    style="background: var(--primary-soft); color: var(--primary); border-color: var(--primary);">📂
-                    Импорт</button>
-                <input type="file" id="csv-file-input" accept=".csv" class="hidden" onchange="importFromCSV(event)">
-            </div>
-        </div>
-        <div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Дата</th>
-                        <th>Сетап</th>
-                        <th>Микс</th>
-                        <th>Время</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody id="history-body"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Модальное окно редактирования -->
-    <div id="edit-modal" class="hidden">
-        <div class="modal-content">
-            <h3 style="margin-bottom: 15px;">✏️ Редактирование покура</h3>
-            <input type="hidden" id="modal-id">
-
+            <!-- Выбор чаши + быстрое добавление -->
             <div class="form-group">
-                <label>Дата</label>
-                <input type="text" id="modal-date">
-            </div>
-
-            <div class="form-group">
-                <label style="text-align: center;">Оценка</label>
-                <div class="stars" id="modal-stars" style="margin: 4px 0 8px; font-size: 2em;">
-                    <span class="modal-star" onclick="setModalRating(1)">★</span>
-                    <span class="modal-star" onclick="setModalRating(2)">★</span>
-                    <span class="modal-star" onclick="setModalRating(3)">★</span>
-                    <span class="modal-star" onclick="setModalRating(4)">★</span>
-                    <span class="modal-star" onclick="setModalRating(5)">★</span>
+                <div class="label-row">
+                    <label style="margin:0;">Чаша</label>
+                    <button type="button" class="text-action-btn" onclick="toggleQuickAddBowl()">+ Своя чаша</button>
+                </div>
+                <select id="bowl-select"></select>
+                <div id="quick-bowl-box" class="quick-add-box hidden">
+                    <input type="text" id="new-bowl-input" placeholder="Название чаши (напр. Облако Phunnel M)">
+                    <button type="button" class="btn btn-small" onclick="addCustomBowl()">Сохранить</button>
                 </div>
             </div>
+
+            <!-- Переключатель Соло / Микс -->
+            <div class="form-group">
+                <div class="mode-switch-bar">
+                    <div class="mode-switch-info">
+                        <span class="mode-title" id="mode-label">Режим: Соло (1 табак)</span>
+                        <span class="mode-sub">Включи микс для нескольких вкусов</span>
+                    </div>
+                    <label class="ios-switch">
+                        <input type="checkbox" id="mix-mode-toggle" onchange="toggleMixMode()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Режим СОЛО -->
+            <div id="solo-container" class="form-group">
+                <label>Табак, граммовка и цена пачки</label>
+                <div class="tobacco-card-box">
+                    <div class="tobacco-row">
+                        <select id="solo-tobacco-brand" class="brand-select"
+                            onchange="onBrandSelectChange(this)"></select>
+                        <input type="text" id="solo-tobacco-flavor" class="flavor-input"
+                            placeholder="Вкус (напр. Pinkman)">
+                        <input type="number" id="solo-tobacco-weight" class="weight-input" placeholder="Гр" value="18"
+                            min="1" max="100" oninput="recalcLiveBowlCost()">
+                    </div>
+                    <input type="text" id="solo-custom-brand" class="custom-brand-input hidden"
+                        placeholder="Введите название нового бренда..." oninput="recalcLiveBowlCost()">
+
+                    <div class="pack-price-row">
+                        <div class="pack-input-wrap">
+                            <span>Пачка ₽:</span>
+                            <input type="number" id="solo-pack-price" placeholder="280" min="0"
+                                oninput="onPackInfoChange('solo')">
+                        </div>
+                        <div class="pack-input-wrap">
+                            <span>Вес пачки (г):</span>
+                            <input type="number" id="solo-pack-weight" placeholder="25" min="1"
+                                oninput="onPackInfoChange('solo')">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Режим МИКС -->
+            <div id="mix-container" class="form-group hidden">
+                <div class="label-row">
+                    <label style="margin:0;">Состав микса</label>
+                    <span id="mix-total-weight" class="weight-badge">Всего: 0 г</span>
+                </div>
+                <div id="mix-rows-list"></div>
+                <button type="button" class="btn btn-secondary btn-dashed" onclick="addMixRow()">+ Добавить табак в
+                    микс</button>
+            </div>
+
+            <!-- Угли для старта и схема постановки -->
+            <div class="form-group">
+                <label>Угли на старт и постановка</label>
+                <div class="coal-setup-row">
+                    <div class="coal-count-box">
+                        <span>Углей (шт):</span>
+                        <input type="number" id="start-coals-input" value="3" min="1" max="10"
+                            oninput="recalcLiveBowlCost()">
+                    </div>
+                    <select id="coal-placement" style="flex: 1;">
+                        <option value="2 внутри, 1 на ребре (Пирамида)">2 внутри, 1 на ребре</option>
+                        <option value="3 внутри">3 внутри</option>
+                        <option value="2 внутри, 2 на краях">2 внутри, 2 на краях</option>
+                        <option value="3 на краях (Фольга / На грани)">3 на краях</option>
+                        <option value="4 угля (Мощный прогрев)">4 угля</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Живая плашка расчета стоимости чаши -->
+            <div class="live-cost-banner" id="live-cost-banner">
+                <div class="live-cost-left">
+                    <span class="live-cost-title">💰 Себестоимость забивки</span>
+                    <span class="live-cost-sub" id="live-cost-details">Табак: 0 ₽ • Угли: 0 ₽</span>
+                </div>
+                <div class="live-cost-value" id="live-cost-total">0 ₽</div>
+            </div>
+
+            <!-- Время прогрева с быстрыми пресетами -->
+            <div class="form-group" style="margin-top: 14px;">
+                <div class="label-row">
+                    <label style="margin:0;">Время прогрева</label>
+                    <div class="preset-pills">
+                        <button type="button" class="pill-btn" onclick="setWarmupPreset(5, 0)">5м</button>
+                        <button type="button" class="pill-btn" onclick="setWarmupPreset(6, 0)">6м</button>
+                        <button type="button" class="pill-btn" onclick="setWarmupPreset(7, 0)">7м</button>
+                    </div>
+                </div>
+                <div class="time-inputs">
+                    <div class="time-box">
+                        <input type="number" id="warmup-min" value="5" min="0" max="59">
+                        <span>мин</span>
+                    </div>
+                    <div class="time-box">
+                        <input type="number" id="warmup-sec" value="0" min="0" max="59">
+                        <span>сек</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn" id="start-btn" onclick="startWarmupSession()">🔥 Начать прогрев</button>
+        </div>
+
+        <!-- Активная сессия -->
+        <div class="card hidden" id="active-session">
+            <div id="warmup-box" class="timer-container">
+                <div class="status-badge" id="status-title">🔥 Прогрев чаши...</div>
+                <div class="active-mix-subtitle" id="active-mix-label"></div>
+                <div class="timer-display" id="timer">05:00</div>
+
+                <!-- Кнопки управления на этапе прогрева -->
+                <div id="warmup-controls">
+                    <button class="btn btn-secondary" onclick="addWarmupMinute()">+1 минута к прогреву</button>
+                    <button class="btn btn-success" id="start-smoking-btn" onclick="startSmokingFromWarmup()">💨 Начать
+                        курить</button>
+                    <button class="btn btn-text-Cancel" onclick="cancelActiveSession()">Отменить сессию</button>
+                </div>
+
+                <!-- Кнопки управления во время покура -->
+                <div id="smoking-controls" class="hidden">
+                    <!-- Мини-счетчик потраченных углей за сессию -->
+                    <div class="session-coal-tracker">
+                        <span>🔥 Углей за сессию: <b id="active-coals-count">3</b> шт.</span>
+                        <button type="button" class="pill-btn" onclick="addExtraCoalInSession(1)">+1 уголь</button>
+                        <button type="button" class="pill-btn" onclick="addExtraCoalInSession(2)">+2 угля</button>
+                    </div>
+
+                    <button class="btn btn-danger" onclick="finishSmokingSession()">🛑 Завершить сессию</button>
+                </div>
+            </div>
+
+            <!-- Оценка после завершения -->
+            <div id="rating-form" class="hidden">
+                <!-- Умная корректировка времени, если забыл выключить таймер -->
+                <div id="forgotten-timer-box" class="sub-timer-box hidden"
+                    style="border-color: var(--primary); background: var(--primary-soft);">
+                    <div style="font-size: 0.85em; font-weight: 700; color: var(--primary); margin-bottom: 6px;">
+                        🤔 Забыл выключить таймер?
+                    </div>
+                    <div style="font-size: 0.78em; color: var(--text-secondary); margin-bottom: 10px;">
+                        Таймер насчитал <b id="forgotten-raw-time" style="color: var(--text);">02:15:00</b>. Выбери
+                        реальное время покура:
+                    </div>
+                    <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;">
+                        <button type="button" class="pill-btn" onclick="applyQuickSmokeDuration(45)">45 мин</button>
+                        <button type="button" class="pill-btn" onclick="applyQuickSmokeDuration(60)">1 час</button>
+                        <button type="button" class="pill-btn" onclick="applyQuickSmokeDuration(75)">1 ч 15 м</button>
+                        <button type="button" class="pill-btn" onclick="applyQuickSmokeDuration(90)">1 ч 30 м</button>
+                    </div>
+                </div>
+
+                <h3 style="text-align: center; margin-bottom: 8px;">Оцените покур</h3>
+                <div class="stars" id="star-rating">
+                    <span class="star" data-value="1">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="5">★</span>
+                </div>
+                <div class="form-group">
+                    <textarea id="comment" rows="3" placeholder="Как курилось? Что по жару и вкусу?..."></textarea>
+                </div>
+                <button class="btn" onclick="saveCompletedSession()">💾 Сохранить в историю</button>
+            </div>
+        </div>
+
+        <!-- КАРТА КАЛЬЯННЫХ ПОБЕД И ФИНАНСОВАЯ СТАТИСТИКА -->
+        <div class="card" id="analytics-card">
+            <div class="analytics-header">
+                <h2>🏆 Статистика и Бюджет</h2>
+                <!-- Кастомный выпадающий фильтр периодов в стиле iOS 27 -->
+                <div class="period-dropdown-wrap" id="period-dropdown-wrap">
+                    <button type="button" class="period-dropdown-btn" id="period-dropdown-btn"
+                        onclick="togglePeriodDropdown(event)">
+                        <span id="period-dropdown-label">За всё время</span>
+                        <span class="dropdown-chevron">▾</span>
+                    </button>
+                    <div class="period-dropdown-menu hidden" id="period-dropdown-menu"></div>
+                </div>
+            </div>
+
+            <!-- Bento-сетка 2x2 -->
+            <div class="bento-stats-grid" id="hookah-stats-grid">
+                <div class="bento-item">
+                    <span class="bento-icon">💨</span>
+                    <span class="bento-val" id="stat-total-hours">0 ч 0 м</span>
+                    <span class="bento-label">Часов в дыму</span>
+                </div>
+                <div class="bento-item">
+                    <span class="bento-icon">💸</span>
+                    <span class="bento-val" id="stat-total-money">0 ₽</span>
+                    <span class="bento-label" id="stat-avg-cost">Средняя: 0 ₽</span>
+                </div>
+                <div class="bento-item">
+                    <span class="bento-icon">❤️</span>
+                    <span class="bento-val" id="stat-fav-brand">—</span>
+                    <span class="bento-label" id="stat-total-grams">Табака: 0 г</span>
+                </div>
+                <div class="bento-item">
+                    <span class="bento-icon">🏺</span>
+                    <span class="bento-val" id="stat-fav-bowl">—</span>
+                    <span class="bento-label" id="stat-total-sessions">Сессий: 0</span>
+                </div>
+            </div>
+
+            <!-- Умный склад углей (Coal Inventory) -->
+            <div class="coal-inventory-box">
+                <div class="coal-inv-header">
+                    <div>
+                        <div class="coal-inv-title">📦 Склад углей</div>
+                        <div class="coal-inv-sub" id="coal-price-info">1 шт ≈ 9.7 ₽ (Пачка 72 шт = 700 ₽)</div>
+                    </div>
+                    <button type="button" class="pill-btn" onclick="toggleCoalSettings()">⚙️ Настроить</button>
+                </div>
+
+                <div class="coal-stock-bar">
+                    <div class="coal-stock-status">
+                        Остаток: <strong id="coal-stock-remaining">72</strong> шт.
+                        <span id="coal-low-badge" class="low-stock-badge hidden">Мало углей!</span>
+                    </div>
+                    <button type="button" class="btn-buy-coal" onclick="buyNewCoalPack()">+ Купил пачку</button>
+                </div>
+
+                <!-- Настройки пачки углей -->
+                <div id="coal-settings-panel" class="coal-settings-panel hidden">
+                    <div class="pack-price-row">
+                        <div class="pack-input-wrap">
+                            <span>Штук в пачке:</span>
+                            <input type="number" id="coal-pack-size-input" value="72" min="1">
+                        </div>
+                        <div class="pack-input-wrap">
+                            <span>Цена пачки ₽:</span>
+                            <input type="number" id="coal-pack-price-input" value="700" min="0">
+                        </div>
+                    </div>
+                    <div class="pack-price-row" style="margin-top:6px;">
+                        <div class="pack-input-wrap" style="flex:1;">
+                            <span>Сейчас углей дома (шт):</span>
+                            <input type="number" id="coal-current-stock-input" value="72" min="0">
+                        </div>
+                        <button type="button" class="btn btn-small"
+                            onclick="saveCoalInventorySettings()">Сохранить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- История и бекапы -->
+        <div class="card">
+            <div class="history-header">
+                <h2>История</h2>
+                <div class="backup-actions">
+                    <button class="pill-btn accent-pill" onclick="openManualAddModal()">➕ Добавить</button>
+                    <button class="pill-btn" onclick="exportToAppleNotes()"
+                        title="Скопировать текст для Заметок iPhone">📋 Заметки</button>
+                    <button class="pill-btn" onclick="exportHistoryData()" title="Скачать файл резервной копии">📊
+                        Экспорт</button>
+                    <button class="pill-btn" onclick="document.getElementById('import-file').click()"
+                        title="Восстановить из файла">📂 Импорт</button>
+                    <input type="file" id="import-file" accept=".json" style="display:none"
+                        onchange="importHistoryData(event)">
+                </div>
+            </div>
+
+            <!-- Живой поиск и фильтр по оценке -->
+            <div class="filter-bar">
+                <input type="text" id="search-input" placeholder="🔍 Поиск по вкусу, бренду, чаше..."
+                    oninput="applyFilters()">
+                <select id="filter-rating" onchange="applyFilters()">
+                    <option value="all">Все ★</option>
+                    <option value="5">Только ★ 5</option>
+                    <option value="4">★ 4 и выше</option>
+                    <option value="3">★ 3 и выше</option>
+                </select>
+            </div>
+
+            <div id="history-list"></div>
+        </div>
+    </div>
+
+    <!-- Модальное окно редактирования сессии -->
+    <div id="edit-modal" class="modal-backdrop hidden" onclick="handleBackdropClick(event, 'edit-modal')">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 14px;">✏️ Редактировать запись</h3>
+            <input type="hidden" id="edit-session-id">
 
             <div class="form-group">
                 <label>Чаша</label>
-                <div class="select-with-add">
-                    <select id="modal-bowl">
-                        <option value="" disabled="" selected="">Выбери чашу...</option>
+                <select id="edit-bowl"></select>
+            </div>
+
+            <div class="form-group">
+                <div class="label-row">
+                    <label style="margin:0;">Состав табака</label>
+                    <button type="button" class="text-action-btn" onclick="addEditMixRow()">+ Добавить вкус</button>
+                </div>
+                <div id="edit-mix-rows"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Угли и расстановка</label>
+                <div class="coal-setup-row">
+                    <div class="coal-count-box">
+                        <span>Углей (шт):</span>
+                        <input type="number" id="edit-coals-used" value="3" min="1" max="15">
+                    </div>
+                    <select id="edit-placement" style="flex:1;">
+                        <option value="2 внутри, 1 на ребре (Пирамида)">2 внутри, 1 на ребре</option>
+                        <option value="3 внутри">3 внутри</option>
+                        <option value="2 внутри, 2 на краях">2 внутри, 2 на краях</option>
+                        <option value="3 на краях (Фольга / На грани)">3 на краях</option>
+                        <option value="4 угля (Мощный прогрев)">4 угля</option>
                     </select>
-                    <button type="button" class="btn-plus" onclick="addNewBowlPrompt('modal-bowl')">+</button>
-                    <button type="button" class="btn-minus" onclick="deleteSelectedBowl('modal-bowl')">−</button>
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Расстановка и кол-во углей</label>
-                <div style="display: flex; gap: 8px;">
-                    <select id="modal-placement" style="flex: 2;">
-                        <option value="3 внутри">3 внутри (В колодке)</option>
-                        <option value="2 + 1">2 + 1 (На грани)</option>
-                        <option value="Чебурашка">Чебурашка (1 внутри, 2 на бортах)</option>
-                        <option value="Пирамида">Пирамида (2 внутри, 1 сверху)</option>
-                        <option value="Домик">Домик (2 внутри, 2 на бортах)</option>
-                        <option value="4 внутри">4 внутри (Макс. жар)</option>
-                    </select>
-                    <input type="number" id="modal-coals-used" placeholder="Углей шт" min="0"
-                        style="flex: 1; text-align: center;">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Табак в забивке</label>
-                <div id="modal-mix-container"></div>
-                <button type="button" class="btn btn-secondary" onclick="addModalMixRow()"
-                    style="padding: 8px; font-size: 0.8em; margin-top: 4px; margin-bottom: 0;">+ Добавить табак</button>
-            </div>
-
-            <div class="form-group">
-                <label>Время прогрева (Часы и Минуты)</label>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <input type="number" id="modal-warmup-h" min="0" placeholder="Час" style="text-align: center;">
-                    <span>ч</span>
-                    <input type="number" id="modal-warmup-m" min="0" max="59" placeholder="Мин"
-                        style="text-align: center;">
-                    <span>мин</span>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Время покура (Часы и Минуты)</label>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <input type="number" id="modal-smoke-h" min="0" placeholder="Час" style="text-align: center;">
-                    <span>ч</span>
-                    <input type="number" id="modal-smoke-m" min="0" max="59" placeholder="Мин"
-                        style="text-align: center;">
-                    <span>мин</span>
-                </div>
+                <label>Оценка (1–5)</label>
+                <select id="edit-rating">
+                    <option value="5">★★★★★ (5)</option>
+                    <option value="4">★★★★☆ (4)</option>
+                    <option value="3">★★★☆☆ (3)</option>
+                    <option value="2">★★☆☆☆ (2)</option>
+                    <option value="1">★☆☆☆☆ (1)</option>
+                </select>
             </div>
 
             <div class="form-group">
                 <label>Комментарий</label>
-                <textarea id="modal-comment" rows="2"></textarea>
+                <textarea id="edit-comment" rows="3"></textarea>
             </div>
 
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button class="btn btn-secondary" onclick="closeEditModal()" style="margin:0;">Отмена</button>
-                <button class="btn" onclick="saveEditedSession()" style="margin:0;">Сохранить</button>
+            <div class="modal-actions-row">
+                <button class="btn btn-secondary" onclick="closeEditModal()">Отмена</button>
+                <button class="btn" onclick="saveEditedSession()">Сохранить</button>
             </div>
         </div>
     </div>
 
-    <!-- Модаль ручного добавления сессии -->
-    <div id="manual-add-modal" class="hidden"
-        style="position: fixed; inset: 0; background: var(--modal-backdrop); backdrop-filter: blur(16px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px;">
+    <!-- Кастомное диалоговое окно подтверждения (вместо системного confirm) -->
+    <div id="confirm-modal" class="modal-backdrop hidden" style="z-index: 2100;">
+        <div class="modal-content modal-compact">
+            <h3 id="confirm-modal-title" style="margin-bottom: 8px; font-size: 1.15em;">Подтверждение</h3>
+            <p id="confirm-modal-text"
+                style="color: var(--text-secondary); font-size: 0.9em; margin-bottom: 18px; line-height: 1.4;"></p>
+            <div class="modal-actions-row">
+                <button type="button" class="btn btn-secondary" id="confirm-cancel-btn">Отмена</button>
+                <button type="button" class="btn btn-danger" id="confirm-ok-btn">Да</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Кастомное информационное окно (вместо системного alert) -->
+    <div id="notice-modal" class="modal-backdrop hidden" style="z-index: 2200;">
+        <div class="modal-content modal-compact">
+            <h3 id="notice-modal-title" style="margin-bottom: 8px; font-size: 1.15em;">Уведомление</h3>
+            <p id="notice-modal-text"
+                style="color: var(--text-secondary); font-size: 0.9em; margin-bottom: 18px; line-height: 1.4; white-space: pre-line;">
+            </p>
+            <button type="button" class="btn" id="notice-ok-btn" style="margin:0;">Понятно</button>
+        </div>
+    </div>
+
+    <!-- Модаль ручного добавления сессии задним числом -->
+    <div id="manual-add-modal" class="modal-backdrop hidden" onclick="handleBackdropClick(event, 'manual-add-modal')">
         <div class="modal-content">
-            <h3 style="margin-bottom: 15px;">➕ Записать покур задним числом</h3>
-            <div class="form-group">
-                <label>Дата сессии</label>
-                <input type="date" id="manual-date-input">
-            </div>
-            <div class="form-group">
-                <label>Чаша</label>
-                <select id="manual-bowl-select"></select>
-            </div>
-            <div class="form-group">
-                <label>Бренд и Вкус</label>
-                <div style="display: flex; gap: 8px; margin-bottom: 6px;">
-                    <select id="manual-brand-select" style="flex: 1.2;"></select>
-                    <input type="text" id="manual-flavor-input" placeholder="Вкус" style="flex: 1.8;">
+            <h3 style="margin-bottom: 14px;">➕ Записать покур задним числом</h3>
+
+            <div class="manual-grid-row">
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <label>Дата сессии</label>
+                    <input type="date" id="manual-date-input">
                 </div>
-                <div style="display: flex; gap: 8px;">
-                    <input type="number" id="manual-weight-input" placeholder="Грамм" value="18" style="flex: 1;">
-                    <input type="number" id="manual-duration-input" placeholder="Минут курения" value="60"
-                        style="flex: 1;">
+                <div class="form-group" style="flex: 1.2; margin-bottom: 0;">
+                    <label>Чаша</label>
+                    <select id="manual-bowl-select"></select>
                 </div>
             </div>
-            <div class="form-group">
-                <label>Оценка (1-5)</label>
-                <select id="manual-rating-select">
-                    <option value="5">★ 5 (Идеально)</option>
-                    <option value="4">★ 4 (Хорошо)</option>
-                    <option value="3">★ 3 (Норм)</option>
-                    <option value="2">★ 2 (Такое себе)</option>
-                    <option value="1">★ 1 (Ужасно)</option>
-                </select>
+
+            <div class="form-group" style="margin-top: 12px;">
+                <label>Табак и вкус</label>
+                <div class="manual-grid-row">
+                    <select id="manual-brand-select" style="flex: 1.1;" onchange="onManualBrandChange(this)"></select>
+                    <input type="text" id="manual-flavor-input" placeholder="Вкус (напр. Pinkman)" style="flex: 1.5;">
+                </div>
+                <input type="text" id="manual-custom-brand" class="custom-brand-input hidden"
+                    placeholder="Введите название бренда..." style="margin-bottom: 8px;">
+                <div class="manual-grid-row" style="margin-bottom: 0;">
+                    <div class="pack-input-wrap" style="flex: 1;">
+                        <span>Вес табака (г):</span>
+                        <input type="number" id="manual-weight-input" value="18" min="1" max="100">
+                    </div>
+                    <div class="pack-input-wrap" style="flex: 1;">
+                        <span>Длительность (мин):</span>
+                        <input type="number" id="manual-duration-input" value="60" min="5" max="300">
+                    </div>
+                </div>
             </div>
+
+            <div class="form-group">
+                <label>Угли и оценка</label>
+                <div class="manual-grid-row" style="margin-bottom: 0;">
+                    <div class="pack-input-wrap" style="flex: 0.9;">
+                        <span>Углей (шт):</span>
+                        <input type="number" id="manual-coals-input" value="3" min="1" max="12">
+                    </div>
+                    <select id="manual-rating-select" style="flex: 1.3;">
+                        <option value="5">★ 5 — Идеально</option>
+                        <option value="4">★ 4 — Хорошо</option>
+                        <option value="3">★ 3 — Норм</option>
+                        <option value="2">★ 2 — Такое себе</option>
+                        <option value="1">★ 1 — Ужасно</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label>Комментарий</label>
                 <textarea id="manual-comment-input" rows="2" placeholder="Заметки о покуре..."></textarea>
             </div>
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button class="btn btn-secondary"
-                    onclick="document.getElementById('manual-add-modal').classList.add('hidden')"
-                    style="margin:0;">Отмена</button>
-                <button class="btn" onclick="saveManualSession()" style="margin:0;">Сохранить в историю</button>
+
+            <div class="modal-actions-row">
+                <button type="button" class="btn btn-secondary" onclick="closeManualAddModal()">Отмена</button>
+                <button type="button" class="btn" onclick="saveManualSession()">Сохранить</button>
             </div>
         </div>
     </div>
 
-    <!-- Универсальное диалоговое окно iOS (вместо системных prompt/alert) -->
-    <div id="ios-dialog-modal" class="hidden">
-        <div class="ios-dialog-box">
-            <h3 id="ios-dialog-title" style="font-size: 1.05em; margin-bottom: 8px;">Новое значение</h3>
-            <p id="ios-dialog-msg" class="hidden"
-                style="font-size: 0.88em; color: var(--text-secondary); margin: 0 0 14px 0; line-height: 1.4;"></p>
-            <input type="text" id="ios-dialog-input" placeholder="Введите название..." style="margin-bottom: 14px;">
-            <div style="display: flex; gap: 8px;">
-                <button type="button" id="ios-dialog-cancel" class="btn btn-secondary" onclick="closeIosDialog()"
-                    style="margin:0; padding: 11px;">Отмена</button>
-                <button type="button" id="ios-dialog-ok" class="btn" style="margin:0; padding: 11px;">ОК</button>
-            </div>
-        </div>
-    </div>
+    <!-- Модалка рулетки вкусов -->
+    <div id="roulette-modal" class="modal-backdrop hidden" onclick="handleBackdropClick(event, 'roulette-modal')">
+        <div class="modal-content" style="text-align: center;">
+            <h3 style="margin-bottom: 4px;">🎲 Интеллектуальный подбор</h3>
+            <p style="color: var(--text-secondary); font-size: 0.82em; margin-bottom: 14px;">Топ-вкусы с высоким
+                народным рейтингом</p>
 
-    <!-- Экран успешного сохранения с анимацией -->
-    <div id="save-success-overlay" class="save-success-overlay hidden">
-        <div class="save-success-card">
-            <div class="success-check-circle">✓</div>
-            <h3 style="margin: 0 0 6px 0; font-size: 1.25em;">Успешно сохранено!</h3>
-            <p style="margin: 0; color: var(--text-secondary); font-size: 0.92em;">До скорой дымной встречи 💨</p>
-            <div id="post-save-coal-alert" class="post-save-coal-alert hidden"></div>
+            <div class="manual-grid-row" style="text-align: left;">
+                <div class="form-group" style="flex: 1.2; margin-bottom: 0;">
+                    <label>Бренд</label>
+                    <select id="roulette-brand-filter">
+                        <option value="all">🌐 Все бренды</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <label>Профиль</label>
+                    <select id="roulette-cat-filter">
+                        <option value="all">✨ Любой</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="roulette-result-card" class="roulette-Showcase-card">
+                <div class="roulette-badge-row">
+                    <span class="roulette-brand-tag" id="roulette-res-brand">Готов к подбору</span>
+                    <span class="roulette-cat-tag hidden" id="roulette-res-cat">Фрукты</span>
+                </div>
+                <div class="roulette-flavor-title" id="roulette-res-name">Нажми «Крутить рулетку»</div>
+                <div class="roulette-flavor-desc" id="roulette-res-desc">Подберем проверенный моно-вкус из базы или
+                    добавим в твой текущий микс.</div>
+            </div>
+
+            <button type="button" class="btn" id="roulette-spin-btn" onclick="spinFlavorRoulette()"
+                style="margin-bottom: 10px;">🎲 Крутить рулетку!</button>
+            <div class="modal-actions-row">
+                <button type="button" class="btn btn-secondary" onclick="closeRouletteModal()">Закрыть</button>
+                <button type="button" class="btn btn-success hidden" id="roulette-apply-btn"
+                    onclick="applyRouletteFlavor()">⚡ Забить в чашу</button>
+            </div>
         </div>
     </div>
 
     <script src="app.js"></script>
-
-    <!-- Модалка рулетки вкусов -->
-    <!-- Модаль ручного добавления сессии -->
-    <div id="manual-add-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <h3 style="margin-top:0; margin-bottom: 16px; font-size: 1.15em;">➕ Записать прошедший покур</h3>
-
-            <div class="form-group">
-                <label>Дата сессии</label>
-                <input type="date" id="manual-date-input">
-            </div>
-
-            <div class="form-group">
-                <label>Чаша</label>
-                <select id="manual-bowl-select"></select>
-            </div>
-
-            <div class="form-group">
-                <label>Бренд и Вкус</label>
-                <div class="manual-grid-row">
-                    <select id="manual-brand-select" style="flex: 1.2;"></select>
-                    <input type="text" id="manual-flavor-input" placeholder="Вкус (напр. Pinkman)" style="flex: 1.8;">
-                </div>
-                <div class="manual-grid-row">
-                    <input type="number" id="manual-weight-input" placeholder="Грамм" value="18" style="flex: 1;">
-                    <input type="number" id="manual-duration-input" placeholder="Минут курения" value="60"
-                        style="flex: 1;">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Оценка покура</label>
-                <select id="manual-rating-select">
-                    <option value="5">★ 5 — Идеально</option>
-                    <option value="4">★ 4 — Хорошо</option>
-                    <option value="3">★ 3 — Нормально</option>
-                    <option value="2">★ 2 — Быстро сгорел</option>
-                    <option value="1">★ 1 — Ужасно</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Заметки / Комментарий</label>
-                <textarea id="manual-comment-input" rows="2" placeholder="Угли, прогрев, впечатления..."></textarea>
-            </div>
-
-            <div style="display: flex; gap: 10px; margin-top: 18px;">
-                <button type="button" class="btn btn-secondary" onclick="closeManualAddModal()"
-                    style="margin:0;">Отмена</button>
-                <button type="button" class="btn" onclick="saveManualSession()" style="margin:0;">Сохранить</button>
-            </div>
-        </div>
-    </div>
 </body>
 
 </html>

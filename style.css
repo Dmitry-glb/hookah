@@ -1,14 +1,14 @@
 /* ==========================================================================
-   DimHookah — Ultra Liquid Glass & Active Lava Mesh (iOS 27 / VisionOS)
+   DimHookah — Ultra Liquid Glass & JS Canvas Lava Edition (iOS 27 / VisionOS)
    ========================================================================== */
 
 :root {
     --bg-base: #E4E6F1;
     /* Ультра-прозрачные слои стекла (светлая тема) */
-    --surface: rgba(255, 255, 255, 0.24);
+    --surface: rgba(255, 255, 255, 0.22);
     --surface-elevated: rgba(255, 255, 255, 0.72);
-    --surface-input: rgba(255, 255, 255, 0.30);
-    --surface-row: rgba(255, 255, 255, 0.18);
+    --surface-input: rgba(255, 255, 255, 0.28);
+    --surface-row: rgba(255, 255, 255, 0.16);
 
     --text: #111116;
     --text-secondary: rgba(17, 17, 22, 0.65);
@@ -32,13 +32,6 @@
     --shadow-float: 0 24px 54px -10px rgba(12, 14, 28, 0.24);
     --modal-backdrop: rgba(15, 16, 26, 0.35);
 
-    /* Насыщенные сферы живого фона для светлой темы */
-    --blob-1: #FF621A;
-    --blob-2: #8B5CF6;
-    --blob-3: #F59E0B;
-    --blob-4: #EC4899;
-    --blob-opacity: 0.55;
-
     --radius-card: 26px;
     --radius-inner: 15px;
     --radius-pill: 999px;
@@ -48,7 +41,7 @@
 :root[data-theme="dark"] {
     --bg-base: #06060A;
     /* Ультра-прозрачные слои стекла (тёмная тема) */
-    --surface: rgba(18, 18, 26, 0.24);
+    --surface: rgba(18, 18, 26, 0.20);
     --surface-elevated: rgba(26, 26, 36, 0.74);
     --surface-input: rgba(255, 255, 255, 0.08);
     --surface-row: rgba(255, 255, 255, 0.05);
@@ -74,13 +67,6 @@
     --shadow-card: 0 20px 44px -10px rgba(0, 0, 0, 0.65);
     --shadow-float: 0 28px 60px -8px rgba(0, 0, 0, 0.85);
     --modal-backdrop: rgba(0, 0, 0, 0.55);
-
-    /* Сферы живого фона для тёмной темы (раскалённый уголь и ночной неон) */
-    --blob-1: #FF4500;
-    --blob-2: #6D28D9;
-    --blob-3: #D97706;
-    --blob-4: #BE185D;
-    --blob-opacity: 0.46;
 }
 
 * {
@@ -119,124 +105,16 @@ body.modal-open {
     overflow: hidden !important;
 }
 
-/* --- ЖИВОЙ АНИМИРОВАННЫЙ ФОН (ТЕПЕРЬ НА z-index: 0, НЕ ПЕРЕКРЫВАЕТСЯ BODY) --- */
-.ambient-bg {
+/* --- ХОЛСТ ЖИВОГО АНИМИРОВАННОГО ФОНА НА JS --- */
+#liquid-bg-canvas {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     z-index: 0;
-    overflow: hidden;
     pointer-events: none;
-    background-color: var(--bg-base);
-    transition: background-color 0.4s ease;
-}
-
-.ambient-blob {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(55px);
-    -webkit-filter: blur(55px);
-    opacity: var(--blob-opacity);
-    will-change: transform;
-}
-
-.blob-1 {
-    width: 78vw;
-    height: 78vw;
-    max-width: 380px;
-    max-height: 380px;
-    background: radial-gradient(circle, var(--blob-1) 0%, transparent 70%);
-    top: -10%;
-    left: -15%;
-    animation: lavaMove1 11s ease-in-out infinite alternate;
-}
-
-.blob-2 {
-    width: 85vw;
-    height: 85vw;
-    max-width: 420px;
-    max-height: 420px;
-    background: radial-gradient(circle, var(--blob-2) 0%, transparent 70%);
-    top: 25%;
-    right: -20%;
-    animation: lavaMove2 14s ease-in-out infinite alternate;
-}
-
-.blob-3 {
-    width: 75vw;
-    height: 75vw;
-    max-width: 360px;
-    max-height: 360px;
-    background: radial-gradient(circle, var(--blob-3) 0%, transparent 70%);
-    bottom: -8%;
-    left: -10%;
-    animation: lavaMove3 12s ease-in-out infinite alternate;
-}
-
-.blob-4 {
-    width: 65vw;
-    height: 65vw;
-    max-width: 310px;
-    max-height: 310px;
-    background: radial-gradient(circle, var(--blob-4) 0%, transparent 70%);
-    bottom: 18%;
-    right: 5%;
-    animation: lavaMove4 9s ease-in-out infinite alternate;
-}
-
-@keyframes lavaMove1 {
-    0% {
-        transform: translate(0, 0) scale(1) rotate(0deg);
-    }
-
-    50% {
-        transform: translate(38vw, 22vh) scale(1.22) rotate(45deg);
-    }
-
-    100% {
-        transform: translate(12vw, 48vh) scale(0.9) rotate(90deg);
-    }
-}
-
-@keyframes lavaMove2 {
-    0% {
-        transform: translate(0, 0) scale(1);
-    }
-
-    50% {
-        transform: translate(-42vw, -18vh) scale(1.18);
-    }
-
-    100% {
-        transform: translate(-20vw, 28vh) scale(0.92);
-    }
-}
-
-@keyframes lavaMove3 {
-    0% {
-        transform: translate(0, 0) scale(1);
-    }
-
-    50% {
-        transform: translate(35vw, -28vh) scale(1.25);
-    }
-
-    100% {
-        transform: translate(8vw, -12vh) scale(0.95);
-    }
-}
-
-@keyframes lavaMove4 {
-    0% {
-        transform: translate(0, 0) scale(0.9);
-    }
-
-    50% {
-        transform: translate(-30vw, -25vh) scale(1.2);
-    }
-
-    100% {
-        transform: translate(15vw, 15vh) scale(1.05);
-    }
+    display: block;
 }
 
 .container {
@@ -948,28 +826,6 @@ textarea:focus {
     flex-direction: column;
     gap: 8px;
     margin-top: 6px;
-}
-
-.session-coal-tracker {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    background: var(--surface-input);
-    padding: 8px 12px;
-    border-radius: 13px;
-    border: 1px solid var(--border);
-    margin-bottom: 4px;
-}
-
-.coal-tracker-label {
-    font-size: 0.85em;
-    font-weight: 600;
-}
-
-.coal-tracker-btns {
-    display: flex;
-    gap: 6px;
 }
 
 @keyframes pulse-alarm {

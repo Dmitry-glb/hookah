@@ -10,8 +10,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="DimHookah">
-    <meta name="theme-color" content="#E8EAF2" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#060609" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#E4E6F1" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#06060A" media="(prefers-color-scheme: dark)">
 
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
@@ -19,13 +19,8 @@
 </head>
 
 <body>
-    <!-- Живой анимированный фон для эффекта преломления Liquid Glass -->
-    <div class="ambient-bg" aria-hidden="true">
-        <div class="ambient-blob blob-1"></div>
-        <div class="ambient-blob blob-2"></div>
-        <div class="ambient-blob blob-3"></div>
-        <div class="ambient-blob blob-4"></div>
-    </div>
+    <!-- Живой анимированный фон на JS Canvas для эффекта преломления Liquid Glass -->
+    <canvas id="liquid-bg-canvas" aria-hidden="true"></canvas>
 
     <!-- Фоновый аудио-трек для удержания PWA активным и работы MediaSession -->
     <audio id="bg-audio" loop playsinline style="display:none;"></audio>
@@ -220,16 +215,8 @@
                     <button class="btn btn-text-Cancel" onclick="cancelActiveSession()">Отменить сессию</button>
                 </div>
 
-                <!-- Кнопки управления во время покура -->
+                <!-- Кнопка завершения во время покура (без добавления углей) -->
                 <div id="smoking-controls" class="session-btn-stack hidden">
-                    <div class="session-coal-tracker">
-                        <span class="coal-tracker-label">🔥 Углей: <b id="active-coals-count">3</b> шт.</span>
-                        <div class="coal-tracker-btns">
-                            <button type="button" class="pill-btn" onclick="addExtraCoalInSession(1)">+1 уголь</button>
-                            <button type="button" class="pill-btn" onclick="addExtraCoalInSession(2)">+2 угля</button>
-                        </div>
-                    </div>
-
                     <button class="btn btn-danger" onclick="finishSmokingSession()">🛑 Завершить сессию</button>
                 </div>
             </div>
@@ -261,11 +248,10 @@
                 <div class="form-group">
                     <label>Расстановка углей</label>
                     <select id="coal-placement" class="control-h">
-                        <option value="2 внутри, 1 на ребре (Пирамида)">2 внутри, 1 на ребре (Пирамида)</option>
-                        <option value="3 внутри">3 внутри</option>
-                        <option value="2 внутри, 2 на краях">2 внутри, 2 на краях</option>
-                        <option value="3 на краях (Фольга / На грани)">3 на краях (Фольга / На грани)</option>
-                        <option value="4 угля (Мощный прогрев)">4 угля (Мощный прогрев)</option>
+                        <option value="2 + 1">2 + 1</option>
+                        <option value="3 в колодке">3 в колодке</option>
+                        <option value="пирамида">пирамида</option>
+                        <option value="чебурашка">чебурашка</option>
                     </select>
                 </div>
 
@@ -446,11 +432,10 @@
                         <span>угл.</span>
                     </div>
                     <select id="edit-placement" class="control-h">
-                        <option value="2 внутри, 1 на ребре (Пирамида)">2 внутри, 1 на ребре</option>
-                        <option value="3 внутри">3 внутри</option>
-                        <option value="2 внутри, 2 на краях">2 внутри, 2 на краях</option>
-                        <option value="3 на краях (Фольга / На грани)">3 на краях</option>
-                        <option value="4 угля (Мощный прогрев)">4 угля</option>
+                        <option value="2 + 1">2 + 1</option>
+                        <option value="3 в колодке">3 в колодке</option>
+                        <option value="пирамида">пирамида</option>
+                        <option value="чебурашка">чебурашка</option>
                     </select>
                 </div>
             </div>
@@ -550,11 +535,10 @@
                         <span>угл.</span>
                     </div>
                     <select id="manual-placement-select" class="control-h">
-                        <option value="2 внутри, 1 на ребре (Пирамида)">2 внутри, 1 на ребре</option>
-                        <option value="3 внутри">3 внутри</option>
-                        <option value="2 внутри, 2 на краях">2 внутри, 2 на краях</option>
-                        <option value="3 на краях (Фольга / На грани)">3 на краях</option>
-                        <option value="4 угля (Мощный прогрев)">4 угля</option>
+                        <option value="2 + 1">2 + 1</option>
+                        <option value="3 в колодке">3 в колодке</option>
+                        <option value="пирамида">пирамида</option>
+                        <option value="чебурашка">чебурашка</option>
                     </select>
                 </div>
             </div>

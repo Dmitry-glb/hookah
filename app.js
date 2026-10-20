@@ -1,5 +1,12 @@
-// --- БАЗОВЫЕ КАТАЛОГИ ---
+// --- БАЗОВЫЕ КАТАЛОГИ (ЧАШИ ДОБАВЛЯЮТСЯ ТОЛЬКО ВРУЧНУЮ) ---
 const DEFAULT_BOWLS = [];
+
+const LEGACY_PRESET_BOWLS = [
+    "Cosmobowl Turkish", "Cosmobowl Killer", "Космобоул Турка", "Космобоул Убивашка",
+    "Облако Phunnel M", "Торнадо Убивашка", "SmokeLab Mummy", "Смоук Лаб Мумия",
+    "Grynbowls Традишка", "UPG Малая", "UPG (Апгрейд Форм) Малая", "Werkbund Zeus",
+    "Japona Hookah Mummy", "Moon Phunnel", "ST Классика", "Fox Турка", "Solaris", "Solaris (Солярис)"
+];
 
 const DEFAULT_BRANDS = [
     "Musthave",
@@ -52,10 +59,58 @@ let lastLockScreenTitle = '';
 let lockedScrollY = 0;
 
 function stripRussianBrackets(name) {
-    return (name || '').replace(/\s*\([^)]*\)\s*$/g, '').trim();
+    return String(name || '').replace(/\s*\([^)]*\)\s*$/g, '').trim();
 }
 
-// --- ФОНОВЫЙ WEB WORKER ДЛЯ ТАЙМЕРА (НЕ ЗАСЫПАЕТ В ФОНОВЫХ ВКЛАДКАХ ТАК БЫСТРО, КАК SETINTERVAL) ---
+// --- АВТОПОДСТАНОВКА ГРАММОВКИ С ПОСЛЕДНЕГО ПОКУРА ---
+function getLastUsedWeights(sessionsList = null) {
+    let sessions = sessionsList;
+    if (!Array.isArray(sessions)) {
+        try {
+            sessions = JSON.parse(localStorage.getItem('hookah_sessions') || '[]');
+        } catch (e) {
+            sessions = [];
+        }
+    }
+
+    if (Array.isArray(sessions) && sessions.length > 0) {
+        for (let i = sessions.length - 1; i >= 0; i--) {
+            const s = sessions[i];
+            if (Array.isArray(s.mix) && s.mix.length > 0) {
+                const weights = s.mix.map(m => parseFloat(m.weight)).filter(w => Number.isFinite(w) && w > 0);
+                if (weights.length > 0) {
+                    const total = Math.round(weights.reduce((a, b) => a + b, 0));
+                    return {
+                        soloWeight: total > 0 ? total : weights[0],
+                        mixWeights: weights
+                    };
+                }
+            }
+        }
+    }
+
+    const savedLast = parseFloat(localStorage.getItem('hookah_last_weight'));
+    const fallback = Number.isFinite(savedLast) && savedLast > 0 ? savedLast : 18;
+    return {
+        soloWeight: fallback,
+        mixWeights: [Math.round(fallback * 0.6), Math.max(1, fallback - Math.round(fallback * 0.6))]
+    };
+}
+
+function applyLastUsedWeightToForm(sessionsList = null) {
+    const { soloWeight } = getLastUsedWeights(sessionsList);
+    const soloWeightEl = document.getElementById('solo-tobacco-weight');
+    if (soloWeightEl) {
+        soloWeightEl.value = soloWeight;
+    }
+    const manualWeightEl = document.getElementById('manual-weight-input');
+    if (manualWeightEl) {
+        manualWeightEl.value = soloWeight;
+    }
+    recalcLiveBowlCost();
+}
+
+// --- ФОНОВЫЙ WEB WORKER ДЛЯ ТАЙМЕРА ---
 function startTimerTicker(callback) {
     stopTimerTicker();
 
@@ -210,7 +265,7 @@ function applyThemeMode(mode) {
     }
 }
 
-// --- ЗВУК IOS 27 И УМНАЯ MEDIASESSION (НЕ КОНФЛИКТУЕТ С TIKTOK) ---
+// --- ЗВУК IOS 27 И УМНАЯ MEDIASESSION ---
 function initAudio() {
     if (!audioCtx) {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -261,7 +316,6 @@ function prepareKeepAliveAudio() {
     }
 }
 
-// Генерируем WAV-мелодию iOS 27 прямо в память, чтобы она могла пробить фоновый режим через <audio>
 function prepareChimeWavUrl() {
     if (chimeAudioUrl) return;
     const sampleRate = 22050;
@@ -345,8 +399,6 @@ function updateLockScreenMetadata(title, artist, force = false) {
     if (!('mediaSession' in navigator)) return;
 
     const audioEl = document.getElementById('bg-audio');
-    // Если наш фоновый звук поставлен на паузу другим приложением (например, TikTok),
-    // не перехватываем плеер принудительно каждую секунду
     if (!force && audioEl && audioEl.paused) {
         return;
     }
@@ -367,7 +419,6 @@ function updateLockScreenMetadata(title, artist, force = false) {
 }
 
 function playIos27Chime() {
-    // 1. Играем через Web Audio API (если приложение открыто или звук разрешен)
     try {
         initAudio();
         if (audioCtx && audioCtx.state === 'running') {
@@ -404,7 +455,6 @@ function playIos27Chime() {
         }
     } catch (e) { }
 
-    // 2. Дублируем через системный <audio> (пробивает фоновый режим)
     try {
         prepareChimeWavUrl();
         const audioEl = document.getElementById('bg-audio');
@@ -479,10 +529,16 @@ request.onupgradeneeded = function (event) {
 };
 request.onsuccess = function (event) {
     db = event.target.result;
-    loadAllData(renderData);
+    loadAllData((sessions) => {
+        applyLastUsedWeightToForm(sessions);
+        renderData(sessions);
+    });
 };
 request.onerror = function () {
-    loadAllData(renderData);
+    loadAllData((sessions) => {
+        applyLastUsedWeightToForm(sessions);
+        renderData(sessions);
+    });
 };
 
 function saveSessionsToStorage(sessions, callback) {
@@ -503,7 +559,12 @@ function saveSessionsToStorage(sessions, callback) {
 }
 
 function loadAllData(callback) {
-    let localData = JSON.parse(localStorage.getItem('hookah_sessions') || '[]');
+    let localData = [];
+    try {
+        localData = JSON.parse(localStorage.getItem('hookah_sessions') || '[]');
+    } catch (e) {
+        localData = [];
+    }
     if (db) {
         try {
             const tx = db.transaction(["sessions"], "readonly");
@@ -526,14 +587,20 @@ function loadAllData(callback) {
 
 // --- КАТАЛОГИ ЧАШ, БРЕНДОВ, ЦЕН ПАЧЕК И СКЛАДА УГЛЕЙ ---
 function initCatalogs() {
-    let storedBowls = JSON.parse(localStorage.getItem('hookah_bowls') || '[]');
-    const storedBrands = JSON.parse(localStorage.getItem('hookah_brands') || 'null');
-    const storedPacks = JSON.parse(localStorage.getItem('hookah_brand_packs') || '{}');
-    const storedCoals = JSON.parse(localStorage.getItem('hookah_coal_inventory') || 'null');
+    let storedBowls = [];
+    let storedBrands = null;
+    let storedPacks = {};
+    let storedCoals = null;
 
-    // Однократная очистка старых дефолтных чаш (оставляем только те, что реально были в истории покуров)
+    try { storedBowls = JSON.parse(localStorage.getItem('hookah_bowls') || '[]'); } catch (e) { }
+    try { storedBrands = JSON.parse(localStorage.getItem('hookah_brands') || 'null'); } catch (e) { }
+    try { storedPacks = JSON.parse(localStorage.getItem('hookah_brand_packs') || '{}'); } catch (e) { }
+    try { storedCoals = JSON.parse(localStorage.getItem('hookah_coal_inventory') || 'null'); } catch (e) { }
+
+    // Однократная очистка старых предустановленных чаш
     if (!localStorage.getItem('hookah_custom_bowls_only_v1')) {
-        const historySessions = JSON.parse(localStorage.getItem('hookah_sessions') || '[]');
+        let historySessions = [];
+        try { historySessions = JSON.parse(localStorage.getItem('hookah_sessions') || '[]'); } catch (e) { }
         const usedInHistory = new Set(historySessions.map(s => s.bowl).filter(Boolean));
         storedBowls = (Array.isArray(storedBowls) ? storedBowls : []).filter(
             b => !LEGACY_PRESET_BOWLS.includes(b) || usedInHistory.has(b)
@@ -547,6 +614,9 @@ function initCatalogs() {
         ? storedBrands
         : DEFAULT_BRANDS;
     savedBrands = Array.from(new Set(rawBrands.map(stripRussianBrackets).filter(Boolean)));
+    if (savedBrands.length === 0) {
+        savedBrands = [...DEFAULT_BRANDS];
+    }
 
     brandPackDefaults = {};
     if (storedPacks && typeof storedPacks === 'object') {
@@ -576,14 +646,26 @@ function initCatalogs() {
     localStorage.setItem('hookah_coal_inventory', JSON.stringify(coalInventory));
 
     populateSelects();
+    applyLastUsedWeightToForm();
     renderCoalInventoryUI();
 }
 
 function getBowlOptionsHtml(selectedVal = '') {
     if (savedBowls.length === 0) {
-        return `<option value="">Нет чаш — нажми «+ Добавить» выше</option>`;
+        return `<option value="" selected>Нет чаш — нажми «+ Добавить»</option>`;
     }
-    return savedBowls.map(b => `<option value="${b}" ${b === selectedVal ? 'selected' : ''}>${b}</option>`).join('');
+    const target = savedBowls.includes(selectedVal) ? selectedVal : savedBowls[0];
+    return savedBowls.map(b => `<option value="${b}" ${b === target ? 'selected' : ''}>${b}</option>`).join('');
+}
+
+function getBrandOptionsHtml(selectedVal = '') {
+    if (savedBrands.length === 0) {
+        savedBrands = [...DEFAULT_BRANDS];
+    }
+    const cleanSelected = stripRussianBrackets(selectedVal);
+    const target = savedBrands.includes(cleanSelected) ? cleanSelected : savedBrands[0];
+    const options = savedBrands.map(b => `<option value="${b}" ${b === target ? 'selected' : ''}>${b}</option>`).join('');
+    return `${options}<option value="__custom__">➕ Другой бренд...</option>`;
 }
 
 function populateSelects() {
@@ -591,34 +673,33 @@ function populateSelects() {
     if (bowlSelect) {
         const currentVal = bowlSelect.value && savedBowls.includes(bowlSelect.value) ? bowlSelect.value : (savedBowls[0] || '');
         bowlSelect.innerHTML = getBowlOptionsHtml(currentVal);
+        bowlSelect.value = currentVal;
     }
 
     const soloBrand = document.getElementById('solo-tobacco-brand');
     if (soloBrand) {
-        const currentBrand = soloBrand.value && soloBrand.value !== '__custom__' && savedBrands.includes(soloBrand.value)
-            ? soloBrand.value
-            : savedBrands[0];
-        soloBrand.innerHTML = getBrandOptionsHtml(currentBrand);
+        const prevBrand = stripRussianBrackets(soloBrand.value);
+        const targetBrand = (prevBrand && prevBrand !== '__custom__' && savedBrands.includes(prevBrand))
+            ? prevBrand
+            : (savedBrands[0] || DEFAULT_BRANDS[0]);
+
+        soloBrand.innerHTML = getBrandOptionsHtml(targetBrand);
+        soloBrand.value = targetBrand;
+        if (soloBrand.selectedIndex === -1 && soloBrand.options.length > 0) {
+            soloBrand.selectedIndex = 0;
+        }
         fillPackInputsForBrand('solo', soloBrand.value);
     }
+
+    // Обновляем также селекты в строках микса, если они открыты
+    document.querySelectorAll('#mix-rows-list .brand-select').forEach(sel => {
+        const cur = stripRussianBrackets(sel.value);
+        const target = (cur && savedBrands.includes(cur)) ? cur : (savedBrands[0] || DEFAULT_BRANDS[0]);
+        sel.innerHTML = getBrandOptionsHtml(target);
+        sel.value = target;
+    });
+
     recalcLiveBowlCost();
-}
-
-async function deleteSelectedBowl() {
-    const select = document.getElementById('bowl-select');
-    const target = select?.value;
-    if (!target) {
-        showBannerToast('Сначала добавь чашу в список');
-        return;
-    }
-
-    const ok = await showIosConfirm('Удалить чашу?', `Убрать чашу «${target}» из списка?`, 'Удалить', true);
-    if (!ok) return;
-
-    savedBowls = savedBowls.filter(b => b !== target);
-    localStorage.setItem('hookah_bowls', JSON.stringify(savedBowls));
-    populateSelects();
-    showBannerToast(`Чаша «${target}» удалена`);
 }
 
 function fillPackInputsForBrand(mode, brandName, rowEl = null) {
@@ -671,66 +752,106 @@ function onPackInfoChange(mode, inputEl = null) {
 // --- ДОБАВЛЕНИЕ И УДАЛЕНИЕ ЧАШ ---
 function toggleQuickAddBowl() {
     const box = document.getElementById('quick-bowl-box');
+    if (!box) return;
     box.classList.toggle('hidden');
     if (!box.classList.contains('hidden')) {
-        document.getElementById('new-bowl-input').focus();
+        document.getElementById('new-bowl-input')?.focus();
     }
 }
 
 function addCustomBowl() {
     const input = document.getElementById('new-bowl-input');
+    if (!input) return;
     const name = input.value.trim();
-    if (!name) return;
-
-    if (!savedBowls.includes(name)) {
-        savedBowls.unshift(name);
-        localStorage.setItem('hookah_bowls', JSON.stringify(savedBowls));
+    if (!name) {
+        showBannerToast('Введи название чаши!');
+        input.focus();
+        return;
     }
+
+    const existsIdx = savedBowls.findIndex(b => b.toLowerCase() === name.toLowerCase());
+    if (existsIdx !== -1) {
+        savedBowls.splice(existsIdx, 1);
+    }
+    savedBowls.unshift(name);
+    localStorage.setItem('hookah_bowls', JSON.stringify(savedBowls));
+
     populateSelects();
-    document.getElementById('bowl-select').value = name;
+    const bowlSelect = document.getElementById('bowl-select');
+    if (bowlSelect) bowlSelect.value = name;
+
     input.value = '';
-    document.getElementById('quick-bowl-box').classList.add('hidden');
+    document.getElementById('quick-bowl-box')?.classList.add('hidden');
     showBannerToast(`Чаша «${name}» добавлена`);
 }
 
+async function deleteSelectedBowl() {
+    const select = document.getElementById('bowl-select');
+    const target = select?.value;
+    if (!target) {
+        showBannerToast('Сначала добавь чашу в список');
+        return;
+    }
+
+    const ok = await showIosConfirm('Удалить чашу?', `Убрать чашу «${target}» из списка?`, 'Удалить', true);
+    if (!ok) return;
+
+    savedBowls = savedBowls.filter(b => b !== target);
+    localStorage.setItem('hookah_bowls', JSON.stringify(savedBowls));
+    populateSelects();
+    showBannerToast(`Чаша «${target}» удалена`);
+}
 
 // --- ДОБАВЛЕНИЕ И УДАЛЕНИЕ БРЕНДОВ ТАБАКА ---
 function toggleQuickAddBrand() {
     const box = document.getElementById('quick-brand-box');
+    if (!box) return;
     box.classList.toggle('hidden');
     if (!box.classList.contains('hidden')) {
-        document.getElementById('new-brand-input').focus();
+        document.getElementById('new-brand-input')?.focus();
     }
 }
 
 function addCustomBrandFromBar() {
     const input = document.getElementById('new-brand-input');
+    if (!input) return;
     const name = stripRussianBrackets(input.value);
-    if (!name) return;
-
-    if (!savedBrands.includes(name)) {
-        savedBrands.unshift(name);
-        localStorage.setItem('hookah_brands', JSON.stringify(savedBrands));
+    if (!name) {
+        showBannerToast('Введи название бренда!');
+        input.focus();
+        return;
     }
+
+    const existsIdx = savedBrands.findIndex(b => b.toLowerCase() === name.toLowerCase());
+    if (existsIdx !== -1) {
+        savedBrands.splice(existsIdx, 1);
+    }
+    savedBrands.unshift(name);
+    localStorage.setItem('hookah_brands', JSON.stringify(savedBrands));
+
     populateSelects();
+
     const soloBrand = document.getElementById('solo-tobacco-brand');
     if (soloBrand) {
         soloBrand.value = name;
+        document.getElementById('solo-custom-brand')?.classList.add('hidden');
         fillPackInputsForBrand('solo', name);
     }
+
     input.value = '';
-    document.getElementById('quick-brand-box').classList.add('hidden');
-    showBannerToast(`Бренд «${name}» добавлен`);
+    document.getElementById('quick-brand-box')?.classList.add('hidden');
+    recalcLiveBowlCost();
+    showBannerToast(`Бренд «${name}» добавлен и выбран`);
 }
 
 function openBrandManagerModal() {
     renderBrandManagerList();
-    document.getElementById('brand-manager-modal').classList.remove('hidden');
+    document.getElementById('brand-manager-modal')?.classList.remove('hidden');
     syncBodyScrollLock();
 }
 
 function closeBrandManagerModal() {
-    document.getElementById('brand-manager-modal').classList.add('hidden');
+    document.getElementById('brand-manager-modal')?.classList.add('hidden');
     syncBodyScrollLock();
 }
 
@@ -798,7 +919,7 @@ function onManualBrandChange(selectEl) {
 function ensureBrandSaved(brandName) {
     const clean = stripRussianBrackets(brandName);
     if (clean && clean !== '__custom__' && !savedBrands.includes(clean)) {
-        savedBrands.push(clean);
+        savedBrands.unshift(clean);
         localStorage.setItem('hookah_brands', JSON.stringify(savedBrands));
     }
 }
@@ -883,7 +1004,7 @@ function renderCoalInventoryUI() {
 }
 
 function toggleCoalSettings() {
-    document.getElementById('coal-settings-panel').classList.toggle('hidden');
+    document.getElementById('coal-settings-panel')?.classList.toggle('hidden');
 }
 
 function saveCoalInventorySettings() {
@@ -899,7 +1020,7 @@ function saveCoalInventorySettings() {
     localStorage.setItem('hookah_coal_inventory', JSON.stringify(coalInventory));
     renderCoalInventoryUI();
     recalcLiveBowlCost();
-    document.getElementById('coal-settings-panel').classList.add('hidden');
+    document.getElementById('coal-settings-panel')?.classList.add('hidden');
     showBannerToast('Склад углей обновлён');
 }
 
@@ -942,8 +1063,9 @@ function toggleMixMode(forceState = null) {
 
         const list = document.getElementById('mix-rows-list');
         if (list.children.length === 0) {
-            addMixRow(savedBrands[0], '', 10);
-            addMixRow(savedBrands[1] || savedBrands[0], '', 8);
+            const { mixWeights } = getLastUsedWeights();
+            addMixRow(savedBrands[0], '', mixWeights[0] || 10);
+            addMixRow(savedBrands[1] || savedBrands[0], '', mixWeights[1] || 8);
         }
     } else {
         soloContainer.classList.remove('hidden');
@@ -958,8 +1080,9 @@ function toggleMixMode(forceState = null) {
 
 function addMixRow(brand = '', flavor = '', weight = '') {
     const list = document.getElementById('mix-rows-list');
-    const selectedBrand = stripRussianBrackets(brand) || savedBrands[0];
+    const selectedBrand = stripRussianBrackets(brand) || savedBrands[0] || DEFAULT_BRANDS[0];
     const pack = brandPackDefaults[selectedBrand] || { price: '', weight: '' };
+    const defaultWeight = weight !== '' ? weight : 10;
 
     const card = document.createElement('div');
     card.className = 'tobacco-card-box';
@@ -970,7 +1093,7 @@ function addMixRow(brand = '', flavor = '', weight = '') {
             </select>
             <input type="text" class="flavor-input control-h" placeholder="Вкус" value="${flavor}">
             <div class="unit-input-box control-h">
-                <input type="number" class="mix-weight-input" value="${weight}" placeholder="0" min="1" max="100" oninput="recalcLiveBowlCost()">
+                <input type="number" class="mix-weight-input" value="${defaultWeight}" placeholder="0" min="1" max="100" oninput="recalcLiveBowlCost()">
                 <span>г</span>
             </div>
             <button type="button" class="remove-mix-btn" onclick="removeMixRow(this)">✕</button>
@@ -994,6 +1117,8 @@ function addMixRow(brand = '', flavor = '', weight = '') {
         </div>
     `;
     list.appendChild(card);
+    const sel = card.querySelector('.brand-select');
+    if (sel) sel.value = selectedBrand;
     recalcLiveBowlCost();
 }
 
@@ -1011,13 +1136,14 @@ function getDraftMixFromForm() {
     if (!isMixMode) {
         const brandSelect = document.getElementById('solo-tobacco-brand');
         const customBrand = document.getElementById('solo-custom-brand').value.trim();
-        const brand = stripRussianBrackets(brandSelect.value === '__custom__' ? (customBrand || 'Свой табак') : brandSelect.value);
+        const brand = stripRussianBrackets(brandSelect.value === '__custom__' ? (customBrand || 'Свой табак') : (brandSelect.value || savedBrands[0]));
         const flavor = document.getElementById('solo-tobacco-flavor').value.trim();
         const weight = parseFloat(document.getElementById('solo-tobacco-weight').value) || 0;
         const packPrice = parseFloat(document.getElementById('solo-pack-price').value) || 0;
         const packWeight = parseFloat(document.getElementById('solo-pack-weight').value) || 0;
         const cost = Math.round(calcSingleTobaccoCost(weight, packPrice, packWeight));
 
+        if (weight > 0) localStorage.setItem('hookah_last_weight', String(weight));
         ensureBrandSaved(brand);
         if (brand && packPrice > 0 && packWeight > 0) {
             brandPackDefaults[brand] = { price: packPrice, weight: packWeight };
@@ -1026,16 +1152,18 @@ function getDraftMixFromForm() {
         return [{ brand, flavor, weight, packPrice, packWeight, cost }];
     } else {
         const items = [];
+        let sumW = 0;
         document.querySelectorAll('#mix-rows-list .tobacco-card-box').forEach(card => {
             const sel = card.querySelector('.brand-select');
             const custom = card.querySelector('.custom-brand-input').value.trim();
-            const brand = stripRussianBrackets(sel.value === '__custom__' ? (custom || 'Свой табак') : sel.value);
+            const brand = stripRussianBrackets(sel.value === '__custom__' ? (custom || 'Свой табак') : (sel.value || savedBrands[0]));
             const flavor = card.querySelector('.flavor-input').value.trim();
             const weight = parseFloat(card.querySelector('.mix-weight-input').value) || 0;
             const packPrice = parseFloat(card.querySelector('.mix-pack-price').value) || 0;
             const packWeight = parseFloat(card.querySelector('.mix-pack-weight').value) || 0;
             const cost = Math.round(calcSingleTobaccoCost(weight, packPrice, packWeight));
 
+            sumW += weight;
             ensureBrandSaved(brand);
             if (brand && packPrice > 0 && packWeight > 0) {
                 brandPackDefaults[brand] = { price: packPrice, weight: packWeight };
@@ -1045,6 +1173,7 @@ function getDraftMixFromForm() {
                 items.push({ brand, flavor, weight, packPrice, packWeight, cost });
             }
         });
+        if (sumW > 0) localStorage.setItem('hookah_last_weight', String(sumW));
         return items.length ? items : [{ brand: savedBrands[0], flavor: '', weight: 0, packPrice: 0, packWeight: 0, cost: 0 }];
     }
 }
@@ -1109,7 +1238,13 @@ function restoreActiveSessionIfAny() {
         activeCoalsUsed = state.activeCoalsUsed || 3;
         alarmAlreadyPlayed = !!state.alarmAlreadyPlayed;
 
-        if (state.bowl) document.getElementById('bowl-select').value = state.bowl;
+        if (state.bowl) {
+            if (!savedBowls.includes(state.bowl)) {
+                savedBowls.unshift(state.bowl);
+                populateSelects();
+            }
+            document.getElementById('bowl-select').value = state.bowl;
+        }
         if (state.placement && document.getElementById('coal-placement')) {
             document.getElementById('coal-placement').value = state.placement;
         }
@@ -1160,7 +1295,7 @@ function restoreActiveSessionIfAny() {
     }
 }
 
-// --- ЛОГИКА ТАЙМЕРА ПРОГРЕВА (С УХОДОМ В МИНУС И УЧЕТОМ ОБЩЕГО ВРЕМЕНИ) ---
+// --- ЛОГИКА ТАЙМЕРА ПРОГРЕВА И ПОКУРА ---
 function startWarmupSession() {
     const selectedBowl = document.getElementById('bowl-select')?.value;
     if (!selectedBowl) {
@@ -1169,6 +1304,7 @@ function startWarmupSession() {
         showIosNotice("Добавь свою чашу 🏺", "Список чаш пуст! Введи название своей чаши в поле выше и нажми «ОК».");
         return;
     }
+
     initAudio();
     if ("Notification" in window && Notification.permission === "default") {
         Notification.requestPermission();
@@ -1221,7 +1357,6 @@ function updateWarmupTimer() {
     const timerEl = document.getElementById('timer');
     const overtimeBadge = document.getElementById('warmup-overtime-label');
 
-    // Когда время прогрева вышло — уходим в минус и продолжаем считать общий прогрев!
     if (diffSec <= 0) {
         const overtimeSec = Math.abs(diffSec);
         const minusFormatted = `-${formatTimerSec(overtimeSec)}`;
@@ -1283,7 +1418,6 @@ function addExtraCoalInSession(count) {
 
 function startSmokingFromWarmup() {
     initAudio();
-    // В общий прогрев записывается ВСЁ время от старта прогрева (включая время в минусе!)
     actualWarmupDuration = Math.max(1, Math.floor((Date.now() - stepStartTime) / 1000));
 
     document.getElementById('warmup-box').classList.remove('alarm-active');
@@ -1422,6 +1556,11 @@ function saveCompletedSession() {
     const placement = document.getElementById('coal-placement')?.value || '2 внутри, 1 на ребре (Пирамида)';
     const coalsUsed = activeCoalsUsed || 3;
 
+    const totalW = mix.reduce((acc, item) => acc + (parseFloat(item.weight) || 0), 0);
+    if (totalW > 0) {
+        localStorage.setItem('hookah_last_weight', String(Math.round(totalW)));
+    }
+
     const tobaccoCost = mix.reduce((acc, item) => acc + (item.cost || 0), 0);
     const coalCost = Math.round(coalsUsed * getSingleCoalPrice());
     const sessionCost = Math.round(tobaccoCost + coalCost);
@@ -1445,21 +1584,21 @@ function saveCompletedSession() {
         sessions.push(session);
         saveSessionsToStorage(sessions, () => {
             clearActiveSessionState();
-            resetUI();
+            resetUI(sessions);
             renderData(sessions);
             showSaveSuccessOverlay();
         });
     });
 }
 
-function resetUI() {
+function resetUI(sessions = null) {
     document.getElementById('setup-form').classList.remove('hidden');
     document.getElementById('active-session').classList.add('hidden');
     document.getElementById('comment').value = '';
     document.getElementById('solo-tobacco-flavor').value = '';
     currentRating = 0;
     document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
-    recalcLiveBowlCost();
+    applyLastUsedWeightToForm(sessions);
 }
 
 // --- ВЫПАДАЮЩИЙ КАЛЕНДАРЬ ПЕРИОДОВ И КАРТА ПОБЕД ---
@@ -1677,6 +1816,11 @@ function repeatSession(sessionId) {
         const target = sessions.find(s => s.id === sessionId);
         if (!target) return;
 
+        if (target.bowl && !savedBowls.includes(target.bowl)) {
+            savedBowls.unshift(target.bowl);
+            localStorage.setItem('hookah_bowls', JSON.stringify(savedBowls));
+            populateSelects();
+        }
         document.getElementById('bowl-select').value = target.bowl;
         if (target.placement && document.getElementById('coal-placement')) {
             document.getElementById('coal-placement').value = target.placement;
@@ -1687,13 +1831,13 @@ function repeatSession(sessionId) {
 
         if (mixArr.length <= 1) {
             toggleMixMode(false);
-            const first = mixArr[0] || { brand: savedBrands[0], flavor: '', weight: 18 };
+            const first = mixArr[0] || { brand: savedBrands[0], flavor: '', weight: getLastUsedWeights(sessions).soloWeight };
             const cleanB = stripRussianBrackets(first.brand);
             ensureBrandSaved(cleanB);
             populateSelects();
             document.getElementById('solo-tobacco-brand').value = cleanB;
             document.getElementById('solo-tobacco-flavor').value = first.flavor || '';
-            document.getElementById('solo-tobacco-weight').value = first.weight || 18;
+            document.getElementById('solo-tobacco-weight').value = first.weight || getLastUsedWeights(sessions).soloWeight;
             fillPackInputsForBrand('solo', cleanB);
         } else {
             toggleMixMode(true);
@@ -1725,6 +1869,7 @@ async function deleteSession(sessionId) {
     loadAllData(sessions => {
         const updated = sessions.filter(s => s.id !== sessionId);
         saveSessionsToStorage(updated, () => {
+            applyLastUsedWeightToForm(updated);
             renderData(updated);
             showBannerToast('Запись удалена');
         });
@@ -1756,21 +1901,24 @@ function openEditModal(sessionId) {
 
 function addEditMixRow(brand = '', flavor = '', weight = '') {
     const container = document.getElementById('edit-mix-rows');
+    const cleanB = stripRussianBrackets(brand) || savedBrands[0] || DEFAULT_BRANDS[0];
     const row = document.createElement('div');
     row.className = 'tobacco-grid-mix';
     row.style.marginBottom = '8px';
     row.innerHTML = `
         <select class="brand-select control-h">
-            ${getBrandOptionsHtml(brand || savedBrands[0])}
+            ${getBrandOptionsHtml(cleanB)}
         </select>
         <input type="text" class="flavor-input control-h" placeholder="Вкус" value="${flavor}">
         <div class="unit-input-box control-h">
-            <input type="number" class="edit-weight-input" value="${weight}" min="1" max="100">
+            <input type="number" class="edit-weight-input" value="${weight || 18}" min="1" max="100">
             <span>г</span>
         </div>
         <button type="button" class="remove-mix-btn" onclick="this.parentElement.remove()">✕</button>
     `;
     container.appendChild(row);
+    const sel = row.querySelector('.brand-select');
+    if (sel) sel.value = cleanB;
 }
 
 function closeEditModal() {
@@ -1814,6 +1962,7 @@ function saveEditedSession() {
         }
         saveSessionsToStorage(sessions, () => {
             closeEditModal();
+            applyLastUsedWeightToForm(sessions);
             renderData(sessions);
             showBannerToast('Изменения сохранены');
         });
@@ -1833,13 +1982,19 @@ function openManualAddModal() {
 
     const brandSelect = document.getElementById('manual-brand-select');
     if (brandSelect) {
-        brandSelect.innerHTML = getBrandOptionsHtml(savedBrands[0]);
+        const firstBrand = savedBrands[0] || DEFAULT_BRANDS[0];
+        brandSelect.innerHTML = getBrandOptionsHtml(firstBrand);
+        brandSelect.value = firstBrand;
     }
     const customBrand = document.getElementById('manual-custom-brand');
     if (customBrand) {
         customBrand.value = '';
         customBrand.classList.add('hidden');
     }
+
+    const { soloWeight } = getLastUsedWeights();
+    const manualWeightInput = document.getElementById('manual-weight-input');
+    if (manualWeightInput) manualWeightInput.value = soloWeight;
 
     document.getElementById('manual-flavor-input').value = '';
     document.getElementById('manual-comment-input').value = '';
@@ -1859,9 +2014,9 @@ function saveManualSession() {
     const bowl = document.getElementById('manual-bowl-select').value || 'Не указана';
     const brandSelectVal = document.getElementById('manual-brand-select').value;
     const customBrandVal = document.getElementById('manual-custom-brand')?.value.trim();
-    const brand = stripRussianBrackets(brandSelectVal === '__custom__' ? (customBrandVal || 'Свой табак') : (brandSelectVal || 'Без бренда'));
+    const brand = stripRussianBrackets(brandSelectVal === '__custom__' ? (customBrandVal || 'Свой табак') : (brandSelectVal || savedBrands[0] || 'Без бренда'));
     const flavor = document.getElementById('manual-flavor-input').value.trim();
-    const weight = parseFloat(document.getElementById('manual-weight-input').value) || 18;
+    const weight = parseFloat(document.getElementById('manual-weight-input').value) || getLastUsedWeights().soloWeight;
     const durMins = parseInt(document.getElementById('manual-duration-input').value) || 60;
     const coalsUsed = parseInt(document.getElementById('manual-coals-input')?.value) || 3;
     const placement = document.getElementById('manual-placement-select')?.value || '2 внутри, 1 на ребре (Пирамида)';
@@ -1871,6 +2026,10 @@ function saveManualSession() {
     if (!dateVal) {
         showIosNotice('Дата покура', 'Пожалуйста, укажи дату сессии.');
         return;
+    }
+
+    if (weight > 0) {
+        localStorage.setItem('hookah_last_weight', String(weight));
     }
 
     ensureBrandSaved(brand);
@@ -1910,6 +2069,7 @@ function saveManualSession() {
         syncCatalogFromHistory(history);
         saveSessionsToStorage(history, () => {
             closeManualAddModal();
+            applyLastUsedWeightToForm(history);
             renderData(history);
             showSaveSuccessOverlay();
         });
@@ -1957,7 +2117,7 @@ function fallbackShareText(text) {
 function exportHistoryData() {
     loadAllData(sessions => {
         const backup = {
-            version: 5,
+            version: 6,
             exportedAt: new Date().toISOString(),
             bowls: savedBowls,
             brands: savedBrands,
@@ -2010,6 +2170,7 @@ function importHistoryData(event) {
 
             saveSessionsToStorage(importedSessions, () => {
                 populateSelects();
+                applyLastUsedWeightToForm(importedSessions);
                 renderCoalInventoryUI();
                 renderData(importedSessions);
                 showBannerToast(`Импортировано записей: ${importedSessions.length}`);

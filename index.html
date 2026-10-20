@@ -10,8 +10,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="DimHookah">
-    <meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#09090C" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#E8EAF2" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#060609" media="(prefers-color-scheme: dark)">
 
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
@@ -19,12 +19,12 @@
 </head>
 
 <body>
-
     <!-- Живой анимированный фон для эффекта преломления Liquid Glass -->
     <div class="ambient-bg" aria-hidden="true">
         <div class="ambient-blob blob-1"></div>
         <div class="ambient-blob blob-2"></div>
         <div class="ambient-blob blob-3"></div>
+        <div class="ambient-blob blob-4"></div>
     </div>
 
     <!-- Фоновый аудио-трек для удержания PWA активным и работы MediaSession -->
@@ -80,8 +80,8 @@
                 </div>
                 <select id="bowl-select" class="control-h"></select>
                 <div id="quick-bowl-box" class="quick-add-box hidden">
-                    <input type="text" id="new-bowl-input" class="control-h"
-                        placeholder="Название чаши (напр. Облако Phunnel M)">
+                    <input type="text" id="new-bowl-input" class="control-h" placeholder="Название чаши"
+                        onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomBowl();}">
                     <button type="button" class="btn btn-inline" onclick="addCustomBowl()">ОК</button>
                 </div>
             </div>
@@ -108,8 +108,8 @@
                     </div>
                 </div>
                 <div id="quick-brand-box" class="quick-add-box hidden" style="margin-bottom: 10px;">
-                    <input type="text" id="new-brand-input" class="control-h"
-                        placeholder="Название бренда (напр. Krone)">
+                    <input type="text" id="new-brand-input" class="control-h" placeholder="Название бренда"
+                        onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomBrandFromBar();}">
                     <button type="button" class="btn btn-inline" onclick="addCustomBrandFromBar()">ОК</button>
                 </div>
 
@@ -120,7 +120,7 @@
                             <select id="solo-tobacco-brand" class="brand-select control-h"
                                 onchange="onBrandSelectChange(this)"></select>
                             <input type="text" id="solo-tobacco-flavor" class="flavor-input control-h"
-                                placeholder="Вкус (Pinkman)">
+                                placeholder="Вкус">
                             <div class="unit-input-box control-h">
                                 <input type="number" id="solo-tobacco-weight" value="18" min="1" max="100"
                                     oninput="recalcLiveBowlCost()">
@@ -163,7 +163,7 @@
                 </div>
             </div>
 
-            <!-- Угли на старт и время прогрева в единой аккуратной строке 2 колонки -->
+            <!-- Угли на старт и время прогрева -->
             <div class="setup-dual-grid">
                 <div class="setup-mini-card">
                     <div class="mini-card-top">
@@ -196,7 +196,7 @@
             <div class="live-cost-banner" id="live-cost-banner">
                 <div class="live-cost-left">
                     <span class="live-cost-title">💰 Себестоимость забивки</span>
-                    <span class="live-cost-sub" id="live-cost-details">Табак (18 г): 0 ₽ • Угли (3 шт): 0 ₽</span>
+                    <span class="live-cost-sub" id="live-cost-details">Табак: 0 ₽ • Угли: 0 ₽</span>
                 </div>
                 <div class="live-cost-value" id="live-cost-total">0 ₽</div>
             </div>
@@ -210,7 +210,6 @@
                 <div class="status-badge" id="status-title">🔥 Прогрев чаши...</div>
                 <div class="active-mix-subtitle" id="active-mix-label"></div>
                 <div class="timer-display" id="timer">05:00</div>
-                <!-- Индикатор общего времени прогрева при уходе в минус -->
                 <div class="overtime-sub-badge hidden" id="warmup-overtime-label">Общий прогрев: 05:00</div>
 
                 <!-- Кнопки управления на этапе прогрева -->
@@ -237,7 +236,6 @@
 
             <!-- Оценка после завершения + выбор расстановки углей -->
             <div id="rating-form" class="hidden">
-                <!-- Умная корректировка времени, если забыл выключить таймер -->
                 <div id="forgotten-timer-box" class="sub-timer-box hidden">
                     <div class="forgotten-title">🤔 Забыл выключить таймер?</div>
                     <div class="forgotten-sub">
@@ -521,7 +519,7 @@
                 <label>Табак и вкус</label>
                 <div class="manual-grid-2" style="margin-bottom: 8px;">
                     <select id="manual-brand-select" class="control-h" onchange="onManualBrandChange(this)"></select>
-                    <input type="text" id="manual-flavor-input" class="control-h" placeholder="Вкус (напр. Pinkman)">
+                    <input type="text" id="manual-flavor-input" class="control-h" placeholder="Вкус">
                 </div>
                 <input type="text" id="manual-custom-brand" class="custom-brand-input control-h hidden"
                     placeholder="Введите название бренда..." style="margin-bottom: 8px;">

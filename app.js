@@ -1,4 +1,4 @@
-// --- БАЗОВЫЕ КАТАЛОГИ (БЕЗ РУССКИХ ДУБЛЕЙ В СКОБКАХ) ---
+// --- БАЗОВЫЕ КАТАЛОГИ ---
 const DEFAULT_BOWLS = [
     "Cosmobowl Turkish",
     "Cosmobowl Killer",
@@ -42,12 +42,13 @@ const DEFAULT_BRANDS = [
 
 let savedBowls = [];
 let savedBrands = [];
-let brandPackDefaults = {}; // Заполняется только тем, что вводит сам пользователь
+let brandPackDefaults = {};
 let coalInventory = { packSize: 72, packPrice: 700, remaining: 72 };
 let currentAnalyticsPeriod = 'all';
 
 let isMixMode = false;
 let timerInterval = null;
+let bgWorker = null;
 let targetTimestamp = null;
 let stepStartTime = null;
 let actualWarmupDuration = 0;
@@ -60,14 +61,54 @@ let smokeReminder90Sent = false;
 
 let audioCtx = null;
 let silentAudioUrl = null;
+let chimeAudioUrl = null;
+let lastLockScreenTitle = '';
 let lockedScrollY = 0;
 
-// Очистка старых названий брендов от перевода в скобках: "Musthave (Мастхэв)" -> "Musthave"
 function stripRussianBrackets(name) {
     return (name || '').replace(/\s*\([^)]*\)\s*$/g, '').trim();
 }
 
-// --- БЛОКИРОВКА СКРОЛЛА ФОНА ПОД МОДАЛКАМИ (IOS SAFARI FIX) ---
+// --- ФОНОВЫЙ WEB WORKER ДЛЯ ТАЙМЕРА (НЕ ЗАСЫПАЕТ В ФОНОВЫХ ВКЛАДКАХ ТАК БЫСТРО, КАК SETINTERVAL) ---
+function startTimerTicker(callback) {
+    stopTimerTicker();
+
+    try {
+        const blob = new Blob([`
+            let id = null;
+            self.onmessage = function(e) {
+                if (e.data === 'start') {
+                    if (id) clearInterval(id);
+                    id = setInterval(() => self.postMessage('tick'), 1000);
+                } else if (e.data === 'stop') {
+                    if (id) clearInterval(id);
+                    id = null;
+                }
+            };
+        `], { type: 'application/javascript' });
+        bgWorker = new Worker(URL.createObjectURL(blob));
+        bgWorker.onmessage = () => callback();
+        bgWorker.postMessage('start');
+    } catch (e) {
+        timerInterval = setInterval(callback, 1000);
+    }
+}
+
+function stopTimerTicker() {
+    if (bgWorker) {
+        try {
+            bgWorker.postMessage('stop');
+            bgWorker.terminate();
+        } catch (e) { }
+        bgWorker = null;
+    }
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+}
+
+// --- БЛОКИРОВКА СКРОЛЛА ФОНА ПОД МОДАЛКАМИ ---
 function syncBodyScrollLock() {
     const anyModalOpen = Array.from(document.querySelectorAll('.modal-backdrop'))
         .some(el => !el.classList.contains('hidden'));
@@ -95,7 +136,7 @@ function handleBackdropClick(event, modalId) {
     }
 }
 
-// --- КАСТОМНЫЕ МОДАЛКИ ВМЕСТО CONFIRM И ALERT ---
+// --- КАСТОМНЫЕ МОДАЛКИ ---
 function showIosConfirm(title, text, okLabel = 'Да', isDanger = true) {
     return new Promise((resolve) => {
         const modal = document.getElementById('confirm-modal');
@@ -183,7 +224,7 @@ function applyThemeMode(mode) {
     }
 }
 
-// --- ЗВУК В СТИЛЕ IOS 27 (AMBIENT GLASS MARIMBA CHIME) И ФОНОВОЕ АУДИО ---
+// --- ЗВУК IOS 27 И УМНАЯ MEDIASESSION (НЕ КОНФЛИКТУЕТ С TIKTOK) ---
 function initAudio() {
     if (!audioCtx) {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -193,6 +234,7 @@ function initAudio() {
         audioCtx.resume();
     }
     prepareKeepAliveAudio();
+    prepareChimeWavUrl();
 }
 
 function prepareKeepAliveAudio() {
@@ -233,13 +275,73 @@ function prepareKeepAliveAudio() {
     }
 }
 
+// Генерируем WAV-мелодию iOS 27 прямо в память, чтобы она могла пробить фоновый режим через <audio>
+function prepareChimeWavUrl() {
+    if (chimeAudioUrl) return;
+    const sampleRate = 22050;
+    const durationSec = 2.4;
+    const numSamples = Math.floor(sampleRate * durationSec);
+    const buffer = new ArrayBuffer(44 + numSamples * 2);
+    const view = new DataView(buffer);
+
+    const writeString = (offset, str) => {
+        for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+    };
+
+    writeString(0, 'RIFF');
+    view.setUint32(4, 36 + numSamples * 2, true);
+    writeString(8, 'WAVE');
+    writeString(12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, 1, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true);
+    view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true);
+    writeString(36, 'data');
+    view.setUint32(40, numSamples * 2, true);
+
+    const notes = [
+        { freq: 523.25, start: 0.00, dur: 0.75 },
+        { freq: 659.25, start: 0.11, dur: 0.75 },
+        { freq: 783.99, start: 0.22, dur: 0.80 },
+        { freq: 987.77, start: 0.33, dur: 0.90 },
+        { freq: 1174.66, start: 0.44, dur: 1.10 },
+        { freq: 523.25, start: 1.15, dur: 0.75 },
+        { freq: 659.25, start: 1.26, dur: 0.75 },
+        { freq: 783.99, start: 1.37, dur: 0.80 },
+        { freq: 1174.66, start: 1.48, dur: 0.90 },
+        { freq: 1567.98, start: 1.60, dur: 0.78 }
+    ];
+
+    for (let i = 0; i < numSamples; i++) {
+        const t = i / sampleRate;
+        let sample = 0;
+        for (const n of notes) {
+            if (t >= n.start && t <= n.start + n.dur) {
+                const localT = t - n.start;
+                const env = Math.min(1, localT / 0.015) * Math.exp(-3.5 * (localT / n.dur));
+                sample += Math.sin(2 * Math.PI * n.freq * localT) * env * 0.22;
+                sample += Math.sin(2 * Math.PI * (n.freq * 2) * localT) * env * 0.05;
+            }
+        }
+        const clamped = Math.max(-1, Math.min(1, sample));
+        view.setInt16(44 + i * 2, Math.floor(clamped * 32767), true);
+    }
+
+    const blob = new Blob([buffer], { type: 'audio/wav' });
+    chimeAudioUrl = URL.createObjectURL(blob);
+}
+
 function startKeepAliveAudio(titleText, subtitleText) {
     prepareKeepAliveAudio();
     const audioEl = document.getElementById('bg-audio');
     if (audioEl) {
+        audioEl.volume = 0.01;
         audioEl.play().catch(() => { });
     }
-    updateLockScreenMetadata(titleText, subtitleText);
+    updateLockScreenMetadata(titleText, subtitleText, true);
 }
 
 function stopKeepAliveAudio() {
@@ -250,79 +352,94 @@ function stopKeepAliveAudio() {
     if ('mediaSession' in navigator) {
         navigator.mediaSession.playbackState = 'none';
     }
+    lastLockScreenTitle = '';
 }
 
-function updateLockScreenMetadata(title, artist) {
-    if ('mediaSession' in navigator) {
+function updateLockScreenMetadata(title, artist, force = false) {
+    if (!('mediaSession' in navigator)) return;
+
+    const audioEl = document.getElementById('bg-audio');
+    // Если наш фоновый звук поставлен на паузу другим приложением (например, TikTok),
+    // не перехватываем плеер принудительно каждую секунду
+    if (!force && audioEl && audioEl.paused) {
+        return;
+    }
+
+    if (!force && title === lastLockScreenTitle) {
+        return;
+    }
+    lastLockScreenTitle = title;
+
+    try {
         navigator.mediaSession.metadata = new MediaMetadata({
             title: title || 'DimHookah',
             artist: artist || 'Контроль сессии',
             album: 'DimHookah Timer',
             artwork: [{ src: 'icon.png', sizes: '192x192', type: 'image/png' }]
         });
-        navigator.mediaSession.playbackState = 'playing';
-    }
+    } catch (e) { }
 }
 
-// Кристальный перелив в стиле iOS 27 (Glass Marimba Chord)
 function playIos27Chime() {
+    // 1. Играем через Web Audio API (если приложение открыто или звук разрешен)
     try {
         initAudio();
-        if (!audioCtx) return;
-        const now = audioCtx.currentTime;
+        if (audioCtx && audioCtx.state === 'running') {
+            const now = audioCtx.currentTime;
+            const notes = [
+                { freq: 523.25, delay: 0.00, dur: 0.85 },
+                { freq: 659.25, delay: 0.11, dur: 0.85 },
+                { freq: 783.99, delay: 0.22, dur: 0.90 },
+                { freq: 987.77, delay: 0.33, dur: 1.05 },
+                { freq: 1174.66, delay: 0.45, dur: 1.30 },
+                { freq: 523.25, delay: 1.35, dur: 0.85 },
+                { freq: 659.25, delay: 1.46, dur: 0.85 },
+                { freq: 783.99, delay: 1.57, dur: 0.90 },
+                { freq: 1174.66, delay: 1.68, dur: 1.15 },
+                { freq: 1567.98, delay: 1.82, dur: 1.60 }
+            ];
 
-        // Ноты стеклянного аккорда Cmaj9 (C5, E5, G5, B5, D6, G6) — два мягких каскада
-        const notes = [
-            { freq: 523.25, delay: 0.00, dur: 0.85 },
-            { freq: 659.25, delay: 0.11, dur: 0.85 },
-            { freq: 783.99, delay: 0.22, dur: 0.90 },
-            { freq: 987.77, delay: 0.33, dur: 1.05 },
-            { freq: 1174.66, delay: 0.45, dur: 1.30 },
-            // Второй каскад через паузу
-            { freq: 523.25, delay: 1.35, dur: 0.85 },
-            { freq: 659.25, delay: 1.46, dur: 0.85 },
-            { freq: 783.99, delay: 1.57, dur: 0.90 },
-            { freq: 1174.66, delay: 1.68, dur: 1.15 },
-            { freq: 1567.98, delay: 1.82, dur: 1.60 }
-        ];
+            notes.forEach(n => {
+                const start = now + n.delay;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(n.freq, start);
 
-        notes.forEach(n => {
-            const start = now + n.delay;
+                gain.gain.setValueAtTime(0.0001, start);
+                gain.gain.linearRampToValueAtTime(0.26, start + 0.018);
+                gain.gain.exponentialRampToValueAtTime(0.0001, start + n.dur);
 
-            // Основной теплый тон (sine)
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(n.freq, start);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(start);
+                osc.stop(start + n.dur + 0.05);
+            });
+        }
+    } catch (e) { }
 
-            gain.gain.setValueAtTime(0.0001, start);
-            gain.gain.linearRampToValueAtTime(0.26, start + 0.018);
-            gain.gain.exponentialRampToValueAtTime(0.0001, start + n.dur);
-
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start(start);
-            osc.stop(start + n.dur + 0.05);
-
-            // Стеклянный обертон на октаву выше (triangle)
-            const harmonic = audioCtx.createOscillator();
-            const hGain = audioCtx.createGain();
-            harmonic.type = 'triangle';
-            harmonic.frequency.setValueAtTime(n.freq * 2, start);
-
-            hGain.gain.setValueAtTime(0.0001, start);
-            hGain.gain.linearRampToValueAtTime(0.06, start + 0.012);
-            hGain.gain.exponentialRampToValueAtTime(0.0001, start + n.dur * 0.55);
-
-            harmonic.connect(hGain);
-            hGain.connect(audioCtx.destination);
-            harmonic.start(start);
-            harmonic.stop(start + n.dur);
-        });
+    // 2. Дублируем через системный <audio> (пробивает фоновый режим)
+    try {
+        prepareChimeWavUrl();
+        const audioEl = document.getElementById('bg-audio');
+        if (audioEl && chimeAudioUrl) {
+            audioEl.loop = false;
+            audioEl.src = chimeAudioUrl;
+            audioEl.volume = 0.95;
+            audioEl.play().catch(() => { });
+            setTimeout(() => {
+                if (silentAudioUrl) {
+                    audioEl.src = silentAudioUrl;
+                    audioEl.loop = true;
+                    audioEl.volume = 0.01;
+                    audioEl.play().catch(() => { });
+                }
+            }, 2600);
+        }
     } catch (e) { }
 
     if (navigator.vibrate) {
-        navigator.vibrate([120, 80, 120, 80, 280]);
+        navigator.vibrate([150, 80, 150, 80, 300]);
     }
 }
 
@@ -338,9 +455,23 @@ function sendPush(title, body) {
     showBannerToast(`${title}: ${body}`);
     if ("Notification" in window && Notification.permission === "granted") {
         try {
-            if (navigator.serviceWorker && navigator.serviceWorker.ready) {
-                navigator.serviceWorker.ready.then(reg => {
-                    reg.showNotification(title, { body, icon: 'icon.png', vibrate: [150, 80, 200] });
+            if (navigator.serviceWorker) {
+                navigator.serviceWorker.getRegistration().then(reg => {
+                    if (reg && reg.showNotification) {
+                        reg.showNotification(title, {
+                            body,
+                            icon: 'icon.png',
+                            badge: 'icon.png',
+                            tag: 'dimhookah-timer-alert',
+                            renotify: true,
+                            requireInteraction: true,
+                            vibrate: [200, 100, 200]
+                        }).catch(() => {
+                            try { new Notification(title, { body, icon: 'icon.png' }); } catch (e) { }
+                        });
+                    } else {
+                        new Notification(title, { body, icon: 'icon.png' });
+                    }
                 });
             } else {
                 new Notification(title, { body, icon: 'icon.png' });
@@ -418,13 +549,11 @@ function initCatalogs() {
         ? Array.from(new Set(storedBowls))
         : [...DEFAULT_BOWLS];
 
-    // Очищаем сохраненные бренды от старых русских переводов в скобках
     const rawBrands = Array.isArray(storedBrands) && storedBrands.length > 0
         ? storedBrands
         : DEFAULT_BRANDS;
     savedBrands = Array.from(new Set(rawBrands.map(stripRussianBrackets).filter(Boolean)));
 
-    // Переносим сохраненные пользователем цены пачек на чистые названия брендов
     brandPackDefaults = {};
     if (storedPacks && typeof storedPacks === 'object') {
         Object.keys(storedPacks).forEach(k => {
@@ -435,7 +564,6 @@ function initCatalogs() {
         });
     }
 
-    // Защита от NaN при остатке 0 углей
     if (storedCoals && typeof storedCoals === 'object') {
         const parsedSize = Number(storedCoals.packSize);
         const parsedPrice = Number(storedCoals.packPrice);
@@ -567,7 +695,7 @@ async function deleteSelectedBowl() {
         return;
     }
 
-    const ok = await showIosConfirm('Удалить чашу?', `Убрать чашу «${target}» из твоего списка?`, 'Удалить', true);
+    const ok = await showIosConfirm('Удалить чашу?', `Убрать чашу «${target}» из списка?`, 'Удалить', true);
     if (!ok) return;
 
     savedBowls = savedBowls.filter(b => b !== target);
@@ -685,7 +813,7 @@ function ensureBrandSaved(brandName) {
     }
 }
 
-// --- КАЛЬКУЛЯТОР СЕБЕСТОИМОСТИ И СКЛАД УГЛЕЙ (БЕЗ NaN) ---
+// --- КАЛЬКУЛЯТОР СЕБЕСТОИМОСТИ И СКЛАД УГЛЕЙ ---
 function getSingleCoalPrice() {
     const size = Number(coalInventory.packSize);
     const price = Number(coalInventory.packPrice);
@@ -713,7 +841,7 @@ function recalcLiveBowlCost() {
         tobaccoCost = calcSingleTobaccoCost(g, p, w);
     } else {
         document.querySelectorAll('#mix-rows-list .tobacco-card-box').forEach(card => {
-            const g = parseFloat(card.querySelector('.weight-input')?.value) || 0;
+            const g = parseFloat(card.querySelector('.mix-weight-input')?.value) || 0;
             const p = parseFloat(card.querySelector('.mix-pack-price')?.value) || 0;
             const w = parseFloat(card.querySelector('.mix-pack-weight')?.value) || 0;
             totalGrams += g;
@@ -747,7 +875,7 @@ function renderCoalInventoryUI() {
     const badgeEl = document.getElementById('coal-low-badge');
 
     if (infoEl) {
-        infoEl.innerText = `1 уголь ≈ ${oneCoal.toFixed(1)} ₽ (Пачка ${coalInventory.packSize} шт = ${coalInventory.packPrice} ₽)`;
+        infoEl.innerText = `1 шт ≈ ${oneCoal.toFixed(1)} ₽ (Пачка ${coalInventory.packSize} шт = ${coalInventory.packPrice} ₽)`;
     }
     if (remEl) {
         remEl.innerText = String(safeRemaining);
@@ -782,7 +910,7 @@ function saveCoalInventorySettings() {
     renderCoalInventoryUI();
     recalcLiveBowlCost();
     document.getElementById('coal-settings-panel').classList.add('hidden');
-    showBannerToast('Настройки склада углей сохранены');
+    showBannerToast('Склад углей обновлён');
 }
 
 function buyNewCoalPack() {
@@ -803,7 +931,7 @@ function consumeCoalsFromStock(count) {
     renderCoalInventoryUI();
 }
 
-// --- ПЕРЕКЛЮЧАТЕЛЬ СОЛО / МИКС ПО КЛИКУ НА ПЛАШКУ ---
+// --- ПЕРЕКЛЮЧАТЕЛЬ СОЛО / МИКС ---
 function toggleMixMode(forceState = null) {
     isMixMode = typeof forceState === 'boolean' ? forceState : !isMixMode;
 
@@ -818,7 +946,7 @@ function toggleMixMode(forceState = null) {
         soloContainer.classList.add('hidden');
         mixContainer.classList.remove('hidden');
         modeLabel.innerText = '🧪 Режим: Микс (Несколько вкусов)';
-        if (modeSubLabel) modeSubLabel.innerText = 'Нажми, чтобы вернуться в режим Соло';
+        if (modeSubLabel) modeSubLabel.innerText = 'Нажми для возврата в режим Соло';
         if (pillBadge) pillBadge.innerText = 'Микс ⇄';
         if (modeBtn) modeBtn.classList.add('mix-active');
 
@@ -831,7 +959,7 @@ function toggleMixMode(forceState = null) {
         soloContainer.classList.remove('hidden');
         mixContainer.classList.add('hidden');
         modeLabel.innerText = '🍂 Режим: Соло (1 табак)';
-        if (modeSubLabel) modeSubLabel.innerText = 'Нажми, чтобы переключить в режим Микса';
+        if (modeSubLabel) modeSubLabel.innerText = 'Нажми для переключения в Микс';
         if (pillBadge) pillBadge.innerText = 'Соло ⇄';
         if (modeBtn) modeBtn.classList.remove('mix-active');
     }
@@ -846,23 +974,32 @@ function addMixRow(brand = '', flavor = '', weight = '') {
     const card = document.createElement('div');
     card.className = 'tobacco-card-box';
     card.innerHTML = `
-        <div class="tobacco-row">
-            <select class="brand-select" onchange="onBrandSelectChange(this)">
+        <div class="tobacco-grid-mix">
+            <select class="brand-select control-h" onchange="onBrandSelectChange(this)">
                 ${getBrandOptionsHtml(selectedBrand)}
             </select>
-            <input type="text" class="flavor-input" placeholder="Вкус" value="${flavor}">
-            <input type="number" class="weight-input" placeholder="Гр" value="${weight}" min="1" max="100" oninput="recalcLiveBowlCost()">
+            <input type="text" class="flavor-input control-h" placeholder="Вкус" value="${flavor}">
+            <div class="unit-input-box control-h">
+                <input type="number" class="mix-weight-input" value="${weight}" placeholder="0" min="1" max="100" oninput="recalcLiveBowlCost()">
+                <span>г</span>
+            </div>
             <button type="button" class="remove-mix-btn" onclick="removeMixRow(this)">✕</button>
         </div>
-        <input type="text" class="custom-brand-input hidden" placeholder="Введите название бренда..." oninput="recalcLiveBowlCost()">
-        <div class="pack-price-row">
-            <div class="pack-input-wrap">
-                <span>Пачка ₽:</span>
-                <input type="number" class="mix-pack-price" placeholder="Цена" value="${pack.price || ''}" min="0" oninput="onPackInfoChange('mix', this)">
+        <input type="text" class="custom-brand-input control-h hidden" placeholder="Введите название бренда..." oninput="recalcLiveBowlCost()">
+        <div class="pack-price-grid">
+            <div class="pack-field">
+                <span class="pack-field-label">Цена пачки</span>
+                <div class="pack-field-control">
+                    <input type="number" class="mix-pack-price" placeholder="0" value="${pack.price || ''}" min="0" oninput="onPackInfoChange('mix', this)">
+                    <span>₽</span>
+                </div>
             </div>
-            <div class="pack-input-wrap">
-                <span>Вес (г):</span>
-                <input type="number" class="mix-pack-weight" placeholder="Грамм" value="${pack.weight || ''}" min="1" oninput="onPackInfoChange('mix', this)">
+            <div class="pack-field">
+                <span class="pack-field-label">Вес пачки</span>
+                <div class="pack-field-control">
+                    <input type="number" class="mix-pack-weight" placeholder="25" value="${pack.weight || ''}" min="1" oninput="onPackInfoChange('mix', this)">
+                    <span>г</span>
+                </div>
             </div>
         </div>
     `;
@@ -904,7 +1041,7 @@ function getDraftMixFromForm() {
             const custom = card.querySelector('.custom-brand-input').value.trim();
             const brand = stripRussianBrackets(sel.value === '__custom__' ? (custom || 'Свой табак') : sel.value);
             const flavor = card.querySelector('.flavor-input').value.trim();
-            const weight = parseFloat(card.querySelector('.weight-input').value) || 0;
+            const weight = parseFloat(card.querySelector('.mix-weight-input').value) || 0;
             const packPrice = parseFloat(card.querySelector('.mix-pack-price').value) || 0;
             const packWeight = parseFloat(card.querySelector('.mix-pack-weight').value) || 0;
             const cost = Math.round(calcSingleTobaccoCost(weight, packPrice, packWeight));
@@ -942,7 +1079,6 @@ function formatMixPlainText(mixArray) {
     }).join(' + ');
 }
 
-// --- БЫСТРЫЕ ПРЕСЕТЫ ПРОГРЕВА (ТОЛЬКО МИНУТЫ) ---
 function setWarmupPreset(min) {
     document.getElementById('warmup-min').value = min;
 }
@@ -1001,23 +1137,25 @@ function restoreActiveSessionIfAny() {
             document.getElementById('smoking-controls').classList.add('hidden');
             document.getElementById('rating-form').classList.add('hidden');
 
-            clearInterval(timerInterval);
-            timerInterval = setInterval(updateWarmupTimer, 1000);
+            startTimerTicker(updateWarmupTimer);
             updateWarmupTimer();
         } else if (state.stage === 'smoking') {
             document.getElementById('status-title').innerText = '💨 Идет покур';
             document.getElementById('warmup-controls').classList.add('hidden');
             document.getElementById('smoking-controls').classList.remove('hidden');
             document.getElementById('rating-form').classList.add('hidden');
+            document.getElementById('warmup-overtime-label')?.classList.add('hidden');
+            document.getElementById('timer')?.classList.remove('overtime-text');
 
-            clearInterval(timerInterval);
-            timerInterval = setInterval(updateSmokingTimer, 1000);
+            startTimerTicker(updateSmokingTimer);
             updateSmokingTimer();
         } else if (state.stage === 'rating') {
             document.getElementById('status-title').innerText = '✅ Сессия завершена';
             document.getElementById('warmup-controls').classList.add('hidden');
             document.getElementById('smoking-controls').classList.add('hidden');
             document.getElementById('rating-form').classList.remove('hidden');
+            document.getElementById('warmup-overtime-label')?.classList.add('hidden');
+            document.getElementById('timer')?.classList.remove('overtime-text');
             document.getElementById('timer').innerText = formatTimerSec(smokeDuration);
 
             const forgottenBox = document.getElementById('forgotten-timer-box');
@@ -1028,11 +1166,11 @@ function restoreActiveSessionIfAny() {
             }
         }
     } catch (e) {
-        console.warn('Ошибка восстановления сессии, но данные сохранены:', e);
+        console.warn('Ошибка восстановления сессии:', e);
     }
 }
 
-// --- ЛОГИКА ТАЙМЕРА ПРОГРЕВА И ПОКУРА ---
+// --- ЛОГИКА ТАЙМЕРА ПРОГРЕВА (С УХОДОМ В МИНУС И УЧЕТОМ ОБЩЕГО ВРЕМЕНИ) ---
 function startWarmupSession() {
     initAudio();
     if ("Notification" in window && Notification.permission === "default") {
@@ -1060,6 +1198,8 @@ function startWarmupSession() {
     document.getElementById('smoking-controls').classList.add('hidden');
     document.getElementById('rating-form').classList.add('hidden');
     document.getElementById('warmup-box').classList.remove('alarm-active');
+    document.getElementById('warmup-overtime-label')?.classList.add('hidden');
+    document.getElementById('timer')?.classList.remove('overtime-text');
 
     document.getElementById('status-title').innerText = '🔥 Прогрев чаши...';
     const mixText = formatMixPlainText(mix);
@@ -1072,20 +1212,35 @@ function startWarmupSession() {
     saveActiveSessionState('warmup');
     startKeepAliveAudio('🔥 Прогрев чаши', mixText);
 
-    clearInterval(timerInterval);
-    timerInterval = setInterval(updateWarmupTimer, 1000);
+    startTimerTicker(updateWarmupTimer);
     updateWarmupTimer();
 }
 
 function updateWarmupTimer() {
     const now = Date.now();
-    const remaining = Math.ceil((targetTimestamp - now) / 1000);
+    const diffSec = Math.ceil((targetTimestamp - now) / 1000);
+    const totalElapsedWarmup = Math.max(0, Math.floor((now - stepStartTime) / 1000));
 
-    if (remaining <= 0) {
-        document.getElementById('timer').innerText = "00:00";
-        document.getElementById('status-title').innerText = "🚨 Чаша прогрелась! Пора раскуривать!";
+    const timerEl = document.getElementById('timer');
+    const overtimeBadge = document.getElementById('warmup-overtime-label');
+
+    // Когда время прогрева вышло — уходим в минус и продолжаем считать общий прогрев!
+    if (diffSec <= 0) {
+        const overtimeSec = Math.abs(diffSec);
+        const minusFormatted = `-${formatTimerSec(overtimeSec)}`;
+
+        if (timerEl) {
+            timerEl.innerText = minusFormatted;
+            timerEl.classList.add('overtime-text');
+        }
+        if (overtimeBadge) {
+            overtimeBadge.innerText = `Общий прогрев: ${formatDurationText(totalElapsedWarmup)} (перегрев +${formatTimerSec(overtimeSec)})`;
+            overtimeBadge.classList.remove('hidden');
+        }
+
+        document.getElementById('status-title').innerText = "🚨 Чаша прогрелась! Идет перегрев!";
         document.getElementById('warmup-box').classList.add('alarm-active');
-        updateLockScreenMetadata('🚨 Чаша готова!', 'Пора раскуривать кальян');
+        updateLockScreenMetadata(`🚨 Перегрев: ${minusFormatted}`, `Общий прогрев: ${formatTimerSec(totalElapsedWarmup)}`);
 
         if (!alarmAlreadyPlayed) {
             alarmAlreadyPlayed = true;
@@ -1096,8 +1251,11 @@ function updateWarmupTimer() {
         return;
     }
 
-    const formatted = formatTimerSec(remaining);
-    document.getElementById('timer').innerText = formatted;
+    if (timerEl) timerEl.classList.remove('overtime-text');
+    if (overtimeBadge) overtimeBadge.classList.add('hidden');
+
+    const formatted = formatTimerSec(diffSec);
+    if (timerEl) timerEl.innerText = formatted;
     updateLockScreenMetadata(`🔥 Прогрев: ${formatted}`, getCurrentMixSummaryText());
 }
 
@@ -1111,6 +1269,8 @@ function addWarmupMinute() {
     }
     alarmAlreadyPlayed = false;
     document.getElementById('warmup-box').classList.remove('alarm-active');
+    document.getElementById('warmup-overtime-label')?.classList.add('hidden');
+    document.getElementById('timer')?.classList.remove('overtime-text');
     document.getElementById('status-title').innerText = "🔥 Прогрев чаши (+1 мин)...";
     saveActiveSessionState('warmup');
     updateWarmupTimer();
@@ -1126,9 +1286,12 @@ function addExtraCoalInSession(count) {
 
 function startSmokingFromWarmup() {
     initAudio();
-    actualWarmupDuration = Math.floor((Date.now() - stepStartTime) / 1000);
+    // В общий прогрев записывается ВСЁ время от старта прогрева (включая время в минусе!)
+    actualWarmupDuration = Math.max(1, Math.floor((Date.now() - stepStartTime) / 1000));
 
     document.getElementById('warmup-box').classList.remove('alarm-active');
+    document.getElementById('warmup-overtime-label')?.classList.add('hidden');
+    document.getElementById('timer')?.classList.remove('overtime-text');
     document.getElementById('status-title').innerText = '💨 Идет покур';
     document.getElementById('active-mix-label').innerText = getCurrentMixSummaryText();
     document.getElementById('warmup-controls').classList.add('hidden');
@@ -1140,8 +1303,7 @@ function startSmokingFromWarmup() {
     saveActiveSessionState('smoking');
     startKeepAliveAudio('💨 Покур: 00:00', getCurrentMixSummaryText());
 
-    clearInterval(timerInterval);
-    timerInterval = setInterval(updateSmokingTimer, 1000);
+    startTimerTicker(updateSmokingTimer);
     updateSmokingTimer();
 }
 
@@ -1160,7 +1322,7 @@ function updateSmokingTimer() {
     if (elapsedSmoke >= 5400 && !smokeReminder90Sent) {
         smokeReminder90Sent = true;
         playIos27Chime();
-        sendPush('Покур идет уже 1.5 часа ⏳', 'Не забудь остановить таймер в DimHookah, чтобы не испортить статистику!');
+        sendPush('Покур идет уже 1.5 часа ⏳', 'Не забудь остановить таймер в DimHookah!');
     }
 
     if (elapsedSmoke >= 9000) {
@@ -1170,7 +1332,7 @@ function updateSmokingTimer() {
 
 function finishSmokingSession() {
     smokeDuration = Math.floor((Date.now() - stepStartTime) / 1000);
-    clearInterval(timerInterval);
+    stopTimerTicker();
     stopKeepAliveAudio();
 
     document.getElementById('status-title').innerText = '✅ Сессия завершена';
@@ -1208,7 +1370,7 @@ async function cancelActiveSession() {
     );
     if (!confirmed) return;
 
-    clearInterval(timerInterval);
+    stopTimerTicker();
     stopKeepAliveAudio();
     clearActiveSessionState();
 
@@ -1415,7 +1577,7 @@ function renderAnalyticsAndAchievements(allSessions) {
 
     document.getElementById('stat-total-hours').innerText = formatDurationHM(totalSmokeSeconds);
     document.getElementById('stat-total-money').innerText = `${Math.round(totalSpentRub).toLocaleString('ru-RU')} ₽`;
-    document.getElementById('stat-avg-cost').innerText = `Средняя чаша: ${avgCost} ₽`;
+    document.getElementById('stat-avg-cost').innerText = `Средняя: ${avgCost} ₽`;
     document.getElementById('stat-fav-brand').innerText = favBrand;
     document.getElementById('stat-total-grams').innerText = `Скурено: ${Math.round(totalGrams)} г`;
     document.getElementById('stat-fav-bowl').innerText = favBowl;
@@ -1428,7 +1590,7 @@ function getNormalizedMix(session) {
     return [];
 }
 
-// --- ОТРИСОВКА ИСТОРИИ, ФИЛЬТРАЦИЯ И УПРАВЛЕНИЕ ---
+// --- ОТРИСОВКА ИСТОРИИ ---
 function applyFilters() {
     loadAllData(renderData);
 }
@@ -1455,7 +1617,7 @@ function renderData(sessions) {
     historyList.innerHTML = '';
 
     if (filtered.length === 0) {
-        historyList.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 18px 0;">Записей не найдено</p>';
+        historyList.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 18px 0; font-size: 0.9em;">Записей пока нет</p>';
         return;
     }
 
@@ -1464,7 +1626,7 @@ function renderData(sessions) {
         const mixHtml = formatMixText(mixArr);
         const totalWeight = mixArr.reduce((acc, i) => acc + (parseFloat(i.weight) || 0), 0);
         const costBadge = s.sessionCost ? `<span class="cost-tag">💰 ${s.sessionCost} ₽</span>` : '';
-        const coalsText = s.coalsUsed ? ` • 🔥 ${s.coalsUsed} угл.` : '';
+        const coalsText = s.coalsUsed ? ` • 🔥 ${s.coalsUsed} шт.` : '';
 
         const item = document.createElement('div');
         item.className = 'history-item';
@@ -1475,9 +1637,9 @@ function renderData(sessions) {
             </div>
             <div class="history-mix-title">${mixHtml} ${costBadge}</div>
             <div class="history-meta">
-                🏺 <b>Чаша:</b> ${s.bowl} ${totalWeight > 0 ? `(Всего ${totalWeight}г)` : ''}<br>
-                炭 <b>Постановка:</b> ${s.placement || 'Не указана'}${coalsText}<br>
-                ⏱ <b>Прогрев:</b> ${formatDurationText(s.actualWarmupDuration)} &nbsp;|&nbsp; 💨 <b>Покур:</b> ${formatDurationText(s.smokeDuration)}
+                🏺 <b>Чаша:</b> ${s.bowl} ${totalWeight > 0 ? `(${totalWeight} г)` : ''}<br>
+                炭 <b>Угли:</b> ${s.placement || 'Не указана'}${coalsText}<br>
+                ⏱ <b>Прогрев:</b> ${formatDurationText(s.actualWarmupDuration)} &nbsp;•&nbsp; 💨 <b>Покур:</b> ${formatDurationText(s.smokeDuration)}
             </div>
             ${s.comment ? `<div class="history-comment">«${s.comment}»</div>` : ''}
             <div class="history-actions">
@@ -1598,14 +1760,17 @@ function openEditModal(sessionId) {
 function addEditMixRow(brand = '', flavor = '', weight = '') {
     const container = document.getElementById('edit-mix-rows');
     const row = document.createElement('div');
-    row.className = 'tobacco-row';
+    row.className = 'tobacco-grid-mix';
     row.style.marginBottom = '8px';
     row.innerHTML = `
-        <select class="brand-select" onchange="onBrandSelectChange(this)">
+        <select class="brand-select control-h">
             ${getBrandOptionsHtml(brand || savedBrands[0])}
         </select>
-        <input type="text" class="flavor-input" placeholder="Вкус" value="${flavor}">
-        <input type="number" class="weight-input" placeholder="Гр" value="${weight}" min="1" max="100">
+        <input type="text" class="flavor-input control-h" placeholder="Вкус" value="${flavor}">
+        <div class="unit-input-box control-h">
+            <input type="number" class="edit-weight-input" value="${weight}" min="1" max="100">
+            <span>г</span>
+        </div>
         <button type="button" class="remove-mix-btn" onclick="this.parentElement.remove()">✕</button>
     `;
     container.appendChild(row);
@@ -1625,10 +1790,10 @@ function saveEditedSession() {
     const comment = document.getElementById('edit-comment').value.trim();
 
     const newMix = [];
-    document.querySelectorAll('#edit-mix-rows .tobacco-row').forEach(row => {
+    document.querySelectorAll('#edit-mix-rows .tobacco-grid-mix').forEach(row => {
         const brand = stripRussianBrackets(row.querySelector('.brand-select').value);
         const flavor = row.querySelector('.flavor-input').value.trim();
-        const weight = parseFloat(row.querySelector('.weight-input').value) || 0;
+        const weight = parseFloat(row.querySelector('.edit-weight-input').value) || 0;
         const pack = brandPackDefaults[brand] || { price: 0, weight: 0 };
         const cost = Math.round(calcSingleTobaccoCost(weight, pack.price, pack.weight));
         newMix.push({ brand, flavor, weight, packPrice: pack.price, packWeight: pack.weight, cost });
@@ -1658,7 +1823,7 @@ function saveEditedSession() {
     });
 }
 
-// --- РУЧНОЕ ДОБАВЛЕНИЕ СЕССИИ ЗАДНИМ ЧИСЛОМ ---
+// --- РУЧНОЕ ДОБАВЛЕНИЕ СЕССИИ ---
 function openManualAddModal() {
     const modal = document.getElementById('manual-add-modal');
     if (!modal) return;
@@ -1795,7 +1960,7 @@ function fallbackShareText(text) {
 function exportHistoryData() {
     loadAllData(sessions => {
         const backup = {
-            version: 4,
+            version: 5,
             exportedAt: new Date().toISOString(),
             bowls: savedBowls,
             brands: savedBrands,
@@ -1860,7 +2025,7 @@ function importHistoryData(event) {
     event.target.value = '';
 }
 
-// --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ФОРМАТИРОВАНИЯ ---
+// --- ФОРМАТИРОВАНИЕ ВРЕМЕНИ ---
 function formatTimerSec(totalSeconds) {
     const s = Math.max(0, totalSeconds);
     const hours = Math.floor(s / 3600);
@@ -1894,7 +2059,7 @@ function syncActiveTimerOnWake() {
     }
 }
 
-// --- ИНИЦИАЛИЗАЦИЯ ПРИ ЗАПУСКЕ ---
+// --- ИНИЦИАЛИЗАЦИЯ ---
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     initCatalogs();
@@ -1912,7 +2077,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isWarmup || isSmoking) {
             const audioEl = document.getElementById('bg-audio');
             if (audioEl && audioEl.paused) {
-                startKeepAliveAudio();
+                startKeepAliveAudio(lastLockScreenTitle || 'DimHookah', getCurrentMixSummaryText());
             }
         }
     }, { passive: true });

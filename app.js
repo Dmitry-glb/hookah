@@ -1800,32 +1800,76 @@ function importFromCSV(event) {
     reader.readAsText(file, 'UTF-8');
 }
 
-// --- РУЧНОЕ ДОБАВЛЕНИЕ СЕССИИ ЗАДНИМ ЧИСЛОМ ---
+// --- УНИВЕРСАЛЬНЫЙ КОНТРОЛЛЕР МОДАЛОК (С БЛОКИРОВКОЙ СКРОЛЛА) ---
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+    modal.classList.add('hidden');
+
+    // Снимаем блокировку фона, только если нет других открытых модалок
+    const openModals = document.querySelectorAll('.modal-overlay:not(.hidden), .modal:not(.hidden)');
+    if (openModals.length <= 1) {
+        document.body.classList.remove('modal-open');
+    }
+}
+
+// Перенаправляем закрытие по клику в темный фон
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('modal-overlay')) {
+        closeModal(e.target.id);
+    }
+});
+
+// --- РУЧНОЕ ДОБАВЛЕНИЕ СЕССИИ (ИСПРАВЛЕННОЕ) ---
 function openManualAddModal() {
     const dateInput = document.getElementById('manual-date-input');
-    if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+    if (dateInput) {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        dateInput.value = `${yyyy}-${mm}-${dd}`;
+    }
 
     const bSelect = document.getElementById('manual-bowl-select');
     if (bSelect) bSelect.innerHTML = getBowlOptionsHtml();
 
     const brandSelect = document.getElementById('manual-brand-select');
-    if (brandSelect) brandSelect.innerHTML = getBrandOptionsHtml();
+    if (brandSelect) {
+        brandSelect.innerHTML = getBrandOptionsHtml();
+        brandSelect.onchange = () => {
+            const flavorInput = document.getElementById('manual-flavor-input');
+            if (flavorInput) flavorInput.focus();
+        };
+    }
 
-    document.getElementById('manual-add-modal').classList.remove('hidden');
+    openModal('manual-add-modal');
 }
 
 function saveManualSession() {
-    const dateVal = document.getElementById('manual-date-input').value;
-    const bowl = document.getElementById('manual-bowl-select').value || 'Не указана';
-    const brand = document.getElementById('manual-brand-select').value || 'Без названия';
-    const flavor = document.getElementById('manual-flavor-input').value.trim();
-    const weight = parseFloat(document.getElementById('manual-weight-input').value) || 18;
-    const durMins = parseInt(document.getElementById('manual-duration-input').value) || 60;
-    const rating = parseInt(document.getElementById('manual-rating-select').value) || 5;
-    const comment = document.getElementById('manual-comment-input').value.trim();
+    const dateVal = document.getElementById('manual-date-input')?.value;
+    const bowl = document.getElementById('manual-bowl-select')?.value || 'Не указана';
+    const brand = document.getElementById('manual-brand-select')?.value || 'Без бренда';
+    const flavor = document.getElementById('manual-flavor-input')?.value.trim();
+    const weight = parseFloat(document.getElementById('manual-weight-input')?.value) || 18;
+    const durMins = parseInt(document.getElementById('manual-duration-input')?.value, 10) || 60;
+    const rating = parseInt(document.getElementById('manual-rating-select')?.value, 10) || 5;
+    const comment = document.getElementById('manual-comment-input')?.value.trim() || '';
 
     if (!dateVal) {
-        showIosNotice('Ошибка', 'Укажи дату покура.');
+        showIosNotice('Внимание', 'Укажи дату проведенной сессии.');
+        return;
+    }
+
+    if (!flavor) {
+        showIosNotice('Вкус не указан', 'Напиши название вкуса или микса.');
         return;
     }
 
@@ -1833,7 +1877,8 @@ function saveManualSession() {
     const formattedDate = `${dd}.${mm}.${yyyy}`;
 
     const savedPack = brandPackDefaults[brand];
-    const itemCost = Math.round(calcSingleTobaccoCost(weight, savedPack?.price, savedPack?.weight));
+    const tobaccoCost = Math.round(calcSingleTobaccoCost(weight, savedPack?.price, savedPack?.weight));
+    const coalsPrice = Math.round(3 * getSingleCoalPrice());
 
     const session = {
         id: Date.now(),
@@ -1841,10 +1886,17 @@ function saveManualSession() {
         bowl,
         placement: '3 внутри',
         coalsUsed: 3,
-        coalCost: Math.round(3 * getSingleCoalPrice()),
-        mix: [{ brand, flavor, weight, packPrice: savedPack?.price || 0, packWeight: savedPack?.weight || 0, cost: itemCost }],
-        sessionCost: itemCost + Math.round(3 * getSingleCoalPrice()),
-        actualWarmupDuration: 300,
+        coalCost: coalsPrice,
+        mix: [{
+            brand,
+            flavor,
+            weight,
+            packPrice: savedPack?.price || 0,
+            packWeight: savedPack?.weight || 0,
+            cost: tobaccoCost
+        }],
+        sessionCost: tobaccoCost + coalsPrice,
+        actualWarmupDuration: 360,
         smokeDuration: durMins * 60,
         rating,
         comment
@@ -1854,7 +1906,10 @@ function saveManualSession() {
         history.unshift(session);
         syncCatalogFromHistory(history);
         saveSessionsToStorage(history, () => {
-            document.getElementById('manual-add-modal').classList.add('hidden');
+            closeModal('manual-add-modal');
+            // Сбрасываем поля формы
+            document.getElementById('manual-flavor-input').value = '';
+            document.getElementById('manual-comment-input').value = '';
             renderData(history);
             showSaveSuccessOverlay();
         });

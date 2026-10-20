@@ -492,37 +492,54 @@
     <script src="app.js"></script>
 
     <!-- Модалка рулетки вкусов -->
-    <div id="roulette-modal" class="hidden"
-        style="position: fixed; inset: 0; background: var(--modal-backdrop); backdrop-filter: blur(16px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px;">
-        <div class="modal-content" style="text-align: center;">
-            <h3 style="margin-bottom: 6px;">🎲 Интеллектуальный подбор</h3>
-            <p style="color: var(--text-secondary); font-size: 0.85em; margin-bottom: 14px;">Топ-вкусы с HTReviews
-                (рейтинг 4.0+)</p>
+    <!-- Модаль ручного добавления сессии -->
+    <div id="manual-add-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 style="margin-top:0; margin-bottom: 16px; font-size: 1.15em;">➕ Записать прошедший покур</h3>
 
-            <div class="form-group" style="text-align: left;">
-                <label>Фильтр по бренду</label>
-                <select id="roulette-brand-filter">
-                    <option value="all">🌐 Все бренды (хиты рынка)</option>
+            <div class="form-group">
+                <label>Дата сессии</label>
+                <input type="date" id="manual-date-input">
+            </div>
+
+            <div class="form-group">
+                <label>Чаша</label>
+                <select id="manual-bowl-select"></select>
+            </div>
+
+            <div class="form-group">
+                <label>Бренд и Вкус</label>
+                <div class="manual-grid-row">
+                    <select id="manual-brand-select" style="flex: 1.2;"></select>
+                    <input type="text" id="manual-flavor-input" placeholder="Вкус (напр. Pinkman)" style="flex: 1.8;">
+                </div>
+                <div class="manual-grid-row">
+                    <input type="number" id="manual-weight-input" placeholder="Грамм" value="18" style="flex: 1;">
+                    <input type="number" id="manual-duration-input" placeholder="Минут курения" value="60"
+                        style="flex: 1;">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Оценка покура</label>
+                <select id="manual-rating-select">
+                    <option value="5">★ 5 — Идеально</option>
+                    <option value="4">★ 4 — Хорошо</option>
+                    <option value="3">★ 3 — Нормально</option>
+                    <option value="2">★ 2 — Быстро сгорел</option>
+                    <option value="1">★ 1 — Ужасно</option>
                 </select>
             </div>
 
-            <div id="roulette-result-card" class="glass-panel"
-                style="background: var(--surface-row); margin: 15px 0; padding: 16px; text-align: left;">
-                <div style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase;"
-                    id="roulette-res-brand">Выбери параметры</div>
-                <div style="font-size: 1.2em; font-weight: 800; margin: 4px 0;" id="roulette-res-name">Нажми «Крутить
-                    рулетку»</div>
-                <div style="font-size: 0.85em; color: var(--text-secondary);" id="roulette-res-desc">Здесь появится
-                    описание и народный рейтинг.</div>
+            <div class="form-group">
+                <label>Заметки / Комментарий</label>
+                <textarea id="manual-comment-input" rows="2" placeholder="Угли, прогрев, впечатления..."></textarea>
             </div>
 
-            <button class="btn" onclick="spinFlavorRoulette()" style="margin-bottom: 8px;">🎲 Крутить рулетку!</button>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn btn-secondary"
-                    onclick="document.getElementById('roulette-modal').classList.add('hidden')"
-                    style="margin:0;">Закрыть</button>
-                <button class="btn btn-success hidden" id="roulette-apply-btn" onclick="applyRouletteFlavor()"
-                    style="margin:0;">⚡ Забить в чашу</button>
+            <div style="display: flex; gap: 10px; margin-top: 18px;">
+                <button type="button" class="btn btn-secondary" onclick="closeManualAddModal()"
+                    style="margin:0;">Отмена</button>
+                <button type="button" class="btn" onclick="saveManualSession()" style="margin:0;">Сохранить</button>
             </div>
         </div>
     </div>

@@ -1,19 +1,5 @@
 // --- БАЗОВЫЕ КАТАЛОГИ ---
-const DEFAULT_BOWLS = [
-    "Cosmobowl Turkish",
-    "Cosmobowl Killer",
-    "Облако Phunnel M",
-    "Торнадо Убивашка",
-    "SmokeLab Mummy",
-    "Grynbowls Традишка",
-    "UPG Малая",
-    "Werkbund Zeus",
-    "Japona Hookah Mummy",
-    "Moon Phunnel",
-    "ST Классика",
-    "Fox Турка",
-    "Solaris"
-];
+const DEFAULT_BOWLS = [];
 
 const DEFAULT_BRANDS = [
     "Musthave",
@@ -540,14 +526,22 @@ function loadAllData(callback) {
 
 // --- КАТАЛОГИ ЧАШ, БРЕНДОВ, ЦЕН ПАЧЕК И СКЛАДА УГЛЕЙ ---
 function initCatalogs() {
-    const storedBowls = JSON.parse(localStorage.getItem('hookah_bowls') || 'null');
+    let storedBowls = JSON.parse(localStorage.getItem('hookah_bowls') || '[]');
     const storedBrands = JSON.parse(localStorage.getItem('hookah_brands') || 'null');
     const storedPacks = JSON.parse(localStorage.getItem('hookah_brand_packs') || '{}');
     const storedCoals = JSON.parse(localStorage.getItem('hookah_coal_inventory') || 'null');
 
-    savedBowls = Array.isArray(storedBowls) && storedBowls.length > 0
-        ? Array.from(new Set(storedBowls))
-        : [...DEFAULT_BOWLS];
+    // Однократная очистка старых дефолтных чаш (оставляем только те, что реально были в истории покуров)
+    if (!localStorage.getItem('hookah_custom_bowls_only_v1')) {
+        const historySessions = JSON.parse(localStorage.getItem('hookah_sessions') || '[]');
+        const usedInHistory = new Set(historySessions.map(s => s.bowl).filter(Boolean));
+        storedBowls = (Array.isArray(storedBowls) ? storedBowls : []).filter(
+            b => !LEGACY_PRESET_BOWLS.includes(b) || usedInHistory.has(b)
+        );
+        localStorage.setItem('hookah_custom_bowls_only_v1', '1');
+    }
+
+    savedBowls = Array.isArray(storedBowls) ? Array.from(new Set(storedBowls.filter(Boolean))) : [];
 
     const rawBrands = Array.isArray(storedBrands) && storedBrands.length > 0
         ? storedBrands
@@ -586,19 +580,16 @@ function initCatalogs() {
 }
 
 function getBowlOptionsHtml(selectedVal = '') {
+    if (savedBowls.length === 0) {
+        return `<option value="">Нет чаш — нажми «+ Добавить» выше</option>`;
+    }
     return savedBowls.map(b => `<option value="${b}" ${b === selectedVal ? 'selected' : ''}>${b}</option>`).join('');
-}
-
-function getBrandOptionsHtml(selectedVal = '') {
-    const cleanSelected = stripRussianBrackets(selectedVal);
-    const options = savedBrands.map(b => `<option value="${b}" ${b === cleanSelected ? 'selected' : ''}>${b}</option>`).join('');
-    return `${options}<option value="__custom__">➕ Другой бренд...</option>`;
 }
 
 function populateSelects() {
     const bowlSelect = document.getElementById('bowl-select');
     if (bowlSelect) {
-        const currentVal = bowlSelect.value && savedBowls.includes(bowlSelect.value) ? bowlSelect.value : savedBowls[0];
+        const currentVal = bowlSelect.value && savedBowls.includes(bowlSelect.value) ? bowlSelect.value : (savedBowls[0] || '');
         bowlSelect.innerHTML = getBowlOptionsHtml(currentVal);
     }
 
@@ -611,6 +602,23 @@ function populateSelects() {
         fillPackInputsForBrand('solo', soloBrand.value);
     }
     recalcLiveBowlCost();
+}
+
+async function deleteSelectedBowl() {
+    const select = document.getElementById('bowl-select');
+    const target = select?.value;
+    if (!target) {
+        showBannerToast('Сначала добавь чашу в список');
+        return;
+    }
+
+    const ok = await showIosConfirm('Удалить чашу?', `Убрать чашу «${target}» из списка?`, 'Удалить', true);
+    if (!ok) return;
+
+    savedBowls = savedBowls.filter(b => b !== target);
+    localStorage.setItem('hookah_bowls', JSON.stringify(savedBowls));
+    populateSelects();
+    showBannerToast(`Чаша «${target}» удалена`);
 }
 
 function fillPackInputsForBrand(mode, brandName, rowEl = null) {
@@ -685,24 +693,6 @@ function addCustomBowl() {
     showBannerToast(`Чаша «${name}» добавлена`);
 }
 
-async function deleteSelectedBowl() {
-    const select = document.getElementById('bowl-select');
-    const target = select?.value;
-    if (!target) return;
-
-    if (savedBowls.length <= 1) {
-        showIosNotice('Нельзя удалить', 'В списке должна оставаться хотя бы одна чаша.');
-        return;
-    }
-
-    const ok = await showIosConfirm('Удалить чашу?', `Убрать чашу «${target}» из списка?`, 'Удалить', true);
-    if (!ok) return;
-
-    savedBowls = savedBowls.filter(b => b !== target);
-    localStorage.setItem('hookah_bowls', JSON.stringify(savedBowls));
-    populateSelects();
-    showBannerToast(`Чаша «${target}» удалена`);
-}
 
 // --- ДОБАВЛЕНИЕ И УДАЛЕНИЕ БРЕНДОВ ТАБАКА ---
 function toggleQuickAddBrand() {
@@ -1172,6 +1162,13 @@ function restoreActiveSessionIfAny() {
 
 // --- ЛОГИКА ТАЙМЕРА ПРОГРЕВА (С УХОДОМ В МИНУС И УЧЕТОМ ОБЩЕГО ВРЕМЕНИ) ---
 function startWarmupSession() {
+    const selectedBowl = document.getElementById('bowl-select')?.value;
+    if (!selectedBowl) {
+        document.getElementById('quick-bowl-box')?.classList.remove('hidden');
+        document.getElementById('new-bowl-input')?.focus();
+        showIosNotice("Добавь свою чашу 🏺", "Список чаш пуст! Введи название своей чаши в поле выше и нажми «ОК».");
+        return;
+    }
     initAudio();
     if ("Notification" in window && Notification.permission === "default") {
         Notification.requestPermission();

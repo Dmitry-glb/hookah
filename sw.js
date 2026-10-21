@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dimhookah-pwa-v7';
+const CACHE_NAME = 'dimhookah-pwa-v10';
 const ASSETS = [
     './',
     './index.html',

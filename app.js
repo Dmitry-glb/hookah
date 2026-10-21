@@ -854,6 +854,7 @@ function addCustomBowl() {
     input.value = '';
     document.getElementById('quick-bowl-box')?.classList.add('hidden');
     showBannerToast(`Чаша «${name}» добавлена`);
+    revealSetupStep(2);
 }
 
 async function deleteSelectedBowl() {
@@ -1162,7 +1163,7 @@ function addMixRow(brand = '', flavor = '', weight = '') {
             <select class="brand-select control-h" onchange="onBrandSelectChange(this)">
                 ${getBrandOptionsHtml(selectedBrand)}
             </select>
-            <input type="text" class="flavor-input control-h" placeholder="Вкус" value="${flavor}">
+            <input type="text" class="flavor-input control-h" placeholder="Вкус" value="${flavor}" onfocus="revealSetupStep(3)" oninput="revealSetupStep(3)">
             <div class="unit-input-box control-h">
                 <input type="number" class="mix-weight-input" value="${defaultWeight}" placeholder="0" min="1" max="100" oninput="recalcLiveBowlCost()">
                 <span>г</span>
@@ -1658,6 +1659,7 @@ function resetUI(sessions = null) {
     currentRating = 0;
     document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
     applyLastUsedWeightToForm(sessions);
+    toggleAllSetupSteps(false);
 }
 
 // --- ВЫПАДАЮЩИЙ КАЛЕНДАРЬ ПЕРИОДОВ И КАРТА ПОБЕД ---
@@ -1912,6 +1914,7 @@ function repeatSession(sessionId) {
         recalcLiveBowlCost();
         window.scrollTo({ top: 0, behavior: 'smooth' });
         showBannerToast('Микс загружен в форму сессии!');
+        toggleAllSetupSteps(true);
     });
 }
 
@@ -2146,33 +2149,57 @@ function saveManualSession() {
 }
 
 // --- ЭКСПОРТ В ЗАМЕТКИ IPHONE И JSON БЕКАП ---
-function exportToAppleNotes() {
-    loadAllData(sessions => {
-        if (!sessions || sessions.length === 0) {
-            showIosNotice('История пуста', 'Пока нет сохраненных сессий для экспорта.');
-            return;
-        }
+// --- МГНОВЕННЫЙ ВЫЗОВ СИСТЕМНОГО МЕНЮ «ПОДЕЛИТЬСЯ» IOS ДЛЯ ЗАМЕТОК ---
+async function exportToAppleNotes() {
+    // Читаем синхронно из localStorage, чтобы iOS Safari не заблокировал navigator.share()!
+    let sessions = [];
+    try {
+        sessions = JSON.parse(localStorage.getItem('hookah_sessions') || '[]');
+    } catch (e) {
+        sessions = [];
+    }
 
-        let text = `💨 DimHookah — Дневник покуров (${sessions.length})\n====================\n\n`;
-        sessions.slice().reverse().forEach((s, idx) => {
-            const mixStr = formatMixPlainText(getNormalizedMix(s));
-            const costStr = s.sessionCost ? ` | 💰 ${s.sessionCost} ₽` : '';
-            text += `${idx + 1}. 📅 ${s.date} — ★ ${s.rating}/5${costStr}\n`;
-            text += `   🍂 Табак: ${mixStr}\n`;
-            text += `   🏺 Чаша: ${s.bowl} | 🔥 Угли: ${s.placement || '—'} (${s.coalsUsed || 3} шт)\n`;
-            text += `   ⏱ Прогрев: ${formatDurationText(s.actualWarmupDuration)} | Покур: ${formatDurationText(s.smokeDuration)}\n`;
-            if (s.comment) text += `   💬 Заметка: "${s.comment}"\n`;
-            text += `\n`;
-        });
+    if (!sessions || sessions.length === 0) {
+        showIosNotice('История пуста', 'Пока нет сохраненных сессий для экспорта.');
+        return;
+    }
 
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).then(() => {
-                showIosNotice('Скопировано в буфер! 📋', 'Открой «Заметки» на iPhone и нажми «Вставить» — вся твоя история красиво сохранится.');
-            }).catch(() => fallbackShareText(text));
-        } else {
-            fallbackShareText(text);
-        }
+    let text = `💨 DimHookah — Дневник покуров (${sessions.length})\n====================\n\n`;
+    sessions.slice().reverse().forEach((s, idx) => {
+        const mixStr = formatMixPlainText(getNormalizedMix(s));
+        const costStr = s.sessionCost ? ` | 💰 ${s.sessionCost} ₽` : '';
+        text += `${idx + 1}. 📅 ${s.date} — ★ ${s.rating}/5${costStr}\n`;
+        text += `   🍂 Табак: ${mixStr}\n`;
+        text += `   🏺 Чаша: ${s.bowl} | 🔥 Угли: ${s.placement || '—'} (${s.coalsUsed || 3} шт)\n`;
+        text += `   ⏱ Прогрев: ${formatDurationText(s.actualWarmupDuration)} | Покур: ${formatDurationText(s.smokeDuration)}\n`;
+        if (s.comment) text += `   💬 Заметка: "${s.comment}"\n`;
+        text += `\n`;
     });
+
+    // 1. Сначала пробуем вызвать родное системное окно «Поделиться» iOS!
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: 'DimHookah — Дневник покуров',
+                text: text
+            });
+            return;
+        } catch (err) {
+            // Если пользователь сам закрыл шторку «Поделиться» (AbortError) — ничего не делаем
+            if (err && err.name === 'AbortError') return;
+        }
+    }
+
+    // 2. Резервный вариант (для ПК или если Web Share API недоступен) — копируем в буфер
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            showIosNotice('Скопировано в буфер! 📋', 'Открой «Заметки» на iPhone и нажми «Вставить» — вся твоя история красиво сохранится.');
+        }).catch(() => {
+            showIosNotice('Ваш текст готов', text);
+        });
+    } else {
+        showIosNotice('Ваш текст готов', text);
+    }
 }
 
 function fallbackShareText(text) {
@@ -2316,4 +2343,75 @@ document.addEventListener('DOMContentLoaded', () => {
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => { });
+}
+
+// --- ЛОГИКА ПОШАГОВОГО РАСКРЫТИЯ ПОЛЕЙ (IOS 27 PROGRESSIVE REVEAL) ---
+let allStepsForcedOpen = false;
+
+function revealSetupStep(stepNum) {
+    const stepEl = document.getElementById(`setup-step-${stepNum}`);
+    if (!stepEl) return;
+
+    if (stepEl.classList.contains('step-collapsed')) {
+        stepEl.classList.remove('step-collapsed');
+        stepEl.classList.add('step-visible');
+    }
+
+    // Прячем промежуточную кнопку «Далее» у предыдущего шага, когда следующий уже открыт
+    if (stepNum >= 2) {
+        document.getElementById('step-1-next-btn')?.classList.add('hidden');
+    }
+    if (stepNum >= 3) {
+        document.getElementById('step-2-next-btn')?.classList.add('hidden');
+    }
+
+    syncToggleAllButtonLabel();
+}
+
+function onStep1BowlSelect() {
+    const val = document.getElementById('bowl-select')?.value;
+    if (val) {
+        revealSetupStep(2);
+    }
+}
+
+function onTobaccoFlavorInput() {
+    const val = document.getElementById('solo-tobacco-flavor')?.value.trim();
+    if (val && val.length >= 1) {
+        revealSetupStep(3);
+    }
+}
+
+function toggleAllSetupSteps(forceExpand = null) {
+    const step2 = document.getElementById('setup-step-2');
+    const step3 = document.getElementById('setup-step-3');
+    if (!step2 || !step3) return;
+
+    const isCurrentlyAllOpen = step2.classList.contains('step-visible') && step3.classList.contains('step-visible');
+    const shouldExpand = typeof forceExpand === 'boolean' ? forceExpand : !isCurrentlyAllOpen;
+    allStepsForcedOpen = shouldExpand;
+
+    if (shouldExpand) {
+        revealSetupStep(2);
+        revealSetupStep(3);
+    } else {
+        step2.classList.remove('step-visible');
+        step2.classList.add('step-collapsed');
+        step3.classList.remove('step-visible');
+        step3.classList.add('step-collapsed');
+        document.getElementById('step-1-next-btn')?.classList.remove('hidden');
+        document.getElementById('step-2-next-btn')?.classList.remove('hidden');
+    }
+
+    syncToggleAllButtonLabel();
+}
+
+function syncToggleAllButtonLabel() {
+    const btn = document.getElementById('toggle-all-steps-btn');
+    const step2 = document.getElementById('setup-step-2');
+    const step3 = document.getElementById('setup-step-3');
+    if (!btn || !step2 || !step3) return;
+
+    const bothOpen = step2.classList.contains('step-visible') && step3.classList.contains('step-visible');
+    btn.innerText = bothOpen ? '🔼 Свернуть шаги' : '✨ Развернуть все';
 }

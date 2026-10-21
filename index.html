@@ -57,146 +57,167 @@
             </div>
         </header>
 
-        <!-- Настройка новой сессии -->
+        <!-- Настройка новой сессии (Каскадный режим iOS 27) -->
         <section class="card" id="setup-form">
             <div class="card-header-line">
                 <h2>Новая сессия</h2>
-            </div>
-
-            <!-- Выбор чаши + управление чашами -->
-            <div class="form-group">
-                <div class="label-row">
-                    <label>Чаша</label>
-                    <div class="inline-actions">
-                        <button type="button" class="text-action-btn" onclick="toggleQuickAddBowl()">+ Добавить</button>
-                        <button type="button" class="text-action-btn danger-text"
-                            onclick="deleteSelectedBowl()">Удалить</button>
-                    </div>
-                </div>
-                <select id="bowl-select" class="control-h"></select>
-                <div id="quick-bowl-box" class="quick-add-box hidden">
-                    <input type="text" id="new-bowl-input" class="control-h" placeholder="Название чаши"
-                        onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomBowl();}">
-                    <button type="button" class="btn btn-inline" onclick="addCustomBowl()">ОК</button>
-                </div>
-            </div>
-
-            <!-- Переключатель Соло / Микс по клику на плашку -->
-            <div class="form-group">
-                <button type="button" class="mode-click-bar" id="mode-toggle-btn" onclick="toggleMixMode()">
-                    <div class="mode-switch-info">
-                        <span class="mode-title" id="mode-label">🍂 Режим: Соло (1 табак)</span>
-                        <span class="mode-sub" id="mode-sub-label">Нажми для переключения в Микс</span>
-                    </div>
-                    <span class="mode-pill-indicator" id="mode-pill-badge">Соло ⇄</span>
+                <button type="button" class="pill-btn accent-pill" id="toggle-all-steps-btn"
+                    onclick="toggleAllSetupSteps()">
+                    ✨ Развернуть все
                 </button>
             </div>
 
-            <!-- Управление каталогом табаков -->
-            <div class="form-group">
-                <div class="label-row">
-                    <label>Табак, граммовка и пачка</label>
-                    <div class="inline-actions">
-                        <button type="button" class="text-action-btn" onclick="toggleQuickAddBrand()">+ Бренд</button>
-                        <button type="button" class="text-action-btn danger-text"
-                            onclick="openBrandManagerModal()">Список</button>
+            <!-- ШАГ 1: Выбор чаши -->
+            <div class="wizard-step step-visible" id="setup-step-1">
+                <div class="form-group" style="margin-bottom: 8px;">
+                    <div class="label-row">
+                        <label>1. Выбери чашу</label>
+                        <div class="inline-actions">
+                            <button type="button" class="text-action-btn" onclick="toggleQuickAddBowl()">+
+                                Добавить</button>
+                            <button type="button" class="text-action-btn danger-text"
+                                onclick="deleteSelectedBowl()">Удалить</button>
+                        </div>
+                    </div>
+                    <select id="bowl-select" class="control-h" onchange="onStep1BowlSelect()"></select>
+                    <div id="quick-bowl-box" class="quick-add-box hidden">
+                        <input type="text" id="new-bowl-input" class="control-h" placeholder="Название чаши"
+                            onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomBowl();}">
+                        <button type="button" class="btn btn-inline" onclick="addCustomBowl()">ОК</button>
                     </div>
                 </div>
-                <div id="quick-brand-box" class="quick-add-box hidden" style="margin-bottom: 10px;">
-                    <input type="text" id="new-brand-input" class="control-h" placeholder="Название бренда"
-                        onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomBrandFromBar();}">
-                    <button type="button" class="btn btn-inline" onclick="addCustomBrandFromBar()">ОК</button>
+                <button type="button" class="step-next-Trigger" id="step-1-next-btn" onclick="revealSetupStep(2)">
+                    К выбору табака ↓
+                </button>
+            </div>
+
+            <!-- ШАГ 2: Режим и Табак (появляется плавно после выбора чаши) -->
+            <div class="wizard-step step-collapsed" id="setup-step-2">
+                <div class="step-divider"></div>
+                <div class="form-group">
+                    <button type="button" class="mode-click-bar" id="mode-toggle-btn" onclick="toggleMixMode()">
+                        <div class="mode-switch-info">
+                            <span class="mode-title" id="mode-label">🍂 Режим: Соло (1 табак)</span>
+                            <span class="mode-sub" id="mode-sub-label">Нажми для переключения в Микс</span>
+                        </div>
+                        <span class="mode-pill-indicator" id="mode-pill-badge">Соло ⇄</span>
+                    </button>
                 </div>
 
-                <!-- Режим СОЛО -->
-                <div id="solo-container">
-                    <div class="tobacco-card-box">
-                        <div class="tobacco-grid-solo">
-                            <select id="solo-tobacco-brand" class="brand-select control-h"
-                                onchange="onBrandSelectChange(this)"></select>
-                            <input type="text" id="solo-tobacco-flavor" class="flavor-input control-h"
-                                placeholder="Вкус">
-                            <div class="unit-input-box control-h">
-                                <input type="number" id="solo-tobacco-weight" value="18" min="1" max="100"
-                                    oninput="recalcLiveBowlCost()">
-                                <span>г</span>
-                            </div>
+                <div class="form-group" style="margin-bottom: 8px;">
+                    <div class="label-row">
+                        <label>2. Табак, граммовка и пачка</label>
+                        <div class="inline-actions">
+                            <button type="button" class="text-action-btn" onclick="toggleQuickAddBrand()">+
+                                Бренд</button>
+                            <button type="button" class="text-action-btn danger-text"
+                                onclick="openBrandManagerModal()">Список</button>
                         </div>
-                        <input type="text" id="solo-custom-brand" class="custom-brand-input control-h hidden"
-                            placeholder="Введите название нового бренда..." oninput="recalcLiveBowlCost()">
+                    </div>
+                    <div id="quick-brand-box" class="quick-add-box hidden" style="margin-bottom: 10px;">
+                        <input type="text" id="new-brand-input" class="control-h" placeholder="Название бренда"
+                            onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomBrandFromBar();}">
+                        <button type="button" class="btn btn-inline" onclick="addCustomBrandFromBar()">ОК</button>
+                    </div>
 
-                        <div class="pack-price-grid">
-                            <div class="pack-field">
-                                <span class="pack-field-label">Цена пачки</span>
-                                <div class="pack-field-control">
-                                    <input type="number" id="solo-pack-price" placeholder="0" min="0"
-                                        oninput="onPackInfoChange('solo')">
-                                    <span>₽</span>
-                                </div>
-                            </div>
-                            <div class="pack-field">
-                                <span class="pack-field-label">Вес пачки</span>
-                                <div class="pack-field-control">
-                                    <input type="number" id="solo-pack-weight" placeholder="25" min="1"
-                                        oninput="onPackInfoChange('solo')">
+                    <!-- Режим СОЛО -->
+                    <div id="solo-container">
+                        <div class="tobacco-card-box">
+                            <div class="tobacco-grid-solo">
+                                <select id="solo-tobacco-brand" class="brand-select control-h"
+                                    onchange="onBrandSelectChange(this); revealSetupStep(3);"></select>
+                                <input type="text" id="solo-tobacco-flavor" class="flavor-input control-h"
+                                    placeholder="Вкус" oninput="onTobaccoFlavorInput()" onfocus="revealSetupStep(3)">
+                                <div class="unit-input-box control-h">
+                                    <input type="number" id="solo-tobacco-weight" value="18" min="1" max="100"
+                                        oninput="recalcLiveBowlCost(); revealSetupStep(3);">
                                     <span>г</span>
                                 </div>
                             </div>
+                            <input type="text" id="solo-custom-brand" class="custom-brand-input control-h hidden"
+                                placeholder="Введите название нового бренда..." oninput="recalcLiveBowlCost()">
+
+                            <div class="pack-price-grid">
+                                <div class="pack-field">
+                                    <span class="pack-field-label">Цена пачки</span>
+                                    <div class="pack-field-control">
+                                        <input type="number" id="solo-pack-price" placeholder="0" min="0"
+                                            oninput="onPackInfoChange('solo')">
+                                        <span>₽</span>
+                                    </div>
+                                </div>
+                                <div class="pack-field">
+                                    <span class="pack-field-label">Вес пачки</span>
+                                    <div class="pack-field-control">
+                                        <input type="number" id="solo-pack-weight" placeholder="25" min="1"
+                                            oninput="onPackInfoChange('solo')">
+                                        <span>г</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Режим МИКС -->
+                    <div id="mix-container" class="hidden">
+                        <div class="mix-header-bar">
+                            <span>Компоненты микса</span>
+                            <span id="mix-total-weight" class="weight-badge">Всего: 0 г</span>
+                        </div>
+                        <div id="mix-rows-list"></div>
+                        <button type="button" class="btn btn-secondary btn-dashed"
+                            onclick="addMixRow(); revealSetupStep(3);">+ Добавить табак в микс</button>
+                    </div>
+                </div>
+
+                <button type="button" class="step-next-Trigger" id="step-2-next-btn" onclick="revealSetupStep(3)">
+                    К углям и прогреву ↓
+                </button>
+            </div>
+
+            <!-- ШАГ 3: Угли, время прогрева, себестоимость и Старт -->
+            <div class="wizard-step step-collapsed" id="setup-step-3">
+                <div class="step-divider"></div>
+                <div class="setup-dual-grid">
+                    <div class="setup-mini-card">
+                        <div class="mini-card-top">
+                            <span class="mini-card-label">🔥 3. Угли на старт</span>
+                        </div>
+                        <div class="unit-input-box control-h">
+                            <input type="number" id="start-coals-input" value="3" min="1" max="10"
+                                oninput="recalcLiveBowlCost()">
+                            <span>шт</span>
+                        </div>
+                    </div>
+
+                    <div class="setup-mini-card">
+                        <div class="mini-card-top">
+                            <span class="mini-card-label">⏱ Прогрев</span>
+                            <div class="mini-presets">
+                                <button type="button" class="mini-pill" onclick="setWarmupPreset(5)">5м</button>
+                                <button type="button" class="mini-pill" onclick="setWarmupPreset(6)">6м</button>
+                                <button type="button" class="mini-pill" onclick="setWarmupPreset(7)">7м</button>
+                            </div>
+                        </div>
+                        <div class="unit-input-box control-h">
+                            <input type="number" id="warmup-min" value="5" min="1" max="59">
+                            <span>мин</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Режим МИКС -->
-                <div id="mix-container" class="hidden">
-                    <div class="mix-header-bar">
-                        <span>Компоненты микса</span>
-                        <span id="mix-total-weight" class="weight-badge">Всего: 0 г</span>
+                <!-- Живая плашка расчета стоимости чаши -->
+                <div class="live-cost-banner" id="live-cost-banner">
+                    <div class="live-cost-left">
+                        <span class="live-cost-title">💰 Себестоимость забивки</span>
+                        <span class="live-cost-sub" id="live-cost-details">Табак: 0 ₽ • Угли: 0 ₽</span>
                     </div>
-                    <div id="mix-rows-list"></div>
-                    <button type="button" class="btn btn-secondary btn-dashed" onclick="addMixRow()">+ Добавить табак в
-                        микс</button>
+                    <div class="live-cost-value" id="live-cost-total">0 ₽</div>
                 </div>
+
+                <button class="btn btn-primary-lg" id="start-btn" onclick="startWarmupSession()">🔥 Начать
+                    прогрев</button>
             </div>
-
-            <!-- Угли на старт и время прогрева -->
-            <div class="setup-dual-grid">
-                <div class="setup-mini-card">
-                    <div class="mini-card-top">
-                        <span class="mini-card-label">🔥 Угли на старт</span>
-                    </div>
-                    <div class="unit-input-box control-h">
-                        <input type="number" id="start-coals-input" value="3" min="1" max="10"
-                            oninput="recalcLiveBowlCost()">
-                        <span>шт</span>
-                    </div>
-                </div>
-
-                <div class="setup-mini-card">
-                    <div class="mini-card-top">
-                        <span class="mini-card-label">⏱ Прогрев</span>
-                        <div class="mini-presets">
-                            <button type="button" class="mini-pill" onclick="setWarmupPreset(5)">5м</button>
-                            <button type="button" class="mini-pill" onclick="setWarmupPreset(6)">6м</button>
-                            <button type="button" class="mini-pill" onclick="setWarmupPreset(7)">7м</button>
-                        </div>
-                    </div>
-                    <div class="unit-input-box control-h">
-                        <input type="number" id="warmup-min" value="5" min="1" max="59">
-                        <span>мин</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Живая плашка расчета стоимости чаши -->
-            <div class="live-cost-banner" id="live-cost-banner">
-                <div class="live-cost-left">
-                    <span class="live-cost-title">💰 Себестоимость забивки</span>
-                    <span class="live-cost-sub" id="live-cost-details">Табак: 0 ₽ • Угли: 0 ₽</span>
-                </div>
-                <div class="live-cost-value" id="live-cost-total">0 ₽</div>
-            </div>
-
-            <button class="btn btn-primary-lg" id="start-btn" onclick="startWarmupSession()">🔥 Начать прогрев</button>
         </section>
 
         <!-- Активная сессия -->

@@ -1492,3 +1492,62 @@ textarea:focus {
 .hidden {
     display: none !important;
 }
+
+/* --- КАСКАДНОЕ ПОЯВЛЕНИЕ ПОЛЕЙ В СТИЛЕ IOS 27 (SPRING + BLUR REVEAL) --- */
+.wizard-step {
+    transition:
+        max-height 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+        filter 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    transform-origin: top center;
+    will-change: max-height, opacity, transform, filter;
+}
+
+.wizard-step.step-collapsed {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transform: translateY(-12px) scale(0.97);
+    filter: blur(10px);
+    margin: 0;
+}
+
+.wizard-step.step-visible {
+    max-height: 1200px;
+    opacity: 1;
+    overflow: visible;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+    filter: blur(0px);
+}
+
+.step-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-highlight), transparent);
+    margin: 12px 0;
+    opacity: 0.7;
+}
+
+.step-next-Trigger {
+    width: 100%;
+    height: 36px;
+    margin-top: 4px;
+    border-radius: 12px;
+    border: 1px dashed var(--border-highlight);
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-size: 0.78em;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.step-next-Trigger:active {
+    transform: scale(0.97);
+}

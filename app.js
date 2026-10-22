@@ -2309,11 +2309,13 @@ async function initFlavorPicker() {
     const card = document.getElementById('flavor-picker-card');
     if (!card) return;
     const brandSelect = document.getElementById('picker-brand');
+    const strengthSelect = document.getElementById('picker-strength');
     const categorySelect = document.getElementById('picker-category');
+    const ratingSelect = document.getElementById('picker-rating');
     const result = document.getElementById('flavor-picker-result');
     const count = document.getElementById('flavor-picker-count');
     const button = document.getElementById('pick-flavor-btn');
-    if (!brandSelect || !categorySelect || !result || !count || !button) return;
+    if (!brandSelect || !strengthSelect || !categorySelect || !ratingSelect || !result || !count || !button) return;
     try {
         const response = await fetch('flavors.json', { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -2321,13 +2323,24 @@ async function initFlavorPicker() {
         flavorCatalog = Array.isArray(data) ? data.filter(item => item && String(item.name).trim() && String(item.brand).trim()) : [];
         if (!flavorCatalog.length) throw new Error('empty catalog');
         const brands = [...new Set(flavorCatalog.map(item => String(item.brand).trim()).filter(Boolean))];
-        const categories = [...new Set(flavorCatalog.flatMap(item => Array.isArray(item.taste_groups) ? item.taste_groups : (Array.isArray(item.tastes) ? item.tastes : [])).filter(Boolean))];
+        const categories = [...new Set(flavorCatalog.flatMap(item => {
+            const tags = Array.isArray(item.tags) ? item.tags : [];
+            return [
+                ...(Array.isArray(item.taste_groups) ? item.taste_groups : []),
+                ...(Array.isArray(item.tastes) ? item.tastes : []),
+                ...tags.flatMap(tag => [tag?.taste, tag?.group])
+            ];
+        }).filter(Boolean))];
+        const strengths = [...new Set(flavorCatalog.map(item => String(item.strength || '').trim()).filter(Boolean))];
         brands.sort((a, b) => a.localeCompare(b, 'ru')).forEach(brand => brandSelect.add(new Option(brand, brand)));
+        strengths.sort((a, b) => a.localeCompare(b, 'ru')).forEach(value => strengthSelect.add(new Option(value, value)));
         categories.sort((a, b) => a.localeCompare(b, 'ru')).forEach(category => categorySelect.add(new Option(category, category)));
         count.textContent = `${flavorCatalog.length} позиций`;
         button.addEventListener('click', pickRandomFlavor);
         brandSelect.addEventListener('change', updatePickerCount);
         categorySelect.addEventListener('change', updatePickerCount);
+        strengthSelect.addEventListener('change', updatePickerCount);
+        ratingSelect.addEventListener('change', updatePickerCount);
     } catch (error) {
         count.textContent = 'Каталог недоступен';
         button.disabled = true;
@@ -2338,9 +2351,16 @@ async function initFlavorPicker() {
 function getPickerItems() {
     const brand = document.getElementById('picker-brand')?.value || 'all';
     const category = document.getElementById('picker-category')?.value || 'all';
+    const strength = document.getElementById('picker-strength')?.value || 'all';
+    const rating = document.getElementById('picker-rating')?.value || 'all';
     return flavorCatalog.filter(item => {
-        const categories = Array.isArray(item.taste_groups) ? item.taste_groups : (Array.isArray(item.tastes) ? item.tastes : []);
-        return (brand === 'all' || item.brand === brand) && (category === 'all' || categories.includes(category));
+        const tags = Array.isArray(item.tags) ? item.tags : [];
+        const categories = [
+            ...(Array.isArray(item.taste_groups) ? item.taste_groups : []),
+            ...(Array.isArray(item.tastes) ? item.tastes : []),
+            ...tags.flatMap(tag => [tag?.taste, tag?.group])
+        ].filter(Boolean);
+        return (brand === 'all' || item.brand === brand) && (strength === 'all' || item.strength === strength) && (category === 'all' || categories.includes(category)) && (rating === 'all' || Number(item.rating) >= Number(rating));
     });
 }
 
@@ -2362,7 +2382,8 @@ function pickRandomFlavor() {
     const title = document.createElement('strong'); title.textContent = item.name;
     const meta = document.createElement('p'); meta.textContent = [item.brand, item.line, Number.isFinite(Number(item.rating)) ? `★ ${item.rating}` : ''].filter(Boolean).join(' · ');
     const details = document.createElement('small'); details.textContent = (item.tastes || []).join(', ') || item.alt_name || 'Профиль вкуса не указан';
-    content.append(title, meta, details); result.append(icon, content);
+    const link = document.createElement('a'); link.href = item.source_url || `https://htreviews.org/tobaccos/${item.slug}`; link.target = '_blank'; link.rel = 'noopener'; link.textContent = 'Открыть вкус на HTReviews ↗';
+    content.append(title, meta, details, link); result.append(icon, content);
 }
 function syncActiveTimerOnWake() {
     const isWarmup = !document.getElementById('warmup-controls').classList.contains('hidden');

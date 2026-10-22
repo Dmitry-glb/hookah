@@ -1555,7 +1555,8 @@ textarea:focus {
 .flavor-picker-card { overflow: hidden; }
 .card-hint { margin-top: 4px; color: var(--text-secondary); font-size: .78em; line-height: 1.35; }
 .catalog-count { flex-shrink: 0; border: 1px solid var(--border); border-radius: var(--radius-pill); color: var(--primary); background: var(--primary-soft); padding: 6px 9px; font-size: .7em; font-weight: 800; }
-.picker-filters { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.picker-filters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 10px; }
+.picker-result a { display: inline-block; margin-top: 6px; color: var(--accent); font-size: .82rem; font-weight: 700; text-decoration: none; }
 .picker-field { margin: 0; text-transform: none; letter-spacing: 0; font-size: .75em; }
 .picker-field select { margin-top: 5px; width: 100%; }
 .picker-result { min-height: 78px; display: flex; align-items: center; gap: 12px; padding: 13px; margin-bottom: 10px; border: 1px solid var(--border); border-radius: var(--radius-inner); background: linear-gradient(135deg, var(--primary-soft), var(--surface-row)); }
@@ -1563,4 +1564,5 @@ textarea:focus {
 .picker-result strong { display: block; color: var(--text); font-size: 1em; }
 .picker-result p, .picker-result small { display: block; margin-top: 3px; color: var(--text-secondary); font-size: .78em; line-height: 1.3; }
 .picker-result small { color: var(--text-muted); }
+@media (max-width: 700px) { .picker-filters { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 390px) { .picker-filters { grid-template-columns: 1fr; } }

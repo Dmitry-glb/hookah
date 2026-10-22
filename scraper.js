@@ -1,105 +1,16 @@
-/** Собирает полный каталог HTReviews в flavors.json. Запуск: npm run scrape */
+﻿/** Build an active HTReviews catalog for the picker. Run with: npm run scrape */
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const cheerio = require('cheerio');
-
-const CATALOG_URL = 'https://htreviews.org/tobaccos?r=discussed&s=rating&d=desc&k=3';
-const API_URL = 'https://htreviews.org/getData';
+const BRANDS_URL = 'https://htreviews.org/tobaccos/brands?r=position&s=rating&d=desc';
 const OUTPUT_PATH = path.join(__dirname, 'flavors.json');
-const PAGE_SIZE = 20;
-
-const http = axios.create({
-    timeout: 45_000,
-    headers: { 'User-Agent': 'DimHookah catalog importer/1.0', Accept: 'application/json, text/html;q=0.9, */*;q=0.8' },
-    responseType: 'text'
-});
-
-function numberOrNull(value) {
-    if (value === null || value === undefined || value === '') return null;
-    if (typeof value === 'number') return Number.isFinite(value) ? value : null;
-    const normalized = String(value).trim().replace(/\s/g, '').replace(',', '.');
-    const number = Number(normalized.replace(/k$/i, '')) * (/k$/i.test(normalized) ? 1000 : 1);
-    return Number.isFinite(number) ? number : null;
-}
-
-function cleanText(value) { return String(value || '').replace(/\s+/g, ' ').trim(); }
-
-function getExpectedCount(html) {
-    const $ = cheerio.load(html);
-    const counts = $('.tobacco_list_items[data-count]').map((_, el) => Number($(el).attr('data-count'))).get();
-    return Math.max(...counts.filter(Number.isFinite), 0);
-}
-
-async function getPage(offset) {
-    // `flavor` — полный каталог вкусов. `discussed` из URL пользователя —
-    // рейтинговая выборка и содержит только часть всех позиций.
-    const response = await http.get(API_URL, { params: { r: 'flavor', s: 'rating', d: 'desc', k: 3, o: offset, action: 'tobaccos' } });
-    try {
-        const payload = typeof response.data === 'string' ? response.data.replace(/^\uFEFF/, '') : response.data;
-        const data = typeof payload === 'string' ? JSON.parse(payload) : payload;
-        const rows = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : null);
-        if (!rows) throw new Error('ответ не является массивом записей');
-        return rows;
-    } catch (error) {
-        throw new Error(`Не удалось разобрать ответ на offset=${offset}: ${error.message}`);
-    }
-}
-
-function normalizeRecord(item) {
-    const tags = Array.isArray(item.tags) ? item.tags.map(tag => ({
-        id: numberOrNull(tag.id), name: cleanText(tag.name), group: cleanText(tag.group), taste: cleanText(tag.taste)
-    })).filter(tag => tag.name) : [];
-    const name = cleanText(item.name);
-    const brand = cleanText(item.brand);
-    if (numberOrNull(item.id) === null || !name || !brand || !item.slug) return null;
-    return {
-        id: numberOrNull(item.id), name, flavor: name, alt_name: cleanText(item.alt_name), brand,
-        line: cleanText(item.line), slug: item.slug, source_url: `https://htreviews.org/tobaccos/${item.slug}`,
-        rating: numberOrNull(item.rating), ratings_count: numberOrNull(item.ratings_count),
-        reviews_count: numberOrNull(item.reviews), views: numberOrNull(item.views), strength: cleanText(item.strength),
-        tags, tastes: tags.map(tag => tag.name), taste_groups: [...new Set(tags.map(tag => tag.group).filter(Boolean))]
-    };
-}
-
-async function scrape() {
-    console.log('🌐 Проверяю каталог HTReviews...');
-    const catalogResponse = await http.get(CATALOG_URL);
-    const htmlCount = getExpectedCount(catalogResponse.data);
-    if (!htmlCount) throw new Error('Не удалось определить размер каталога');
-    console.log(`📚 В HTML каталога заявлено позиций: ${htmlCount}`);
-
-    const records = new Map();
-    // getData отдаёт фактические страницы полного каталога. У HTReviews
-    // data-count в HTML относится к выбранной вкладке, поэтому заканчиваем
-    // на короткой/пустой странице и дополнительно проверяем полноту.
-    for (let offset = 0; offset < Math.max(PAGE_SIZE, htmlCount + PAGE_SIZE); offset += PAGE_SIZE) {
-        let page;
-        let lastError;
-        for (let attempt = 1; attempt <= 3; attempt += 1) {
-            try { page = await getPage(offset); break; }
-            catch (error) { lastError = error; if (attempt < 3) await new Promise(resolve => setTimeout(resolve, 700 * attempt)); }
-        }
-        if (!page) throw lastError;
-        if (!page.length) break;
-        page.map(normalizeRecord).filter(Boolean).forEach(record => records.set(record.id || record.slug, record));
-        console.log(`  ✓ получено ${records.size} позиций`);
-        if (page.length < PAGE_SIZE || records.size >= htmlCount) break;
-    }
-
-    const result = [...records.values()];
-    if (!result.length) throw new Error('Проверка полноты не пройдена: каталог пуст');
-    if (result.length < Math.max(1, Math.floor(htmlCount * 0.95))) {
-        throw new Error(`Проверка полноты не пройдена: собрано ${result.length} из ${htmlCount}`);
-    }
-    if (result.some(item => !item.brand || !item.name || !Number.isFinite(item.rating))) {
-        throw new Error('Проверка полей не пройдена: найдены неполные записи');
-    }
-    result.sort((a, b) => (b.rating - a.rating) || (b.reviews_count - a.reviews_count));
-    const tempPath = `${OUTPUT_PATH}.tmp`;
-    fs.writeFileSync(tempPath, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
-    fs.renameSync(tempPath, OUTPUT_PATH);
-    console.log(`✅ Готово: ${result.length} вкусов записано в ${path.basename(OUTPUT_PATH)}`);
-}
-
-scrape().catch(error => { console.error(`❌ Парсер остановлен: ${error.message}`); process.exitCode = 1; });
+const http = axios.create({ timeout: 45000, responseType: 'text', headers: { 'User-Agent': 'DimHookah catalog importer/2.0', Accept: 'text/html,application/json;q=0.9,*/*;q=0.8' } });
+const text = value => String(value || '').replace(/\s+/g, ' ').trim();
+const number = value => { if (value === null || value === undefined || value === '') return null; const raw = String(value).trim().replace(/\s/g, '').replace(',', '.'); const result = Number(raw.replace(/k$/i, '')) * (/k$/i.test(raw) ? 1000 : 1); return Number.isFinite(result) ? result : null; };
+const absolute = href => new URL(href, BRANDS_URL).href;
+const isActive = value => /выпускается/i.test(value || '');
+function parseItem($, el, brand, brandPosition) { const root = $(el); const link = root.find('a.tobacco_list_item_slug').first(); const lineLink = root.find('a.tobacco_list_item_line_slug').first(); const href = link.attr('href'); if (!href) return null; const slug = new URL(href, BRANDS_URL).pathname.replace(/^\/tobaccos\//, ''); const stat = selector => number(root.find(selector).first().text()); return { id: number(root.attr('data-id')), name: text(link.find('span').first().text() || link.text()), flavor: text(link.find('span').first().text() || link.text()), brand: text(brand.name), brand_position: brandPosition, line: text(lineLink.text()), slug, source_url: absolute(href), rating: stat('.list_item_rating span'), ratings_count: stat('.list_item_ratings_count span'), reviews_count: stat('.list_item_reviews span'), views: stat('.list_item_stats span'), strength: null, tags: [], tastes: [], taste_groups: [] }; }
+function parseBrandPage(html, brandPosition, brandSlug) { const $ = cheerio.load(html); const heading = text($('h1').first().text()) || brandSlug; const brand = { name: heading, slug: brandSlug, position: brandPosition, status: isActive(text($('body').text())) ? 'Выпускается' : null }; const lines = new Map(); $('a.tobacco_list_item_line_slug').each((_, el) => { const href = $(el).attr('href'); if (!href) return; const slug = new URL(href, BRANDS_URL).pathname.replace(/^\/tobaccos\//, ''); const details = text($(el).closest('.tobacco_list_item_name').parent().parent().text()); lines.set(slug, { name: text($(el).text()), slug, source_url: absolute(href), status: isActive(details) ? 'Выпускается' : null, strength: (details.match(/(Лёгкая|Средне-лёгкая|Средняя|Средне-крепкая|Крепкая)/i) || [null])[0] }); }); const flavors = $('.tobacco_list_item').map((_, el) => parseItem($, el, brand, brandPosition)).get().filter(Boolean); return { brand, lines, flavors }; }
+async function scrape() { console.log('Проверяю рейтинг брендов HTReviews...'); const html = (await http.get(BRANDS_URL)).data; const $ = cheerio.load(html); const brands = new Map(); $('.tobacco_list_item').each((_, el) => { const link = $(el).find('a.tobacco_list_item_slug').first(); const href = link.attr('href'); if (!href) return; const slug = new URL(href, BRANDS_URL).pathname.replace(/^\/tobaccos\//, ''); brands.set(slug, { name: text(link.find('span').first().text() || link.text()), href: absolute(href), position: number($(el).find('.tobacco_list_item_position p').first().text()) }); }); if (!brands.size) throw new Error('Не найден список брендов'); const records = new Map(); for (const [slug, brand] of brands) { try { let offset = 0; let expected = 0; const lines = new Map(); let brandStatus = null; do { const page = parseBrandPage((await http.get(brand.href, { params: offset ? { o: offset } : {} })).data, brand.position, slug); expected = page.flavors.length > 0 ? Math.max(expected, page.flavors.length) : expected; brandStatus = page.brand.status; page.lines.forEach(line => lines.set(line.slug, line)); for (const item of page.flavors) { const line = [...lines.values()].find(x => item.slug.startsWith(`${x.slug}/`)); if (brandStatus !== 'Выпускается' || (line && line.status && line.status !== 'Выпускается')) continue; item.line = line?.name || item.line; item.line_slug = line?.slug || null; item.line_url = line?.source_url || null; item.strength = line?.strength || null; records.set(item.slug, item); } if (page.flavors.length < 20) break; offset += 20; } while (offset < 1000); console.log(`✓ ${brand.name}: ${records.size} вкусов собрано`); } catch (error) { console.warn(`Пропущен ${brand.name}: ${error.message}`); } } const result = [...records.values()].sort((a,b) => (a.brand_position-b.brand_position) || ((b.rating||0)-(a.rating||0)) || ((b.reviews_count||0)-(a.reviews_count||0))); if (!result.length) throw new Error('Не удалось собрать активные вкусы'); const tmp = `${OUTPUT_PATH}.tmp`; fs.writeFileSync(tmp, `${JSON.stringify(result,null,2)}\n`, 'utf8'); fs.renameSync(tmp, OUTPUT_PATH); console.log(`Готово: ${result.length} активных вкусов записано в ${path.basename(OUTPUT_PATH)}`); }
+scrape().catch(error => { console.error(`Парсер остановлен: ${error.message}`); process.exitCode = 1; });

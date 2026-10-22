@@ -2313,14 +2313,17 @@ async function initFlavorPicker() {
     const result = document.getElementById('flavor-picker-result');
     const count = document.getElementById('flavor-picker-count');
     const button = document.getElementById('pick-flavor-btn');
+    if (!brandSelect || !categorySelect || !result || !count || !button) return;
     try {
         const response = await fetch('flavors.json', { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
-        flavorCatalog = Array.isArray(data) ? data.filter(item => item && item.name && item.brand) : [];
+        flavorCatalog = Array.isArray(data) ? data.filter(item => item && String(item.name).trim() && String(item.brand).trim()) : [];
         if (!flavorCatalog.length) throw new Error('empty catalog');
-        [...new Set(flavorCatalog.map(item => item.brand))].sort((a, b) => a.localeCompare(b, 'ru')).forEach(brand => brandSelect.add(new Option(brand, brand)));
-        [...new Set(flavorCatalog.flatMap(item => item.taste_groups || item.tastes || []).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'ru')).forEach(category => categorySelect.add(new Option(category, category)));
+        const brands = [...new Set(flavorCatalog.map(item => String(item.brand).trim()).filter(Boolean))];
+        const categories = [...new Set(flavorCatalog.flatMap(item => Array.isArray(item.taste_groups) ? item.taste_groups : (Array.isArray(item.tastes) ? item.tastes : [])).filter(Boolean))];
+        brands.sort((a, b) => a.localeCompare(b, 'ru')).forEach(brand => brandSelect.add(new Option(brand, brand)));
+        categories.sort((a, b) => a.localeCompare(b, 'ru')).forEach(category => categorySelect.add(new Option(category, category)));
         count.textContent = `${flavorCatalog.length} позиций`;
         button.addEventListener('click', pickRandomFlavor);
         brandSelect.addEventListener('change', updatePickerCount);
@@ -2336,7 +2339,7 @@ function getPickerItems() {
     const brand = document.getElementById('picker-brand')?.value || 'all';
     const category = document.getElementById('picker-category')?.value || 'all';
     return flavorCatalog.filter(item => {
-        const categories = item.taste_groups || item.tastes || [];
+        const categories = Array.isArray(item.taste_groups) ? item.taste_groups : (Array.isArray(item.tastes) ? item.tastes : []);
         return (brand === 'all' || item.brand === brand) && (category === 'all' || categories.includes(category));
     });
 }

@@ -17,7 +17,9 @@ const http = axios.create({
 
 function numberOrNull(value) {
     if (value === null || value === undefined || value === '') return null;
-    const number = Number(String(value).replace(',', '.').replace(/k$/i, '000'));
+    if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+    const normalized = String(value).trim().replace(/\s/g, '').replace(',', '.');
+    const number = Number(normalized.replace(/k$/i, '')) * (/k$/i.test(normalized) ? 1000 : 1);
     return Number.isFinite(number) ? number : null;
 }
 
@@ -34,9 +36,11 @@ async function getPage(offset) {
     // рейтинговая выборка и содержит только часть всех позиций.
     const response = await http.get(API_URL, { params: { r: 'flavor', s: 'rating', d: 'desc', k: 3, o: offset, action: 'tobaccos' } });
     try {
-        const data = JSON.parse(response.data);
-        if (!Array.isArray(data)) throw new Error('ответ не является массивом');
-        return data;
+        const payload = typeof response.data === 'string' ? response.data.replace(/^\uFEFF/, '') : response.data;
+        const data = typeof payload === 'string' ? JSON.parse(payload) : payload;
+        const rows = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : null);
+        if (!rows) throw new Error('ответ не является массивом записей');
+        return rows;
     } catch (error) {
         throw new Error(`Не удалось разобрать ответ на offset=${offset}: ${error.message}`);
     }
@@ -48,7 +52,7 @@ function normalizeRecord(item) {
     })).filter(tag => tag.name) : [];
     const name = cleanText(item.name);
     const brand = cleanText(item.brand);
-    if (!item.id || !name || !brand || !item.slug) return null;
+    if (numberOrNull(item.id) === null || !name || !brand || !item.slug) return null;
     return {
         id: numberOrNull(item.id), name, flavor: name, alt_name: cleanText(item.alt_name), brand,
         line: cleanText(item.line), slug: item.slug, source_url: `https://htreviews.org/tobaccos/${item.slug}`,
@@ -69,7 +73,7 @@ async function scrape() {
     // getData отдаёт фактические страницы полного каталога. У HTReviews
     // data-count в HTML относится к выбранной вкладке, поэтому заканчиваем
     // на короткой/пустой странице и дополнительно проверяем полноту.
-    for (let offset = 0; offset < 1000; offset += PAGE_SIZE) {
+    for (let offset = 0; offset < Math.max(PAGE_SIZE, htmlCount + PAGE_SIZE); offset += PAGE_SIZE) {
         let page;
         let lastError;
         for (let attempt = 1; attempt <= 3; attempt += 1) {
@@ -80,7 +84,7 @@ async function scrape() {
         if (!page.length) break;
         page.map(normalizeRecord).filter(Boolean).forEach(record => records.set(record.id || record.slug, record));
         console.log(`  ✓ получено ${records.size} позиций`);
-        if (page.length < PAGE_SIZE) break;
+        if (page.length < PAGE_SIZE || records.size >= htmlCount) break;
     }
 
     const result = [...records.values()];
@@ -92,7 +96,9 @@ async function scrape() {
         throw new Error('Проверка полей не пройдена: найдены неполные записи');
     }
     result.sort((a, b) => (b.rating - a.rating) || (b.reviews_count - a.reviews_count));
-    fs.writeFileSync(OUTPUT_PATH, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
+    const tempPath = `${OUTPUT_PATH}.tmp`;
+    fs.writeFileSync(tempPath, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
+    fs.renameSync(tempPath, OUTPUT_PATH);
     console.log(`✅ Готово: ${result.length} вкусов записано в ${path.basename(OUTPUT_PATH)}`);
 }
 

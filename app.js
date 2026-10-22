@@ -1,4 +1,4 @@
-// --- БАЗОВЫЕ КАТАЛОГИ (ЧАШИ ДОБАВЛЯЮТСЯ ТОЛЬКО ВРУЧНУЮ) ---
+﻿// --- БАЗОВЫЕ КАТАЛОГИ (ЧАШИ ДОБАВЛЯЮТСЯ ТОЛЬКО ВРУЧНУЮ) ---
 const DEFAULT_BOWLS = [];
 
 const LEGACY_PRESET_BOWLS = [
@@ -51,6 +51,7 @@ let activeCoalsUsed = 3;
 let alarmAlreadyPlayed = false;
 let smokeReminder60Sent = false;
 let smokeReminder90Sent = false;
+let flavorCatalog = [];
 
 let audioCtx = null;
 let silentAudioUrl = null;
@@ -2304,6 +2305,62 @@ function formatDurationHM(totalSeconds) {
     return `${hours} ч ${mins} м`;
 }
 
+async function initFlavorPicker() {
+    const card = document.getElementById('flavor-picker-card');
+    if (!card) return;
+    const brandSelect = document.getElementById('picker-brand');
+    const categorySelect = document.getElementById('picker-category');
+    const result = document.getElementById('flavor-picker-result');
+    const count = document.getElementById('flavor-picker-count');
+    const button = document.getElementById('pick-flavor-btn');
+    try {
+        const response = await fetch('flavors.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        flavorCatalog = Array.isArray(data) ? data.filter(item => item && item.name && item.brand) : [];
+        if (!flavorCatalog.length) throw new Error('empty catalog');
+        [...new Set(flavorCatalog.map(item => item.brand))].sort((a, b) => a.localeCompare(b, 'ru')).forEach(brand => brandSelect.add(new Option(brand, brand)));
+        [...new Set(flavorCatalog.flatMap(item => item.taste_groups || item.tastes || []).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'ru')).forEach(category => categorySelect.add(new Option(category, category)));
+        count.textContent = `${flavorCatalog.length} позиций`;
+        button.addEventListener('click', pickRandomFlavor);
+        brandSelect.addEventListener('change', updatePickerCount);
+        categorySelect.addEventListener('change', updatePickerCount);
+    } catch (error) {
+        count.textContent = 'Каталог недоступен';
+        button.disabled = true;
+        result.textContent = 'Не удалось загрузить flavors.json. Откройте проект через локальный HTTP-сервер.';
+    }
+}
+
+function getPickerItems() {
+    const brand = document.getElementById('picker-brand')?.value || 'all';
+    const category = document.getElementById('picker-category')?.value || 'all';
+    return flavorCatalog.filter(item => {
+        const categories = item.taste_groups || item.tastes || [];
+        return (brand === 'all' || item.brand === brand) && (category === 'all' || categories.includes(category));
+    });
+}
+
+function updatePickerCount() {
+    const count = document.getElementById('flavor-picker-count');
+    if (count) count.textContent = `${getPickerItems().length} позиций`;
+}
+
+function pickRandomFlavor() {
+    const items = getPickerItems();
+    const result = document.getElementById('flavor-picker-result');
+    if (!result) return;
+    if (!items.length) { result.textContent = 'По этим фильтрам ничего не найдено. Измените профиль.'; return; }
+    const index = window.crypto?.getRandomValues ? window.crypto.getRandomValues(new Uint32Array(1))[0] % items.length : Math.floor(Math.random() * items.length);
+    const item = items[index];
+    result.replaceChildren();
+    const icon = document.createElement('span'); icon.className = 'picker-result-icon'; icon.textContent = '✦';
+    const content = document.createElement('div');
+    const title = document.createElement('strong'); title.textContent = item.name;
+    const meta = document.createElement('p'); meta.textContent = [item.brand, item.line, Number.isFinite(Number(item.rating)) ? `★ ${item.rating}` : ''].filter(Boolean).join(' · ');
+    const details = document.createElement('small'); details.textContent = (item.tastes || []).join(', ') || item.alt_name || 'Профиль вкуса не указан';
+    content.append(title, meta, details); result.append(icon, content);
+}
 function syncActiveTimerOnWake() {
     const isWarmup = !document.getElementById('warmup-controls').classList.contains('hidden');
     const isSmoking = !document.getElementById('smoking-controls').classList.contains('hidden');
@@ -2319,6 +2376,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initLiquidBackgroundCanvas();
     initCatalogs();
     restoreActiveSessionIfAny();
+    initFlavorPicker();
 
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {

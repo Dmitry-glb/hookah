@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 
 <head>
@@ -19,6 +19,7 @@
 </head>
 
 <body>
+
     <!-- Живой анимированный фон на JS Canvas для эффекта преломления Liquid Glass -->
     <canvas id="liquid-bg-canvas" aria-hidden="true"></canvas>
 
@@ -410,6 +411,19 @@
 
             <div id="history-list"></div>
         </section>
+        <section class="card flavor-picker-card" id="flavor-picker-card">
+            <div class="card-header-line">
+                <div><h2>Случайный подборщик вкуса</h2><p class="card-hint">Подборка из локального каталога HTReviews.</p></div>
+                <span class="catalog-count" id="flavor-picker-count">Загрузка…</span>
+            </div>
+            <div class="picker-filters">
+                <label class="picker-field">Бренд<select id="picker-brand" class="control-h"><option value="all">Все бренды</option></select></label>
+                <label class="picker-field">Профиль<select id="picker-category" class="control-h"><option value="all">Любой вкус</option></select></label>
+            </div>
+            <div class="picker-result" id="flavor-picker-result" aria-live="polite"><span class="picker-result-icon">✦</span><div><strong>Готовы к новой забивке?</strong><p>Нажмите кнопку, чтобы получить случайную позицию.</p></div></div>
+            <button type="button" class="btn btn-primary-lg" id="pick-flavor-btn">Подобрать вкус</button>
+        </section>
+
     </div>
 
     <!-- Модальное окно управления списком брендов табака -->
@@ -591,3 +605,4 @@
 </body>
 
 </html>
+

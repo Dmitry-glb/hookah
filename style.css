@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    DimHookah — Ultra Liquid Glass & JS Canvas Lava Edition (iOS 27 / VisionOS)
    ========================================================================== */
 
@@ -1551,3 +1551,16 @@ textarea:focus {
 .step-next-Trigger:active {
     transform: scale(0.97);
 }
+
+.flavor-picker-card { overflow: hidden; }
+.card-hint { margin-top: 4px; color: var(--text-secondary); font-size: .78em; line-height: 1.35; }
+.catalog-count { flex-shrink: 0; border: 1px solid var(--border); border-radius: var(--radius-pill); color: var(--primary); background: var(--primary-soft); padding: 6px 9px; font-size: .7em; font-weight: 800; }
+.picker-filters { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.picker-field { margin: 0; text-transform: none; letter-spacing: 0; font-size: .75em; }
+.picker-field select { margin-top: 5px; width: 100%; }
+.picker-result { min-height: 78px; display: flex; align-items: center; gap: 12px; padding: 13px; margin-bottom: 10px; border: 1px solid var(--border); border-radius: var(--radius-inner); background: linear-gradient(135deg, var(--primary-soft), var(--surface-row)); }
+.picker-result-icon { flex: 0 0 38px; height: 38px; display: grid; place-items: center; border-radius: 13px; color: #fff; background: var(--primary-gradient); font-size: 1.3em; box-shadow: 0 6px 15px var(--primary-glow); }
+.picker-result strong { display: block; color: var(--text); font-size: 1em; }
+.picker-result p, .picker-result small { display: block; margin-top: 3px; color: var(--text-secondary); font-size: .78em; line-height: 1.3; }
+.picker-result small { color: var(--text-muted); }
+@media (max-width: 390px) { .picker-filters { grid-template-columns: 1fr; } }

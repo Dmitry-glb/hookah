@@ -1,202 +1,7916 @@
 [
   {
-    "brand": "Blackburn",
-    "name": "Space Guava",
-    "category": "Тропики",
+    "id": 194944,
+    "name": "Inferno Night",
+    "flavor": "Inferno Night",
+    "alt_name": "Адская Ночь",
+    "brand": "Jibiar",
+    "line": "Основная",
+    "slug": "jibiar/jibiar-main/inferno-night",
+    "source_url": "https://htreviews.org/tobaccos/jibiar/jibiar-main/inferno-night",
+    "rating": 5,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 2000,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 21,
+        "name": "Черника",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Черника"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 196236,
+    "name": "Hypnotic",
+    "flavor": "Hypnotic",
+    "alt_name": "",
+    "brand": "Jibiar",
+    "line": "Основная",
+    "slug": "jibiar/jibiar-main/hypnotic",
+    "source_url": "https://htreviews.org/tobaccos/jibiar/jibiar-main/hypnotic",
+    "rating": 5,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 1.1,
+    "strength": "Лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 25,
+        "name": "Клубника",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Клубника"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 195830,
+    "name": "Grape Soda",
+    "flavor": "Grape Soda",
+    "alt_name": "Виноградная газировка",
+    "brand": "4:20",
+    "line": "Основная",
+    "slug": "420/main/grape-soda",
+    "source_url": "https://htreviews.org/tobaccos/420/main/grape-soda",
+    "rating": 5,
+    "ratings_count": 2,
+    "reviews_count": 1,
+    "views": 906,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 35,
+        "name": "Газировка",
+        "group": "Холодные напитки",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Газировка"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Холодные напитки"
+    ]
+  },
+  {
+    "id": 80125,
+    "name": "White Grape",
+    "flavor": "White Grape",
+    "alt_name": "",
+    "brand": "Argelini",
+    "line": "Основная",
+    "slug": "argelini/argelini-main/white-grape",
+    "source_url": "https://htreviews.org/tobaccos/argelini/argelini-main/white-grape",
+    "rating": 5,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 389,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 88448,
+    "name": "Isabella Grapes",
+    "flavor": "Isabella Grapes",
+    "alt_name": "Виноград Изабелла",
+    "brand": "Just Smoke",
+    "line": "Основная",
+    "slug": "just-smoke/just-smoke-main/isabella-grapes",
+    "source_url": "https://htreviews.org/tobaccos/just-smoke/just-smoke-main/isabella-grapes",
+    "rating": 5,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 163,
+    "strength": "Средне-крепкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 68407,
+    "name": "Golden Grape",
+    "flavor": "Golden Grape",
+    "alt_name": "Виноград",
+    "brand": "Al Fakher",
+    "line": "Gold",
+    "slug": "al-fakher/gold/golden-grape",
+    "source_url": "https://htreviews.org/tobaccos/al-fakher/gold/golden-grape",
     "rating": 4.7,
-    "reviews_count": 510,
-    "description": "Сочная тропическая гуава с лёгкой терпкостью и сладким послевкусием."
+    "ratings_count": 5,
+    "reviews_count": 5,
+    "views": 1000,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
   },
   {
-    "brand": "Blackburn",
-    "name": "Chupa Graper",
-    "category": "Ягоды",
-    "rating": 4.8,
-    "reviews_count": 640,
-    "description": "Леденцовый чупа-чупс с насыщенным соком тёмного винограда."
-  },
-  {
-    "brand": "Blackburn",
-    "name": "Red Alert",
-    "category": "Ягоды",
-    "rating": 4.8,
-    "reviews_count": 590,
-    "description": "Яркий микс спелой садовой клубники и сладкого арбуза."
-  },
-  {
-    "brand": "Blackburn",
-    "name": "Shock",
-    "category": "Кислые",
+    "id": 68564,
+    "name": "Grape Pan Twist",
+    "flavor": "Grape Pan Twist",
+    "alt_name": "Виноградная смесь",
+    "brand": "Afzal",
+    "line": "Основная",
+    "slug": "afzal/afzal-main/grape-pan-twist",
+    "source_url": "https://htreviews.org/tobaccos/afzal/afzal-main/grape-pan-twist",
     "rating": 4.7,
-    "reviews_count": 870,
-    "description": "Экстремально кислая шипучка для любителей бодрящих забивок."
+    "ratings_count": 4,
+    "reviews_count": 4,
+    "views": 1.2,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 13,
+        "name": "Специи",
+        "group": "Специи",
+        "taste": "Специфический"
+      },
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Специи",
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Специи",
+      "Ягодный"
+    ]
   },
   {
-    "brand": "Bonche",
-    "name": "Dark Chocolate",
-    "category": "Десерты",
-    "rating": 4.9,
-    "reviews_count": 310,
-    "description": "Благородный горький шоколад на плотном сигарном листе."
-  },
-  {
-    "brand": "Chabacco",
-    "name": "Бельгийские вафли",
-    "category": "Десерты",
+    "id": 198884,
+    "name": "PURPUR",
+    "flavor": "PURPUR",
+    "alt_name": "",
+    "brand": "Wave",
+    "line": "Основная",
+    "slug": "wave/main/purpur",
+    "source_url": "https://htreviews.org/tobaccos/wave/main/purpur",
     "rating": 4.7,
-    "reviews_count": 420,
-    "description": "Хрустящие горячие вафли со сливочным маслом и кленовым сиропом."
+    "ratings_count": 3,
+    "reviews_count": 3,
+    "views": 460,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 1,
+        "name": "Слива",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 45,
+        "name": "Цветочный",
+        "group": "Цветочный",
+        "taste": "Специфический"
+      }
+    ],
+    "tastes": [
+      "Слива",
+      "Виноград",
+      "Цветочный"
+    ],
+    "taste_groups": [
+      "Фруктовый",
+      "Ягодный",
+      "Цветочный"
+    ]
   },
   {
-    "brand": "Chabacco",
-    "name": "Помело",
-    "category": "Цитрусы",
-    "rating": 4.8,
-    "reviews_count": 530,
-    "description": "Свежий сочный цитрус с лёгкой благородной горчинкой цедры."
+    "id": 200045,
+    "name": "28. Виноградный чай",
+    "flavor": "28. Виноградный чай",
+    "alt_name": "",
+    "brand": "JOY.",
+    "line": "Основная",
+    "slug": "joy/main/28-vinogradnyy-chay",
+    "source_url": "https://htreviews.org/tobaccos/joy/main/28-vinogradnyy-chay",
+    "rating": 4.5,
+    "ratings_count": 17,
+    "reviews_count": 16,
+    "views": 648,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 28,
+        "name": "Чай",
+        "group": "Горячие напитки",
+        "taste": "Терпкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Чай"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Горячие напитки"
+    ]
   },
   {
-    "brand": "Chabacco",
-    "name": "Северная бузина",
-    "category": "Ягоды",
-    "rating": 4.7,
-    "reviews_count": 340,
-    "description": "Кисло-сладкая таёжная ягода с освежающим травянистым оттенком."
+    "id": 179109,
+    "name": "Grape Rose",
+    "flavor": "Grape Rose",
+    "alt_name": "Белый виноград с розой.",
+    "brand": "Hype",
+    "line": "Основная",
+    "slug": "hype/hype-main/grape-rose",
+    "source_url": "https://htreviews.org/tobaccos/hype/hype-main/grape-rose",
+    "rating": 4.5,
+    "ratings_count": 8,
+    "reviews_count": 8,
+    "views": 784,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 99,
+        "name": "Роза",
+        "group": "Цветочный",
+        "taste": "Специфический"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Роза"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Цветочный"
+    ]
   },
   {
-    "brand": "Darkside",
-    "name": "Baja Blue",
-    "category": "Ягоды",
-    "rating": 4.7,
-    "reviews_count": 540,
-    "description": "Сладкая черника, тёмный виноград и лёгкий освежающий ментол."
+    "id": 68133,
+    "name": "Grape with Berry",
+    "flavor": "Grape with Berry",
+    "alt_name": "Виноград с ягодами",
+    "brand": "Al Fakher",
+    "line": "Основная",
+    "slug": "al-fakher/al-fakher-main/grape-with-berry",
+    "source_url": "https://htreviews.org/tobaccos/al-fakher/al-fakher-main/grape-with-berry",
+    "rating": 4.5,
+    "ratings_count": 6,
+    "reviews_count": 6,
+    "views": 1.3,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 22,
+        "name": "Ягоды",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Ягоды"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
   },
   {
-    "brand": "Darkside",
-    "name": "Lemonblast",
-    "category": "Цитрусы",
-    "rating": 4.8,
-    "reviews_count": 1310,
-    "description": "Эталонный натуральный лимон с яркой сочной кислинкой."
+    "id": 100777,
+    "name": "Isabel",
+    "flavor": "Isabel",
+    "alt_name": "Изабелла",
+    "brand": "Morph",
+    "line": "Morph (линейка Medium)",
+    "slug": "morph/morph-lineika-medium/isabel",
+    "source_url": "https://htreviews.org/tobaccos/morph/morph-lineika-medium/isabel",
+    "rating": 4.5,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 105,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
   },
   {
-    "brand": "Darkside",
-    "name": "Red Alert",
-    "category": "Фрукты",
-    "rating": 4.7,
-    "reviews_count": 920,
-    "description": "Освежающий сладкий арбуз с ягодными нотами."
+    "id": 198810,
+    "name": "Виноград",
+    "flavor": "Виноград",
+    "alt_name": "",
+    "brand": "Nаш",
+    "line": "Cigar Product",
+    "slug": "nash/cigar-product/vinograd",
+    "source_url": "https://htreviews.org/tobaccos/nash/cigar-product/vinograd",
+    "rating": 4.4,
+    "ratings_count": 13,
+    "reviews_count": 12,
+    "views": 1.5,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
   },
   {
-    "brand": "Darkside",
-    "name": "Supernova",
-    "category": "Холодок",
-    "rating": 4.9,
-    "reviews_count": 1850,
-    "description": "Легендарный мощный кулер без постороннего привкуса для любого микса."
+    "id": 198828,
+    "name": "Fake Berry",
+    "flavor": "Fake Berry",
+    "alt_name": "Розовый виноград",
+    "brand": "Hell",
+    "line": "Основная",
+    "slug": "hell/main/fake-berry",
+    "source_url": "https://htreviews.org/tobaccos/hell/main/fake-berry",
+    "rating": 4.4,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 187,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
   },
   {
-    "brand": "Deus",
-    "name": "Punky Island",
-    "category": "Тропики",
-    "rating": 4.8,
-    "reviews_count": 610,
-    "description": "Взрывное трио спелой маракуйи, гуавы и медового манго."
+    "id": 199078,
+    "name": "Ландыш виноград",
+    "flavor": "Ландыш виноград",
+    "alt_name": "Lily grape",
+    "brand": "Spectrum",
+    "line": "Medium Line",
+    "slug": "spectrum/medium-line/landysh-vinograd",
+    "source_url": "https://htreviews.org/tobaccos/spectrum/medium-line/landysh-vinograd",
+    "rating": 4.3,
+    "ratings_count": 33,
+    "reviews_count": 32,
+    "views": 2.5,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 45,
+        "name": "Цветочный",
+        "group": "Цветочный",
+        "taste": "Специфический"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Цветочный"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Цветочный"
+    ]
   },
   {
+    "id": 199493,
+    "name": "Виноградно-тропический шейк",
+    "flavor": "Виноградно-тропический шейк",
+    "alt_name": "",
+    "brand": "JOY.",
+    "line": "Основная",
+    "slug": "joy/main/vinogradno-tropicheskiy-sheyk",
+    "source_url": "https://htreviews.org/tobaccos/joy/main/vinogradno-tropicheskiy-sheyk",
+    "rating": 4.3,
+    "ratings_count": 20,
+    "reviews_count": 20,
+    "views": 614,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 5,
+        "name": "Фрукты",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Фрукты",
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Фруктовый",
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 123177,
+    "name": "Evening mix",
+    "flavor": "Evening mix",
+    "alt_name": "Вечерний микс",
+    "brand": "Табак Шпаковского",
+    "line": "Основная",
+    "slug": "tabak-shpakovskogo/tabak-shpakovskogo-main/evening-mix",
+    "source_url": "https://htreviews.org/tobaccos/tabak-shpakovskogo/tabak-shpakovskogo-main/evening-mix",
+    "rating": 4.3,
+    "ratings_count": 11,
+    "reviews_count": 10,
+    "views": 687,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 106,
+        "name": "Джин",
+        "group": "Алкогольный",
+        "taste": "Горький"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Джин"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Алкогольный"
+    ]
+  },
+  {
+    "id": 110039,
+    "name": "E8 x Hookahmarket",
+    "flavor": "E8 x Hookahmarket",
+    "alt_name": "Зеленый чай с виноградом",
+    "brand": "Duft",
+    "line": "Duft Checkmate",
+    "slug": "duft/duft-checkmate/e8-x-hookahmarket",
+    "source_url": "https://htreviews.org/tobaccos/duft/duft-checkmate/e8-x-hookahmarket",
+    "rating": 4.3,
+    "ratings_count": 5,
+    "reviews_count": 5,
+    "views": 781,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 134,
+        "name": "Зеленый чай",
+        "group": "Горячие напитки",
+        "taste": "Терпкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Зеленый чай"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Горячие напитки"
+    ]
+  },
+  {
+    "id": 199566,
+    "name": "Виноград",
+    "flavor": "Виноград",
+    "alt_name": "",
+    "brand": "ON CHILL",
+    "line": "Основная",
+    "slug": "on-chill/main/vinograd",
+    "source_url": "https://htreviews.org/tobaccos/on-chill/main/vinograd",
+    "rating": 4.3,
+    "ratings_count": 4,
+    "reviews_count": 4,
+    "views": 144,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 199657,
+    "name": "Виноград",
+    "flavor": "Виноград",
+    "alt_name": "",
+    "brand": "Blur Mos",
+    "line": "Основная",
+    "slug": "blur-mos/main/vinograd",
+    "source_url": "https://htreviews.org/tobaccos/blur-mos/main/vinograd",
+    "rating": 4.3,
+    "ratings_count": 3,
+    "reviews_count": 3,
+    "views": 147,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 195045,
+    "name": "Виноградный микс",
+    "flavor": "Виноградный микс",
+    "alt_name": "",
+    "brand": "Ronin",
+    "line": "Основная",
+    "slug": "ronin/ronin-main/vinogradnyi-miks",
+    "source_url": "https://htreviews.org/tobaccos/ronin/ronin-main/vinogradnyi-miks",
+    "rating": 4.3,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 483,
+    "strength": "Лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 196797,
+    "name": "Grape Mint",
+    "flavor": "Grape Mint",
+    "alt_name": "",
+    "brand": "Jibiar",
+    "line": "Основная",
+    "slug": "jibiar/jibiar-main/grape-mint",
+    "source_url": "https://htreviews.org/tobaccos/jibiar/jibiar-main/grape-mint",
+    "rating": 4.3,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 359,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 199388,
+    "name": "Виноград",
+    "flavor": "Виноград",
+    "alt_name": "",
+    "brand": "Snobless",
+    "line": "Prime Line",
+    "slug": "snobless/prime-line/vinograd",
+    "source_url": "https://htreviews.org/tobaccos/snobless/prime-line/vinograd",
+    "rating": 4.3,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 324,
+    "strength": "Лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 122809,
+    "name": "Виноград",
+    "flavor": "Виноград",
+    "alt_name": "",
+    "brand": "Inferno",
+    "line": "Inferno Hard",
+    "slug": "inferno/inferno-hard/vinograd",
+    "source_url": "https://htreviews.org/tobaccos/inferno/inferno-hard/vinograd",
+    "rating": 4.3,
+    "ratings_count": 2,
+    "reviews_count": 1,
+    "views": 235,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 199065,
+    "name": "Смородина, апельсин и виноград",
+    "flavor": "Смородина, апельсин и виноград",
+    "alt_name": "",
+    "brand": "MUSTHAVE",
+    "line": "Основная",
+    "slug": "musthave/main/smorodina-apelsin-i-vinograd",
+    "source_url": "https://htreviews.org/tobaccos/musthave/main/smorodina-apelsin-i-vinograd",
+    "rating": 4.2,
+    "ratings_count": 101,
+    "reviews_count": 94,
+    "views": 9.1,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 18,
+        "name": "Апельсин",
+        "group": "Цитрусовый",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 69,
+        "name": "Черная смородина",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Апельсин",
+      "Черная смородина"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Цитрусовый"
+    ]
+  },
+  {
+    "id": 196834,
+    "name": "Crystal Grape",
+    "flavor": "Crystal Grape",
+    "alt_name": "Кристал Грейп",
+    "brand": "DARKSIDE",
+    "line": "Core",
+    "slug": "darkside/core/crystal-grape",
+    "source_url": "https://htreviews.org/tobaccos/darkside/core/crystal-grape",
+    "rating": 4.2,
+    "ratings_count": 52,
+    "reviews_count": 45,
+    "views": 11.7,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 85635,
+    "name": "Grape Fizz",
+    "flavor": "Grape Fizz",
+    "alt_name": "Виноград",
+    "brand": "Duft",
+    "line": "Duft Solo",
+    "slug": "duft/duft-solo/grape-fizz",
+    "source_url": "https://htreviews.org/tobaccos/duft/duft-solo/grape-fizz",
+    "rating": 4.2,
+    "ratings_count": 51,
+    "reviews_count": 45,
+    "views": 4.3,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 196594,
+    "name": "Манго шардоне",
+    "flavor": "Манго шардоне",
+    "alt_name": "",
+    "brand": "Rustpunk",
+    "line": "Основная",
+    "slug": "rustpunk/main/mango-shardone",
+    "source_url": "https://htreviews.org/tobaccos/rustpunk/main/mango-shardone",
+    "rating": 4.2,
+    "ratings_count": 19,
+    "reviews_count": 19,
+    "views": 1.4,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 7,
+        "name": "Манго",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Манго",
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Фруктовый",
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 196744,
+    "name": "Isabella Brew",
+    "flavor": "Isabella Brew",
+    "alt_name": "Виноград Изабелла",
+    "brand": "Mr. Brew",
+    "line": "Основная",
+    "slug": "mr-brew/main/isabella-brew",
+    "source_url": "https://htreviews.org/tobaccos/mr-brew/main/isabella-brew",
+    "rating": 4.2,
+    "ratings_count": 15,
+    "reviews_count": 15,
+    "views": 1.1,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 185751,
+    "name": "Grapes",
+    "flavor": "Grapes",
+    "alt_name": "Виноград",
+    "brand": "Khan Burley",
+    "line": "Основная",
+    "slug": "khan-burley/khan-burley-main/grapes",
+    "source_url": "https://htreviews.org/tobaccos/khan-burley/khan-burley-main/grapes",
+    "rating": 4.2,
+    "ratings_count": 14,
+    "reviews_count": 13,
+    "views": 1.2,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 190887,
+    "name": "Passion Valley",
+    "flavor": "Passion Valley",
+    "alt_name": "",
     "brand": "Element",
-    "name": "Water (Вода)",
-    "category": "Напитки",
-    "rating": 4.6,
-    "reviews_count": 480,
-    "description": "Освежающий зеленый лимонад с сочной мякотью кактуса."
+    "line": "V Element",
+    "slug": "element/v-element/passion-valley",
+    "source_url": "https://htreviews.org/tobaccos/element/v-element/passion-valley",
+    "rating": 4.2,
+    "ratings_count": 8,
+    "reviews_count": 8,
+    "views": 1.2,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 8,
+        "name": "Маракуйя",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 69,
+        "name": "Черная смородина",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 74,
+        "name": "Огурец",
+        "group": "Овощной",
+        "taste": "Терпкий"
+      }
+    ],
+    "tastes": [
+      "Маракуйя",
+      "Виноград",
+      "Черная смородина",
+      "Огурец"
+    ],
+    "taste_groups": [
+      "Фруктовый",
+      "Ягодный",
+      "Овощной"
+    ]
   },
   {
+    "id": 189139,
+    "name": "Jungle Juice",
+    "flavor": "Jungle Juice",
+    "alt_name": "",
     "brand": "Element",
-    "name": "Earth (Земля)",
-    "category": "Фрукты",
-    "rating": 4.7,
-    "reviews_count": 390,
-    "description": "Терпкий натуральный гранатовый сок с лёгкой кислинкой."
+    "line": "V Element",
+    "slug": "element/v-element/jungle-juice",
+    "source_url": "https://htreviews.org/tobaccos/element/v-element/jungle-juice",
+    "rating": 4.2,
+    "ratings_count": 4,
+    "reviews_count": 4,
+    "views": 1.4,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 2,
+        "name": "Ананас",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 7,
+        "name": "Манго",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 51,
+        "name": "Гранат",
+        "group": "Фруктовый",
+        "taste": "Терпкий"
+      }
+    ],
+    "tastes": [
+      "Ананас",
+      "Манго",
+      "Виноград",
+      "Гранат"
+    ],
+    "taste_groups": [
+      "Фруктовый",
+      "Ягодный"
+    ]
   },
   {
-    "brand": "Element",
-    "name": "Фейхоа",
-    "category": "Фрукты",
-    "rating": 4.7,
-    "reviews_count": 760,
-    "description": "Ароматная садовая фейхоа с землянично-травянистым профилем."
+    "id": 195031,
+    "name": "Spiced Grapes",
+    "flavor": "Spiced Grapes",
+    "alt_name": "Пряный виноград",
+    "brand": "Urban Soul",
+    "line": "Основная",
+    "slug": "urban-soul/urban-soul-main/spiced-grapes",
+    "source_url": "https://htreviews.org/tobaccos/urban-soul/urban-soul-main/spiced-grapes",
+    "rating": 4.2,
+    "ratings_count": 5,
+    "reviews_count": 4,
+    "views": 500,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 13,
+        "name": "Специи",
+        "group": "Специи",
+        "taste": "Специфический"
+      },
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 138,
+        "name": "Лаванда",
+        "group": "Цветочный",
+        "taste": "Специфический"
+      }
+    ],
+    "tastes": [
+      "Специи",
+      "Виноград",
+      "Лаванда"
+    ],
+    "taste_groups": [
+      "Специи",
+      "Ягодный",
+      "Цветочный"
+    ]
   },
   {
-    "brand": "Musthave",
-    "name": "Apple Drops",
-    "category": "Фрукты",
-    "rating": 4.8,
-    "reviews_count": 620,
-    "description": "Кисло-сладкие леденцы с насыщенным соком зелёного яблока."
+    "id": 196210,
+    "name": "Cleopatra",
+    "flavor": "Cleopatra",
+    "alt_name": "",
+    "brand": "Jibiar",
+    "line": "Основная",
+    "slug": "jibiar/jibiar-main/cleopatra",
+    "source_url": "https://htreviews.org/tobaccos/jibiar/jibiar-main/cleopatra",
+    "rating": 4.2,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 1.1,
+    "strength": "Лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 21,
+        "name": "Черника",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Черника"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
   },
   {
-    "brand": "Musthave",
-    "name": "Pineapple Rings",
-    "category": "Тропики",
-    "rating": 4.8,
-    "reviews_count": 980,
-    "description": "Сладкие кольца консервированного ананаса в сиропе."
+    "id": 172200,
+    "name": "Araram",
+    "flavor": "Araram",
+    "alt_name": "Арарам",
+    "brand": "MUSTHAVE",
+    "line": "Основная",
+    "slug": "musthave/main/araram",
+    "source_url": "https://htreviews.org/tobaccos/musthave/main/araram",
+    "rating": 4.1,
+    "ratings_count": 127,
+    "reviews_count": 110,
+    "views": 16.4,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 47,
+        "name": "Арбуз",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 91,
+        "name": "Чернослив",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Арбуз",
+      "Чернослив"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Фруктовый"
+    ]
   },
   {
-    "brand": "Musthave",
-    "name": "Pinkman",
-    "category": "Ягоды",
-    "rating": 4.9,
-    "reviews_count": 1450,
-    "description": "Бестселлер: розовый грейпфрут с клубничным сиропом и спелой малиной."
+    "id": 188356,
+    "name": "Grape Me",
+    "flavor": "Grape Me",
+    "alt_name": "Грейп Ми",
+    "brand": "Smoke Angels",
+    "line": "Первая линейка (до 2024 года)",
+    "slug": "smoke-angels/pervaya-lineyka-do-2024-goda/grape-me",
+    "source_url": "https://htreviews.org/tobaccos/smoke-angels/pervaya-lineyka-do-2024-goda/grape-me",
+    "rating": 4.1,
+    "ratings_count": 61,
+    "reviews_count": 55,
+    "views": 2.7,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
   },
   {
-    "brand": "Musthave",
-    "name": "Rocketman",
-    "category": "Напитки",
-    "rating": 4.7,
-    "reviews_count": 890,
-    "description": "Освежающая клубничная содовая с долькой грейпфрута и киви."
+    "id": 180895,
+    "name": "Wind Of Change",
+    "flavor": "Wind Of Change",
+    "alt_name": "Ветер перемен",
+    "brand": "Muassel",
+    "line": "Medium",
+    "slug": "muassel/medium/wind-of-change",
+    "source_url": "https://htreviews.org/tobaccos/muassel/medium/wind-of-change",
+    "rating": 4.1,
+    "ratings_count": 27,
+    "reviews_count": 26,
+    "views": 18.1,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 47,
+        "name": "Арбуз",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Арбуз"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Фруктовый"
+    ]
   },
   {
-    "brand": "Overdose",
-    "name": "Pineapple",
-    "category": "Тропики",
-    "rating": 4.9,
-    "reviews_count": 410,
-    "description": "Сверхъяркий натуральный ананас с высокой крепостью."
+    "id": 196621,
+    "name": "Grape Bonbon",
+    "flavor": "Grape Bonbon",
+    "alt_name": "Виноградный леденец",
+    "brand": "Muassel",
+    "line": "Strong",
+    "slug": "muassel/strong/grape-bonbon",
+    "source_url": "https://htreviews.org/tobaccos/muassel/strong/grape-bonbon",
+    "rating": 4.1,
+    "ratings_count": 13,
+    "reviews_count": 12,
+    "views": 2.2,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 67,
+        "name": "Конфетный",
+        "group": "Десертный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 68,
+        "name": "Леденцы",
+        "group": "Десертный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Конфетный",
+      "Леденцы"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Десертный"
+    ]
   },
   {
-    "brand": "Sebero",
-    "name": "Ice Pear",
-    "category": "Фрукты",
-    "rating": 4.6,
-    "reviews_count": 290,
-    "description": "Сладкая дюшесная груша с мягким сливочным холодком."
-  },
-  {
-    "brand": "Sebero",
-    "name": "Черника",
-    "category": "Ягоды",
-    "rating": 4.8,
-    "reviews_count": 510,
-    "description": "Натуральная лесная черника с мягкой бархатистой сладостью."
-  },
-  {
-    "brand": "Наш",
-    "name": "Малина",
-    "category": "Ягоды",
-    "rating": 4.7,
-    "reviews_count": 520,
-    "description": "Насыщенная садовая малина на немытом табачном листе."
-  },
-  {
+    "id": 196479,
+    "name": "Манговый сплит",
+    "flavor": "Манговый сплит",
+    "alt_name": "",
     "brand": "Северный",
-    "name": "Брусничный Морс",
-    "category": "Ягоды",
-    "rating": 4.6,
-    "reviews_count": 490,
-    "description": "Домашний таёжный брусничный морс с благородной кислинкой."
+    "line": "Основная",
+    "slug": "severnyy/main/mangovyy-split",
+    "source_url": "https://htreviews.org/tobaccos/severnyy/main/mangovyy-split",
+    "rating": 4.1,
+    "ratings_count": 12,
+    "reviews_count": 11,
+    "views": 3.2,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 7,
+        "name": "Манго",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Манго",
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Фруктовый",
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 196641,
+    "name": "Unity",
+    "flavor": "Unity",
+    "alt_name": "Юнити",
+    "brand": "DARKSIDE",
+    "line": "Core",
+    "slug": "darkside/core/unity",
+    "source_url": "https://htreviews.org/tobaccos/darkside/core/unity",
+    "rating": 4.1,
+    "ratings_count": 6,
+    "reviews_count": 6,
+    "views": 10.7,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 2,
+        "name": "Ананас",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 25,
+        "name": "Клубника",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 43,
+        "name": "Персик",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 69,
+        "name": "Черная смородина",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Ананас",
+      "Виноград",
+      "Клубника",
+      "Персик",
+      "Черная смородина"
+    ],
+    "taste_groups": [
+      "Фруктовый",
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 196692,
+    "name": "Виноград-смородина-мята",
+    "flavor": "Виноград-смородина-мята",
+    "alt_name": "",
+    "brand": "Veter",
+    "line": "Основная",
+    "slug": "veter/veter-main/vinograd-smorodina-myata",
+    "source_url": "https://htreviews.org/tobaccos/veter/veter-main/vinograd-smorodina-myata",
+    "rating": 4.1,
+    "ratings_count": 3,
+    "reviews_count": 3,
+    "views": 441,
+    "strength": "Лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      },
+      {
+        "id": 69,
+        "name": "Черная смородина",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята",
+      "Черная смородина"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 121075,
+    "name": "Chupa Graper",
+    "flavor": "Chupa Graper",
+    "alt_name": "Чупа-виноград",
+    "brand": "Black Burn",
+    "line": "Основная",
+    "slug": "black-burn/black-burn-main/chupa-graper",
+    "source_url": "https://htreviews.org/tobaccos/black-burn/black-burn-main/chupa-graper",
+    "rating": 4,
+    "ratings_count": 260,
+    "reviews_count": 241,
+    "views": 20.8,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 68,
+        "name": "Леденцы",
+        "group": "Десертный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Леденцы"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Десертный"
+    ]
+  },
+  {
+    "id": 197213,
+    "name": "Garnet Grape",
+    "flavor": "Garnet Grape",
+    "alt_name": "",
+    "brand": "MUSTHAVE",
+    "line": "Основная",
+    "slug": "musthave/main/garnet-grape",
+    "source_url": "https://htreviews.org/tobaccos/musthave/main/garnet-grape",
+    "rating": 4,
+    "ratings_count": 64,
+    "reviews_count": 59,
+    "views": 7.7,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 51,
+        "name": "Гранат",
+        "group": "Фруктовый",
+        "taste": "Терпкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Гранат"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Фруктовый"
+    ]
+  },
+  {
+    "id": 196385,
+    "name": "Berry Vs",
+    "flavor": "Berry Vs",
+    "alt_name": "Виноград, малина и смородина",
+    "brand": "DARKSIDE",
+    "line": "Xperience",
+    "slug": "darkside/xperience/berry-vs",
+    "source_url": "https://htreviews.org/tobaccos/darkside/xperience/berry-vs",
+    "rating": 4,
+    "ratings_count": 44,
+    "reviews_count": 40,
+    "views": 9.8,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 56,
+        "name": "Малина",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 69,
+        "name": "Черная смородина",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Малина",
+      "Черная смородина"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 198401,
+    "name": "Grape Lemonade",
+    "flavor": "Grape Lemonade",
+    "alt_name": "Виноградный лимонад",
+    "brand": "Banger",
+    "line": "Основная",
+    "slug": "banger/banger-main/grape-lemonade",
+    "source_url": "https://htreviews.org/tobaccos/banger/banger-main/grape-lemonade",
+    "rating": 4,
+    "ratings_count": 18,
+    "reviews_count": 18,
+    "views": 1.5,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 73,
+        "name": "Лимонад",
+        "group": "Холодные напитки",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Лимонад"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Холодные напитки"
+    ]
+  },
+  {
+    "id": 68871,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "Виноград",
+    "brand": "Nakhla",
+    "line": "Основная",
+    "slug": "nakhla/nakhla-main/grape",
+    "source_url": "https://htreviews.org/tobaccos/nakhla/nakhla-main/grape",
+    "rating": 4,
+    "ratings_count": 15,
+    "reviews_count": 14,
+    "views": 893,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 198479,
+    "name": "Виноградный сорбет",
+    "flavor": "Виноградный сорбет",
+    "alt_name": "",
+    "brand": "Северный",
+    "line": "Sorbet",
+    "slug": "severnyy/sorbet/vinogradnyy-sorbet",
+    "source_url": "https://htreviews.org/tobaccos/severnyy/sorbet/vinogradnyy-sorbet",
+    "rating": 4,
+    "ratings_count": 13,
+    "reviews_count": 13,
+    "views": 1.7,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 96,
+        "name": "Мороженое",
+        "group": "Десертный",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мороженое"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Десертный"
+    ]
+  },
+  {
+    "id": 199772,
+    "name": "Черный мультифрукт",
+    "flavor": "Черный мультифрукт",
+    "alt_name": "",
+    "brand": "Matchline",
+    "line": "Основная",
+    "slug": "matchline/main/chernyy-multifrukt",
+    "source_url": "https://htreviews.org/tobaccos/matchline/main/chernyy-multifrukt",
+    "rating": 4,
+    "ratings_count": 12,
+    "reviews_count": 12,
+    "views": 655,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 5,
+        "name": "Фрукты",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Фрукты",
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Фруктовый",
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 161970,
+    "name": "Green grape",
+    "flavor": "Green grape",
+    "alt_name": "Виноград",
+    "brand": "Manual",
+    "line": "Основная",
+    "slug": "manual/manual-main/green-grape",
+    "source_url": "https://htreviews.org/tobaccos/manual/manual-main/green-grape",
+    "rating": 4,
+    "ratings_count": 10,
+    "reviews_count": 10,
+    "views": 995,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 198005,
+    "name": "Grape Soju",
+    "flavor": "Grape Soju",
+    "alt_name": "Виноградный соджу",
+    "brand": "Badge",
+    "line": "Основная",
+    "slug": "badge/main/grape-soju",
+    "source_url": "https://htreviews.org/tobaccos/badge/main/grape-soju",
+    "rating": 4,
+    "ratings_count": 10,
+    "reviews_count": 10,
+    "views": 982,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 78,
+        "name": "Водка",
+        "group": "Алкогольный",
+        "taste": "Горький"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Водка"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Алкогольный"
+    ]
+  },
+  {
+    "id": 196782,
+    "name": "Riesling",
+    "flavor": "Riesling",
+    "alt_name": "Австрийский виноград",
+    "brand": "Душа",
+    "line": "Mono",
+    "slug": "dusha/mono/riesling",
+    "source_url": "https://htreviews.org/tobaccos/dusha/mono/riesling",
+    "rating": 4,
+    "ratings_count": 8,
+    "reviews_count": 8,
+    "views": 1.1,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 121991,
+    "name": "Funky grape",
+    "flavor": "Funky grape",
+    "alt_name": "Сочный красный виноград",
+    "brand": "Hype",
+    "line": "Основная",
+    "slug": "hype/hype-main/funky-grape",
+    "source_url": "https://htreviews.org/tobaccos/hype/hype-main/funky-grape",
+    "rating": 4,
+    "ratings_count": 8,
+    "reviews_count": 8,
+    "views": 324,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 199714,
+    "name": "Виноградная газировка",
+    "flavor": "Виноградная газировка",
+    "alt_name": "",
+    "brand": "Spectrum",
+    "line": "Medium Line",
+    "slug": "spectrum/medium-line/vinogradnaya-gazirovka",
+    "source_url": "https://htreviews.org/tobaccos/spectrum/medium-line/vinogradnaya-gazirovka",
+    "rating": 4,
+    "ratings_count": 6,
+    "reviews_count": 6,
+    "views": 465,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 35,
+        "name": "Газировка",
+        "group": "Холодные напитки",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Газировка"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Холодные напитки"
+    ]
+  },
+  {
+    "id": 86744,
+    "name": "Grape Rape",
+    "flavor": "Grape Rape",
+    "alt_name": "Виноград",
+    "brand": "Hypreme",
+    "line": "Основная",
+    "slug": "hypreme/main/grape-rape",
+    "source_url": "https://htreviews.org/tobaccos/hypreme/main/grape-rape",
+    "rating": 4,
+    "ratings_count": 2,
+    "reviews_count": 2,
+    "views": 546,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 68059,
+    "name": "Grape with cream",
+    "flavor": "Grape with cream",
+    "alt_name": "Виноград со сливками",
+    "brand": "Al Fakher",
+    "line": "Основная",
+    "slug": "al-fakher/al-fakher-main/grape-with-cream",
+    "source_url": "https://htreviews.org/tobaccos/al-fakher/al-fakher-main/grape-with-cream",
+    "rating": 4,
+    "ratings_count": 2,
+    "reviews_count": 2,
+    "views": 323,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 17,
+        "name": "Сливочный",
+        "group": "Сливочный",
+        "taste": "Нейтральный"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Сливочный"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Сливочный"
+    ]
+  },
+  {
+    "id": 71918,
+    "name": "Baja Blue",
+    "flavor": "Baja Blue",
+    "alt_name": "",
+    "brand": "Social Smoke",
+    "line": "Основная",
+    "slug": "social-smoke/social-smoke-main/baja-blue",
+    "source_url": "https://htreviews.org/tobaccos/social-smoke/social-smoke-main/baja-blue",
+    "rating": 4,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 394,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 16,
+        "name": "Шоколад",
+        "group": "Десертный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 21,
+        "name": "Черника",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 56,
+        "name": "Малина",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Шоколад",
+      "Черника",
+      "Малина"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Десертный"
+    ]
+  },
+  {
+    "id": 70021,
+    "name": "Grapes & Cream",
+    "flavor": "Grapes & Cream",
+    "alt_name": "",
+    "brand": "Layalina",
+    "line": "Golden Layalina",
+    "slug": "layalina/golden-layalina/grapes-amp-cream",
+    "source_url": "https://htreviews.org/tobaccos/layalina/golden-layalina/grapes-amp-cream",
+    "rating": 4,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 280,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 17,
+        "name": "Сливочный",
+        "group": "Сливочный",
+        "taste": "Нейтральный"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Сливочный"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Сливочный"
+    ]
+  },
+  {
+    "id": 197445,
+    "name": "Grape Mass",
+    "flavor": "Grape Mass",
+    "alt_name": "",
+    "brand": "Prime",
+    "line": "Основная",
+    "slug": "prime/prime-main/grape-mass",
+    "source_url": "https://htreviews.org/tobaccos/prime/prime-main/grape-mass",
+    "rating": 4,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 152,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 180909,
+    "name": "Grape Bonbon",
+    "flavor": "Grape Bonbon",
+    "alt_name": "Виноградный леденец",
+    "brand": "Muassel",
+    "line": "Medium",
+    "slug": "muassel/medium/grape-bonbon",
+    "source_url": "https://htreviews.org/tobaccos/muassel/medium/grape-bonbon",
+    "rating": 3.9,
+    "ratings_count": 18,
+    "reviews_count": 17,
+    "views": 3.1,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      },
+      {
+        "id": 27,
+        "name": "Лимон",
+        "group": "Цитрусовый",
+        "taste": "Кислый"
+      },
+      {
+        "id": 68,
+        "name": "Леденцы",
+        "group": "Десертный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята",
+      "Лимон",
+      "Леденцы"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий",
+      "Цитрусовый",
+      "Десертный"
+    ]
+  },
+  {
+    "id": 196422,
+    "name": "Виноградный соджу",
+    "flavor": "Виноградный соджу",
+    "alt_name": "",
+    "brand": "Wave",
+    "line": "Основная",
+    "slug": "wave/main/vinogradnyy-sodzhu",
+    "source_url": "https://htreviews.org/tobaccos/wave/main/vinogradnyy-sodzhu",
+    "rating": 3.9,
+    "ratings_count": 8,
+    "reviews_count": 8,
+    "views": 1.7,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 195750,
+    "name": "Виноград",
+    "flavor": "Виноград",
+    "alt_name": "",
+    "brand": "Brusko",
+    "line": "Brusko Hookah (табак)",
+    "slug": "brusko/brusko-hookah-tabak/vinograd",
+    "source_url": "https://htreviews.org/tobaccos/brusko/brusko-hookah-tabak/vinograd",
+    "rating": 3.9,
+    "ratings_count": 6,
+    "reviews_count": 6,
+    "views": 936,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 82274,
+    "name": "Grape Soda",
+    "flavor": "Grape Soda",
+    "alt_name": "Виноградная содовая",
+    "brand": "Fusion",
+    "line": "Fusion Classic",
+    "slug": "fusion/fusion-classic/grape-soda",
+    "source_url": "https://htreviews.org/tobaccos/fusion/fusion-classic/grape-soda",
+    "rating": 3.9,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 235,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 35,
+        "name": "Газировка",
+        "group": "Холодные напитки",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Газировка"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Холодные напитки"
+    ]
+  },
+  {
+    "id": 80259,
+    "name": "Grapes Mint",
+    "flavor": "Grapes Mint",
+    "alt_name": "",
+    "brand": "Gin",
+    "line": "Основная",
+    "slug": "gin/gin-main/grapes-mint",
+    "source_url": "https://htreviews.org/tobaccos/gin/gin-main/grapes-mint",
+    "rating": 3.9,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 105,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 196386,
+    "name": "Grape & Furious",
+    "flavor": "Grape & Furious",
+    "alt_name": "Виноград и базилик",
+    "brand": "DARKSIDE",
+    "line": "Xperience",
+    "slug": "darkside/xperience/grape-furious",
+    "source_url": "https://htreviews.org/tobaccos/darkside/xperience/grape-furious",
+    "rating": 3.8,
+    "ratings_count": 42,
+    "reviews_count": 35,
+    "views": 7.5,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 75,
+        "name": "Базилик",
+        "group": "Травяной",
+        "taste": "Терпкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Базилик"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Травяной"
+    ]
+  },
+  {
+    "id": 198939,
+    "name": "Белла",
+    "flavor": "Белла",
+    "alt_name": "",
+    "brand": "Хулиган",
+    "line": "Стандартная",
+    "slug": "khuligan/standartnaya/bella",
+    "source_url": "https://htreviews.org/tobaccos/khuligan/standartnaya/bella",
+    "rating": 3.8,
+    "ratings_count": 28,
+    "reviews_count": 28,
+    "views": 1.4,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 198556,
+    "name": "White Grape",
+    "flavor": "White Grape",
+    "alt_name": "",
+    "brand": "Black Burn",
+    "line": "Основная",
+    "slug": "black-burn/black-burn-main/white-grape",
+    "source_url": "https://htreviews.org/tobaccos/black-burn/black-burn-main/white-grape",
+    "rating": 3.8,
+    "ratings_count": 28,
+    "reviews_count": 26,
+    "views": 3.7,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 68275,
+    "name": "Grape with mint",
+    "flavor": "Grape with mint",
+    "alt_name": "Виноград с мятой",
+    "brand": "Al Fakher",
+    "line": "Основная",
+    "slug": "al-fakher/al-fakher-main/grape-with-mint",
+    "source_url": "https://htreviews.org/tobaccos/al-fakher/al-fakher-main/grape-with-mint",
+    "rating": 3.8,
+    "ratings_count": 9,
+    "reviews_count": 8,
+    "views": 781,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 68873,
+    "name": "Minty Grape",
+    "flavor": "Minty Grape",
+    "alt_name": "Виноград с мятой",
+    "brand": "Nakhla",
+    "line": "Основная",
+    "slug": "nakhla/nakhla-main/minty-grape",
+    "source_url": "https://htreviews.org/tobaccos/nakhla/nakhla-main/minty-grape",
+    "rating": 3.8,
+    "ratings_count": 6,
+    "reviews_count": 5,
+    "views": 574,
+    "strength": "Лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 198865,
+    "name": "Wild Wizard",
+    "flavor": "Wild Wizard",
+    "alt_name": "Виноградный сорбет",
+    "brand": "Split",
+    "line": "Табак",
+    "slug": "split/tabak/wild-wizard",
+    "source_url": "https://htreviews.org/tobaccos/split/tabak/wild-wizard",
+    "rating": 3.8,
+    "ratings_count": 4,
+    "reviews_count": 4,
+    "views": 185,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 96,
+        "name": "Мороженое",
+        "group": "Десертный",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мороженое"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Десертный"
+    ]
+  },
+  {
+    "id": 70561,
+    "name": "Not Now I'm Naked",
+    "flavor": "Not Now I'm Naked",
+    "alt_name": "",
+    "brand": "Nirvana",
+    "line": "Nirvana Super Shisha",
+    "slug": "nirvana/nirvana-super-shisha/not-now-im-naked",
+    "source_url": "https://htreviews.org/tobaccos/nirvana/nirvana-super-shisha/not-now-im-naked",
+    "rating": 3.8,
+    "ratings_count": 2,
+    "reviews_count": 2,
+    "views": 356,
+    "strength": "",
+    "tags": [
+      {
+        "id": 4,
+        "name": "Дыня",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Дыня",
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Фруктовый",
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 195868,
+    "name": "Ice Grape Berry",
+    "flavor": "Ice Grape Berry",
+    "alt_name": "Виноград ягоды",
+    "brand": "4:20",
+    "line": "Основная",
+    "slug": "420/main/ice-grape-berry",
+    "source_url": "https://htreviews.org/tobaccos/420/main/ice-grape-berry",
+    "rating": 3.8,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 246,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 44,
+        "name": "Холодок",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      },
+      {
+        "id": 56,
+        "name": "Малина",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 140,
+        "name": "Голубика",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Холодок",
+      "Малина",
+      "Голубика"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 81745,
+    "name": "Grape Core",
+    "flavor": "Grape Core",
+    "alt_name": "Грейп Кор",
+    "brand": "DARKSIDE",
+    "line": "Core",
+    "slug": "darkside/core/grape-core",
+    "source_url": "https://htreviews.org/tobaccos/darkside/core/grape-core",
+    "rating": 3.7,
+    "ratings_count": 60,
+    "reviews_count": 56,
+    "views": 15000,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 68170,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "Виноград",
+    "brand": "Al Fakher",
+    "line": "Основная",
+    "slug": "al-fakher/al-fakher-main/grape",
+    "source_url": "https://htreviews.org/tobaccos/al-fakher/al-fakher-main/grape",
+    "rating": 3.7,
+    "ratings_count": 22,
+    "reviews_count": 22,
+    "views": 1000,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 120935,
+    "name": "Deep Purple",
+    "flavor": "Deep Purple",
+    "alt_name": "Чёрный Виноград",
+    "brand": "Malaysian Mix",
+    "line": "Malaysian Tobacco",
+    "slug": "malaysian-mix/malaysian-tobacco/deep-purple",
+    "source_url": "https://htreviews.org/tobaccos/malaysian-mix/malaysian-tobacco/deep-purple",
+    "rating": 3.7,
+    "ratings_count": 5,
+    "reviews_count": 5,
+    "views": 400,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 68453,
+    "name": "Black Grape",
+    "flavor": "Black Grape",
+    "alt_name": "Черный виноград",
+    "brand": "Afzal",
+    "line": "Основная",
+    "slug": "afzal/afzal-main/black-grape",
+    "source_url": "https://htreviews.org/tobaccos/afzal/afzal-main/black-grape",
+    "rating": 3.7,
+    "ratings_count": 3,
+    "reviews_count": 3,
+    "views": 356,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 197924,
+    "name": "Виноградная газировка",
+    "flavor": "Виноградная газировка",
+    "alt_name": "",
+    "brand": "Heat Me",
+    "line": "Основная",
+    "slug": "heat-me/main/vinogradnaya-gazirovka",
+    "source_url": "https://htreviews.org/tobaccos/heat-me/main/vinogradnaya-gazirovka",
+    "rating": 3.7,
+    "ratings_count": 2,
+    "reviews_count": 2,
+    "views": 216,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 35,
+        "name": "Газировка",
+        "group": "Холодные напитки",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Газировка"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Холодные напитки"
+    ]
+  },
+  {
+    "id": 158191,
+    "name": "Ягодный",
+    "flavor": "Ягодный",
+    "alt_name": "",
+    "brand": "Nаш",
+    "line": "White Line",
+    "slug": "nash/white-line/yagodnyy",
+    "source_url": "https://htreviews.org/tobaccos/nash/white-line/yagodnyy",
+    "rating": 3.6,
+    "ratings_count": 34,
+    "reviews_count": 32,
+    "views": 3.2,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 22,
+        "name": "Ягоды",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Ягоды"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 188774,
+    "name": "Виноград Мята",
+    "flavor": "Виноград Мята",
+    "alt_name": "",
+    "brand": "Nаш",
+    "line": "White Line",
+    "slug": "nash/white-line/vinograd-myata",
+    "source_url": "https://htreviews.org/tobaccos/nash/white-line/vinograd-myata",
+    "rating": 3.6,
+    "ratings_count": 25,
+    "reviews_count": 24,
+    "views": 3.1,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 180968,
+    "name": "Gula",
+    "flavor": "Gula",
+    "alt_name": "Чревоугодие",
+    "brand": "Душа",
+    "line": "Семь грехов",
+    "slug": "dusha/sem-grekhov/gula",
+    "source_url": "https://htreviews.org/tobaccos/dusha/sem-grekhov/gula",
+    "rating": 3.6,
+    "ratings_count": 25,
+    "reviews_count": 23,
+    "views": 2000,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 187,
+        "name": "Маргарита",
+        "group": "Алкогольный",
+        "taste": "Кислый"
+      },
+      {
+        "id": 138,
+        "name": "Лаванда",
+        "group": "Цветочный",
+        "taste": "Специфический"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Маргарита",
+      "Лаванда"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Алкогольный",
+      "Цветочный"
+    ]
+  },
+  {
+    "id": 92171,
+    "name": "Acid Grapes",
+    "flavor": "Acid Grapes",
+    "alt_name": "Кислый виноград",
+    "brand": "Trinity",
+    "line": "Burley",
+    "slug": "trinity/burley/acid-grapes",
+    "source_url": "https://htreviews.org/tobaccos/trinity/burley/acid-grapes",
+    "rating": 3.6,
+    "ratings_count": 3,
+    "reviews_count": 3,
+    "views": 328,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 161968,
+    "name": "General",
+    "flavor": "General",
+    "alt_name": "Дженерал",
+    "brand": "Manual",
+    "line": "Основная",
+    "slug": "manual/manual-main/general",
+    "source_url": "https://htreviews.org/tobaccos/manual/manual-main/general",
+    "rating": 3.6,
+    "ratings_count": 2,
+    "reviews_count": 2,
+    "views": 949,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 51,
+        "name": "Гранат",
+        "group": "Фруктовый",
+        "taste": "Терпкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Гранат"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Фруктовый"
+    ]
+  },
+  {
+    "id": 187027,
+    "name": "Ice Grape",
+    "flavor": "Ice Grape",
+    "alt_name": "Освежающий виноград",
+    "brand": "Chabacco",
+    "line": "Strong",
+    "slug": "chabacco/strong/ice-grape",
+    "source_url": "https://htreviews.org/tobaccos/chabacco/strong/ice-grape",
+    "rating": 3.6,
+    "ratings_count": 2,
+    "reviews_count": 2,
+    "views": 421,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 79326,
+    "name": "Grape and Rasberry",
+    "flavor": "Grape and Rasberry",
+    "alt_name": "",
+    "brand": "Starry",
+    "line": "Основная",
+    "slug": "starry/starry-main/grape-and-rasberry",
+    "source_url": "https://htreviews.org/tobaccos/starry/starry-main/grape-and-rasberry",
+    "rating": 3.6,
+    "ratings_count": 1,
+    "reviews_count": 0,
+    "views": 199,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 56,
+        "name": "Малина",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Малина"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 78751,
+    "name": "Ruby Grape",
+    "flavor": "Ruby Grape",
+    "alt_name": "Рубиновый виноград",
+    "brand": "MUSTHAVE",
+    "line": "Основная",
+    "slug": "musthave/main/ruby-grape",
+    "source_url": "https://htreviews.org/tobaccos/musthave/main/ruby-grape",
+    "rating": 3.5,
+    "ratings_count": 66,
+    "reviews_count": 56,
+    "views": 6.8,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 96718,
+    "name": "Divine Peach",
+    "flavor": "Divine Peach",
+    "alt_name": "Божественный персик",
+    "brand": "Smoke Angels",
+    "line": "Первая линейка (до 2024 года)",
+    "slug": "smoke-angels/pervaya-lineyka-do-2024-goda/divine-peach",
+    "source_url": "https://htreviews.org/tobaccos/smoke-angels/pervaya-lineyka-do-2024-goda/divine-peach",
+    "rating": 3.5,
+    "ratings_count": 48,
+    "reviews_count": 44,
+    "views": 2.2,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 28,
+        "name": "Чай",
+        "group": "Горячие напитки",
+        "taste": "Терпкий"
+      },
+      {
+        "id": 43,
+        "name": "Персик",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Чай",
+      "Персик"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Горячие напитки",
+      "Фруктовый"
+    ]
+  },
+  {
+    "id": 195336,
+    "name": "Sila",
+    "flavor": "Sila",
+    "alt_name": "Сила",
+    "brand": "Хулиган",
+    "line": "Стандартная",
+    "slug": "khuligan/standartnaya/sila",
+    "source_url": "https://htreviews.org/tobaccos/khuligan/standartnaya/sila",
+    "rating": 3.5,
+    "ratings_count": 29,
+    "reviews_count": 25,
+    "views": 4000,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 74,
+        "name": "Огурец",
+        "group": "Овощной",
+        "taste": "Терпкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Огурец"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Овощной"
+    ]
+  },
+  {
+    "id": 196628,
+    "name": "Grape Seed",
+    "flavor": "Grape Seed",
+    "alt_name": "Виноградная косточка",
+    "brand": "Muassel",
+    "line": "Strong",
+    "slug": "muassel/strong/grape-seed",
+    "source_url": "https://htreviews.org/tobaccos/muassel/strong/grape-seed",
+    "rating": 3.5,
+    "ratings_count": 12,
+    "reviews_count": 11,
+    "views": 1.6,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 180990,
+    "name": "Grape Seed",
+    "flavor": "Grape Seed",
+    "alt_name": "Виноградная косточка",
+    "brand": "Muassel",
+    "line": "Medium",
+    "slug": "muassel/medium/grape-seed",
+    "source_url": "https://htreviews.org/tobaccos/muassel/medium/grape-seed",
+    "rating": 3.5,
+    "ratings_count": 9,
+    "reviews_count": 9,
+    "views": 2000,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 197717,
+    "name": "Зеленый виноград",
+    "flavor": "Зеленый виноград",
+    "alt_name": "",
+    "brand": "Hypreme",
+    "line": "Red Line",
+    "slug": "hypreme/red-line/zelenyy-vinograd",
+    "source_url": "https://htreviews.org/tobaccos/hypreme/red-line/zelenyy-vinograd",
+    "rating": 3.5,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 255,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 195428,
+    "name": "Виноградный напиток",
+    "flavor": "Виноградный напиток",
+    "alt_name": "ex. Юпи",
+    "brand": "Nаш",
+    "line": "White Line",
+    "slug": "nash/white-line/vinogradnyy-napitok",
+    "source_url": "https://htreviews.org/tobaccos/nash/white-line/vinogradnyy-napitok",
+    "rating": 3.4,
+    "ratings_count": 32,
+    "reviews_count": 30,
+    "views": 3000,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 35,
+        "name": "Газировка",
+        "group": "Холодные напитки",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Газировка"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Холодные напитки"
+    ]
+  },
+  {
+    "id": 195327,
+    "name": "Grape Me",
+    "flavor": "Grape Me",
+    "alt_name": "Виноград и мята",
+    "brand": "Jent",
+    "line": "Основная",
+    "slug": "jent/main/grape-me",
+    "source_url": "https://htreviews.org/tobaccos/jent/main/grape-me",
+    "rating": 3.4,
+    "ratings_count": 29,
+    "reviews_count": 26,
+    "views": 3000,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 195434,
+    "name": "Виноградный сок",
+    "flavor": "Виноградный сок",
+    "alt_name": "",
+    "brand": "Сарма",
+    "line": "Классическая",
+    "slug": "sarma/klassicheskaya/vinogradnyy-sok",
+    "source_url": "https://htreviews.org/tobaccos/sarma/klassicheskaya/vinogradnyy-sok",
+    "rating": 3.3,
+    "ratings_count": 35,
+    "reviews_count": 29,
+    "views": 3.5,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 75310,
+    "name": "Геройский виноград",
+    "flavor": "Геройский виноград",
+    "alt_name": "",
+    "brand": "Северный",
+    "line": "Основная",
+    "slug": "severnyy/main/geroyskiy-vinograd",
+    "source_url": "https://htreviews.org/tobaccos/severnyy/main/geroyskiy-vinograd",
+    "rating": 3.3,
+    "ratings_count": 26,
+    "reviews_count": 23,
+    "views": 1.8,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 198944,
+    "name": "Гранат виноград",
+    "flavor": "Гранат виноград",
+    "alt_name": "",
+    "brand": "Nаш",
+    "line": "White Line",
+    "slug": "nash/white-line/granat-vinograd",
+    "source_url": "https://htreviews.org/tobaccos/nash/white-line/granat-vinograd",
+    "rating": 3.3,
+    "ratings_count": 7,
+    "reviews_count": 7,
+    "views": 1.4,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 51,
+        "name": "Гранат",
+        "group": "Фруктовый",
+        "taste": "Терпкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Гранат"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Фруктовый"
+    ]
+  },
+  {
+    "id": 199933,
+    "name": "Бабл Грейп",
+    "flavor": "Бабл Грейп",
+    "alt_name": "",
+    "brand": "Duft",
+    "line": "Основная",
+    "slug": "duft/main/babl-greyp",
+    "source_url": "https://htreviews.org/tobaccos/duft/main/babl-greyp",
+    "rating": 3.3,
+    "ratings_count": 5,
+    "reviews_count": 5,
+    "views": 203,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 35,
+        "name": "Газировка",
+        "group": "Холодные напитки",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Газировка"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Холодные напитки"
+    ]
+  },
+  {
+    "id": 199167,
+    "name": "Грейпфрут Виноград",
+    "flavor": "Грейпфрут Виноград",
+    "alt_name": "",
+    "brand": "Rell",
+    "line": "Основная",
+    "slug": "rell/main/greypfrut-vinograd",
+    "source_url": "https://htreviews.org/tobaccos/rell/main/greypfrut-vinograd",
+    "rating": 3.3,
+    "ratings_count": 4,
+    "reviews_count": 4,
+    "views": 262,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 82,
+        "name": "Грейпфрут",
+        "group": "Цитрусовый",
+        "taste": "Кислый"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Грейпфрут"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Цитрусовый"
+    ]
+  },
+  {
+    "id": 69184,
+    "name": "Маварди",
+    "flavor": "Маварди",
+    "alt_name": "Маварди",
+    "brand": "Al-Mawardi",
+    "line": "Основная",
+    "slug": "al-mawardi/al-mawardi-main/mavardi",
+    "source_url": "https://htreviews.org/tobaccos/al-mawardi/al-mawardi-main/mavardi",
+    "rating": 3.3,
+    "ratings_count": 3,
+    "reviews_count": 3,
+    "views": 305,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 22,
+        "name": "Ягоды",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 43,
+        "name": "Персик",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Ягоды",
+      "Персик"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Фруктовый"
+    ]
+  },
+  {
+    "id": 78916,
+    "name": "Black Grape",
+    "flavor": "Black Grape",
+    "alt_name": "",
+    "brand": "Buta",
+    "line": "Classic",
+    "slug": "buta/buta-classic/black-grape",
+    "source_url": "https://htreviews.org/tobaccos/buta/buta-classic/black-grape",
+    "rating": 3.2,
+    "ratings_count": 4,
+    "reviews_count": 4,
+    "views": 232,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 77134,
+    "name": "Ants In My Head",
+    "flavor": "Ants In My Head",
+    "alt_name": "",
+    "brand": "Nirvana",
+    "line": "Nirvana Super Shisha",
+    "slug": "nirvana/nirvana-super-shisha/ants-in-my-head",
+    "source_url": "https://htreviews.org/tobaccos/nirvana/nirvana-super-shisha/ants-in-my-head",
+    "rating": 3.1,
+    "ratings_count": 3,
+    "reviews_count": 3,
+    "views": 345,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 5,
+        "name": "Фрукты",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Фрукты"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Фруктовый"
+    ]
+  },
+  {
+    "id": 68640,
+    "name": "Minty Grape",
+    "flavor": "Minty Grape",
+    "alt_name": "Виноград с мятой",
+    "brand": "Afzal",
+    "line": "Основная",
+    "slug": "afzal/afzal-main/minty-grape",
+    "source_url": "https://htreviews.org/tobaccos/afzal/afzal-main/minty-grape",
+    "rating": 3.1,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 265,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 197303,
+    "name": "Dr. Grape",
+    "flavor": "Dr. Grape",
+    "alt_name": "Виноградная газировка",
+    "brand": "JOY.",
+    "line": "Основная",
+    "slug": "joy/main/dr-grape",
+    "source_url": "https://htreviews.org/tobaccos/joy/main/dr-grape",
+    "rating": 3,
+    "ratings_count": 33,
+    "reviews_count": 31,
+    "views": 1.4,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 35,
+        "name": "Газировка",
+        "group": "Холодные напитки",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Газировка"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Холодные напитки"
+    ]
+  },
+  {
+    "id": 195116,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "Виноград",
+    "brand": "Sebero",
+    "line": "Sebero Black",
+    "slug": "sebero/sebero-black/grape",
+    "source_url": "https://htreviews.org/tobaccos/sebero/sebero-black/grape",
+    "rating": 3,
+    "ratings_count": 26,
+    "reviews_count": 25,
+    "views": 2.6,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 145337,
+    "name": "Angel's Poison",
+    "flavor": "Angel's Poison",
+    "alt_name": "",
+    "brand": "Duft",
+    "line": "Duft Pheromone",
+    "slug": "duft/duft-pheromone/angels-poison",
+    "source_url": "https://htreviews.org/tobaccos/duft/duft-pheromone/angels-poison",
+    "rating": 2.9,
+    "ratings_count": 8,
+    "reviews_count": 8,
+    "views": 801,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      },
+      {
+        "id": 19,
+        "name": "Кола",
+        "group": "Холодные напитки",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 21,
+        "name": "Черника",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята",
+      "Кола",
+      "Черника"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий",
+      "Холодные напитки"
+    ]
+  },
+  {
+    "id": 198683,
+    "name": "Японский виноград",
+    "flavor": "Японский виноград",
+    "alt_name": "",
+    "brand": "Nur",
+    "line": "Крепкая",
+    "slug": "nur/krepkaya/yaponskiy-vinograd",
+    "source_url": "https://htreviews.org/tobaccos/nur/krepkaya/yaponskiy-vinograd",
+    "rating": 2.9,
+    "ratings_count": 3,
+    "reviews_count": 3,
+    "views": 323,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 199634,
+    "name": "Тбилиси",
+    "flavor": "Тбилиси",
+    "alt_name": "Виноград, грейпфрут, фейхоа",
+    "brand": "Sebero",
+    "line": "Гид",
+    "slug": "sebero/gid/tbilisi",
+    "source_url": "https://htreviews.org/tobaccos/sebero/gid/tbilisi",
+    "rating": 2.8,
+    "ratings_count": 16,
+    "reviews_count": 16,
+    "views": 973,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 60,
+        "name": "Фейхоа",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 82,
+        "name": "Грейпфрут",
+        "group": "Цитрусовый",
+        "taste": "Кислый"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Фейхоа",
+      "Грейпфрут"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Фруктовый",
+      "Цитрусовый"
+    ]
+  },
+  {
+    "id": 153192,
+    "name": "Wafflefall",
+    "flavor": "Wafflefall",
+    "alt_name": "Вафлепад",
+    "brand": "Element",
+    "line": "V Element",
+    "slug": "element/v-element/wafflefall",
+    "source_url": "https://htreviews.org/tobaccos/element/v-element/wafflefall",
+    "rating": 2.8,
+    "ratings_count": 11,
+    "reviews_count": 11,
+    "views": 1.3,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 40,
+        "name": "Банан",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 112,
+        "name": "Вафли",
+        "group": "Десертный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Банан",
+      "Вафли"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Фруктовый",
+      "Десертный"
+    ]
+  },
+  {
+    "id": 195773,
+    "name": "F/O/G",
+    "flavor": "F/O/G",
+    "alt_name": "Фейхоа, апельсин и виноград",
+    "brand": "Iskra",
+    "line": "Основная",
+    "slug": "iskra/iskra-main/fog",
+    "source_url": "https://htreviews.org/tobaccos/iskra/iskra-main/fog",
+    "rating": 2.8,
+    "ratings_count": 2,
+    "reviews_count": 2,
+    "views": 948,
+    "strength": "Средняя",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 18,
+        "name": "Апельсин",
+        "group": "Цитрусовый",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 60,
+        "name": "Фейхоа",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Апельсин",
+      "Фейхоа"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Цитрусовый",
+      "Фруктовый"
+    ]
+  },
+  {
+    "id": 186562,
+    "name": "Blanc Grapes",
+    "flavor": "Blanc Grapes",
+    "alt_name": "Белый виноград",
+    "brand": "ATLAS",
+    "line": "Основная",
+    "slug": "atlas/atlas-main/blanc-grapes",
+    "source_url": "https://htreviews.org/tobaccos/atlas/atlas-main/blanc-grapes",
+    "rating": 2.8,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 176,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 104050,
+    "name": "Lady’s Fingers",
+    "flavor": "Lady’s Fingers",
+    "alt_name": "Белый виноград",
+    "brand": "Asman",
+    "line": "Основная",
+    "slug": "asman/asman-main/ladys-fingers",
+    "source_url": "https://htreviews.org/tobaccos/asman/asman-main/ladys-fingers",
+    "rating": 2.7,
+    "ratings_count": 3,
+    "reviews_count": 3,
+    "views": 299,
+    "strength": "Лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 105466,
+    "name": "Grape Britain",
+    "flavor": "Grape Britain",
+    "alt_name": "",
+    "brand": "Daly",
+    "line": "Бестабачная смесь Daly",
+    "slug": "daly/daly-main/grape-britain",
+    "source_url": "https://htreviews.org/tobaccos/daly/daly-main/grape-britain",
+    "rating": 2.7,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 151,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 87613,
+    "name": "Berry Tabasco",
+    "flavor": "Berry Tabasco",
+    "alt_name": "",
+    "brand": "Daly",
+    "line": "Бестабачная смесь Daly",
+    "slug": "daly/daly-main/berry-tabasco",
+    "source_url": "https://htreviews.org/tobaccos/daly/daly-main/berry-tabasco",
+    "rating": 2.6,
+    "ratings_count": 2,
+    "reviews_count": 2,
+    "views": 200,
+    "strength": "Лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 69,
+        "name": "Черная смородина",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 76,
+        "name": "Перец",
+        "group": "Овощной",
+        "taste": "Жгучий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Черная смородина",
+      "Перец"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Овощной"
+    ]
+  },
+  {
+    "id": 144807,
+    "name": "Top 2",
+    "flavor": "Top 2",
+    "alt_name": "",
+    "brand": "Sebero",
+    "line": "Sebero Limited Edition",
+    "slug": "sebero/sebero-limited-edition/top-2",
+    "source_url": "https://htreviews.org/tobaccos/sebero/sebero-limited-edition/top-2",
+    "rating": 2.5,
+    "ratings_count": 14,
+    "reviews_count": 14,
+    "views": 2.1,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 27,
+        "name": "Лимон",
+        "group": "Цитрусовый",
+        "taste": "Кислый"
+      },
+      {
+        "id": 32,
+        "name": "Яблоко",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Лимон",
+      "Яблоко"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Цитрусовый",
+      "Фруктовый"
+    ]
+  },
+  {
+    "id": 101615,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "Виноград",
+    "brand": "Daim",
+    "line": "Основная",
+    "slug": "daim/daim-main/grape",
+    "source_url": "https://htreviews.org/tobaccos/daim/daim-main/grape",
+    "rating": 2.5,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 285,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 129783,
+    "name": "Icy Grape",
+    "flavor": "Icy Grape",
+    "alt_name": "Ледяной виноград",
+    "brand": "Afzal",
+    "line": "Основная",
+    "slug": "afzal/afzal-main/icy-grape",
+    "source_url": "https://htreviews.org/tobaccos/afzal/afzal-main/icy-grape",
+    "rating": 2.5,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 194,
+    "strength": "Лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 44,
+        "name": "Холодок",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Холодок"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 99942,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "Виноград",
+    "brand": "Ruda",
+    "line": "Основная",
+    "slug": "ruda/ruda-main/grape",
+    "source_url": "https://htreviews.org/tobaccos/ruda/ruda-main/grape",
+    "rating": 2.5,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 134,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 68572,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "Виноград",
+    "brand": "Afzal",
+    "line": "Основная",
+    "slug": "afzal/afzal-main/grape",
+    "source_url": "https://htreviews.org/tobaccos/afzal/afzal-main/grape",
+    "rating": 2.4,
+    "ratings_count": 3,
+    "reviews_count": 3,
+    "views": 302,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 187479,
+    "name": "Виноград • Абрикос • Гуава",
+    "flavor": "Виноград • Абрикос • Гуава",
+    "alt_name": "",
+    "brand": "Veter",
+    "line": "Основная",
+    "slug": "veter/veter-main/vinograd-abrikos-guava",
+    "source_url": "https://htreviews.org/tobaccos/veter/veter-main/vinograd-abrikos-guava",
+    "rating": 2,
+    "ratings_count": 2,
+    "reviews_count": 1,
+    "views": 336,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 57,
+        "name": "Гуава",
+        "group": "Фруктовый",
+        "taste": "Терпкий"
+      },
+      {
+        "id": 80,
+        "name": "Абрикос",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Гуава",
+      "Абрикос"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Фруктовый"
+    ]
+  },
+  {
+    "id": 71960,
+    "name": "Grape Chill",
+    "flavor": "Grape Chill",
+    "alt_name": "",
+    "brand": "Social Smoke",
+    "line": "Основная",
+    "slug": "social-smoke/social-smoke-main/grape-chill",
+    "source_url": "https://htreviews.org/tobaccos/social-smoke/social-smoke-main/grape-chill",
+    "rating": 2,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 135,
+    "strength": "Лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 98204,
+    "name": "Grape Cider",
+    "flavor": "Grape Cider",
+    "alt_name": "Виноградный сидр",
+    "brand": "LUNA",
+    "line": "Основная",
+    "slug": "luna/luna-main/grape-cider",
+    "source_url": "https://htreviews.org/tobaccos/luna/luna-main/grape-cider",
+    "rating": 2,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 133,
+    "strength": "Средне-лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 125,
+        "name": "Сидр",
+        "group": "Алкогольный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Сидр"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Алкогольный"
+    ]
+  },
+  {
+    "id": 69084,
+    "name": "Double Apple & Grape",
+    "flavor": "Double Apple & Grape",
+    "alt_name": "Двойное яблоко с виноградом",
+    "brand": "Al-Waha",
+    "line": "Основная",
+    "slug": "al-waha/al-waha-main/double-apple-amp-grape",
+    "source_url": "https://htreviews.org/tobaccos/al-waha/al-waha-main/double-apple-amp-grape",
+    "rating": 1,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 279,
+    "strength": "Лёгкая",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 42,
+        "name": "Двойное яблоко",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Двойное яблоко"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Фруктовый"
+    ]
+  },
+  {
+    "id": 135537,
+    "name": "Grapes",
+    "flavor": "Grapes",
+    "alt_name": "Виноград",
+    "brand": "Zenith",
+    "line": "Основная",
+    "slug": "zenith/zenith-main/grapes",
+    "source_url": "https://htreviews.org/tobaccos/zenith/zenith-main/grapes",
+    "rating": 1,
+    "ratings_count": 1,
+    "reviews_count": 1,
+    "views": 169,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 198192,
+    "name": "Виноградный ментос",
+    "flavor": "Виноградный ментос",
+    "alt_name": "",
+    "brand": "Больше, чем",
+    "line": "Основная",
+    "slug": "bolshe-chem/main/vinogradnyy-mentos",
+    "source_url": "https://htreviews.org/tobaccos/bolshe-chem/main/vinogradnyy-mentos",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 437,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 199252,
+    "name": "Виноград Мята",
+    "flavor": "Виноград Мята",
+    "alt_name": "",
+    "brand": "Nur",
+    "line": "Средняя",
+    "slug": "nur/srednyaya/vinograd-myata",
+    "source_url": "https://htreviews.org/tobaccos/nur/srednyaya/vinograd-myata",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 410,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 195814,
+    "name": "Orange, Grape & Mint",
+    "flavor": "Orange, Grape & Mint",
+    "alt_name": "Апельсин виноград мята",
+    "brand": "Space Smoke",
+    "line": "Паста Space Smoke Arabian",
+    "slug": "space-smoke/space-smoke-arabian/orange-grape-mint",
+    "source_url": "https://htreviews.org/tobaccos/space-smoke/space-smoke-arabian/orange-grape-mint",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 408,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      },
+      {
+        "id": 18,
+        "name": "Апельсин",
+        "group": "Цитрусовый",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята",
+      "Апельсин"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий",
+      "Цитрусовый"
+    ]
+  },
+  {
+    "id": 101368,
+    "name": "Grape Blackberry (with nicotine)",
+    "flavor": "Grape Blackberry (with nicotine)",
+    "alt_name": "Виноград Ежевика (с никотином)",
+    "brand": "Plazma",
+    "line": "Основная",
+    "slug": "plazma/plazma-main/grape-blackberry-with-nicotine",
+    "source_url": "https://htreviews.org/tobaccos/plazma/plazma-main/grape-blackberry-with-nicotine",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 399,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 70,
+        "name": "Ежевика",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Ежевика"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 125332,
+    "name": "Dark Grape",
+    "flavor": "Dark Grape",
+    "alt_name": "Черный виноград",
+    "brand": "Venom",
+    "line": "Основная",
+    "slug": "venom/venom-main/dark-grape",
+    "source_url": "https://htreviews.org/tobaccos/venom/venom-main/dark-grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 322,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 98779,
+    "name": "Tequila Grappa",
+    "flavor": "Tequila Grappa",
+    "alt_name": "Текила-граппа",
+    "brand": "Al Saha",
+    "line": "Основная",
+    "slug": "al-saha/al-saha-main/tequila-grappa",
+    "source_url": "https://htreviews.org/tobaccos/al-saha/al-saha-main/tequila-grappa",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 314,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 38,
+        "name": "Текила",
+        "group": "Алкогольный",
+        "taste": "Горький"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Текила"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Алкогольный"
+    ]
+  },
+  {
+    "id": 195982,
+    "name": "Bad Habit",
+    "flavor": "Bad Habit",
+    "alt_name": "",
+    "brand": "Overdozz",
+    "line": "Основная",
+    "slug": "overdozz/main/bad-habit",
+    "source_url": "https://htreviews.org/tobaccos/overdozz/main/bad-habit",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 310,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 88237,
+    "name": "Berry Tabasco",
+    "flavor": "Berry Tabasco",
+    "alt_name": "",
+    "brand": "Daly",
+    "line": "Daly Hard",
+    "slug": "daly/daly-hard/berry-tabasco",
+    "source_url": "https://htreviews.org/tobaccos/daly/daly-hard/berry-tabasco",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 304,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 69,
+        "name": "Черная смородина",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 76,
+        "name": "Перец",
+        "group": "Овощной",
+        "taste": "Жгучий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Черная смородина",
+      "Перец"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Овощной"
+    ]
+  },
+  {
+    "id": 82328,
+    "name": "Blue Gum Ball",
+    "flavor": "Blue Gum Ball",
+    "alt_name": "Синяя жвачка",
+    "brand": "Fusion",
+    "line": "Fusion Classic",
+    "slug": "fusion/fusion-classic/blue-gum-ball",
+    "source_url": "https://htreviews.org/tobaccos/fusion/fusion-classic/blue-gum-ball",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 286,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 21,
+        "name": "Черника",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 69,
+        "name": "Черная смородина",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Черника",
+      "Черная смородина"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 101366,
+    "name": "Grape Blackberry (nicotine free)",
+    "flavor": "Grape Blackberry (nicotine free)",
+    "alt_name": "Виноград Ежевика (без никотина)",
+    "brand": "Plazma",
+    "line": "Основная",
+    "slug": "plazma/plazma-main/grape-blackberry-nicotine-free",
+    "source_url": "https://htreviews.org/tobaccos/plazma/plazma-main/grape-blackberry-nicotine-free",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 286,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 70,
+        "name": "Ежевика",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Ежевика"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 102350,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "Виноград",
+    "brand": "Rave",
+    "line": "Основная",
+    "slug": "rave/rave-main/grape",
+    "source_url": "https://htreviews.org/tobaccos/rave/rave-main/grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 283,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 100968,
+    "name": "Ms. Grape",
+    "flavor": "Ms. Grape",
+    "alt_name": "Мисс Виноград",
+    "brand": "Rell Blend",
+    "line": "Основная",
+    "slug": "rell-blend/rell-blend-main/ms-grape",
+    "source_url": "https://htreviews.org/tobaccos/rell-blend/rell-blend-main/ms-grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 275,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 195968,
+    "name": "Виноград",
+    "flavor": "Виноград",
+    "alt_name": "",
+    "brand": "Brusko",
+    "line": "Соусы Ultra",
+    "slug": "brusko/sousy-ultra/vinograd",
+    "source_url": "https://htreviews.org/tobaccos/brusko/sousy-ultra/vinograd",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 273,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 176829,
+    "name": "Grape gum",
+    "flavor": "Grape gum",
+    "alt_name": "Виноградная жвачка",
+    "brand": "Malaysian Mix",
+    "line": "Malaysian X",
+    "slug": "malaysian-mix/malaysian-x/grape-gum",
+    "source_url": "https://htreviews.org/tobaccos/malaysian-mix/malaysian-x/grape-gum",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 263,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 33,
+        "name": "Жвачка",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      },
+      {
+        "id": 44,
+        "name": "Холодок",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Жвачка",
+      "Холодок"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 184356,
+    "name": "Fresh Grape",
+    "flavor": "Fresh Grape",
+    "alt_name": "Виноград-мята",
+    "brand": "Zapp",
+    "line": "Zapp (линейка Classic)",
+    "slug": "zapp/zapp-lineika-classic/fresh-grape",
+    "source_url": "https://htreviews.org/tobaccos/zapp/zapp-lineika-classic/fresh-grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 263,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 195816,
+    "name": "Grape & mint",
+    "flavor": "Grape & mint",
+    "alt_name": "Виноград с мятой",
+    "brand": "Space Smoke",
+    "line": "Паста Space Smoke Arabian",
+    "slug": "space-smoke/space-smoke-arabian/grape-mint",
+    "source_url": "https://htreviews.org/tobaccos/space-smoke/space-smoke-arabian/grape-mint",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 255,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      },
+      {
+        "id": 44,
+        "name": "Холодок",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      },
+      {
+        "id": 89,
+        "name": "Ментол",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята",
+      "Холодок",
+      "Ментол"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 69122,
+    "name": "Black Grape",
+    "flavor": "Black Grape",
+    "alt_name": "Черный виноград",
+    "brand": "Al-Waha",
+    "line": "Основная",
+    "slug": "al-waha/al-waha-main/black-grape",
+    "source_url": "https://htreviews.org/tobaccos/al-waha/al-waha-main/black-grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 254,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 101279,
+    "name": "Vinchik",
+    "flavor": "Vinchik",
+    "alt_name": "",
+    "brand": "New Yorker Club",
+    "line": "New Yorker Club Red",
+    "slug": "new-yorker-club/new-yorker-club-lineika-red/vinchik",
+    "source_url": "https://htreviews.org/tobaccos/new-yorker-club/new-yorker-club-lineika-red/vinchik",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 251,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 79,
+        "name": "Вино",
+        "group": "Алкогольный",
+        "taste": "Терпкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Вино"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Алкогольный"
+    ]
+  },
+  {
+    "id": 70088,
+    "name": "White Grape",
+    "flavor": "White Grape",
+    "alt_name": "",
+    "brand": "Layalina",
+    "line": "Golden Layalina",
+    "slug": "layalina/golden-layalina/white-grape",
+    "source_url": "https://htreviews.org/tobaccos/layalina/golden-layalina/white-grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 249,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 70090,
+    "name": "White Grape Mint",
+    "flavor": "White Grape Mint",
+    "alt_name": "",
+    "brand": "Layalina",
+    "line": "Golden Layalina",
+    "slug": "layalina/golden-layalina/white-grape-mint",
+    "source_url": "https://htreviews.org/tobaccos/layalina/golden-layalina/white-grape-mint",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 246,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 102388,
+    "name": "Виноградный",
+    "flavor": "Виноградный",
+    "alt_name": "",
+    "brand": "Daly",
+    "line": "Табак Daly (Unique Hookah Tobacco)",
+    "slug": "daly/daly-unique-hookah-tobacco/vinogradnyi",
+    "source_url": "https://htreviews.org/tobaccos/daly/daly-unique-hookah-tobacco/vinogradnyi",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 243,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 101343,
+    "name": "Guava Dark Grape (nicotine free)",
+    "flavor": "Guava Dark Grape (nicotine free)",
+    "alt_name": "Гуава-виноград (без никотина)",
+    "brand": "Plazma",
+    "line": "Основная",
+    "slug": "plazma/plazma-main/guava-dark-grape-nicotine-free",
+    "source_url": "https://htreviews.org/tobaccos/plazma/plazma-main/guava-dark-grape-nicotine-free",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 241,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 57,
+        "name": "Гуава",
+        "group": "Фруктовый",
+        "taste": "Терпкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Гуава"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Фруктовый"
+    ]
+  },
+  {
+    "id": 86293,
+    "name": "Isabel",
+    "flavor": "Isabel",
+    "alt_name": "Виноград Изабелла",
+    "brand": "ZR",
+    "line": "ZR Premium Platinum",
+    "slug": "zr/zr-premium-platinum/isabel",
+    "source_url": "https://htreviews.org/tobaccos/zr/zr-premium-platinum/isabel",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 237,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 97780,
+    "name": "Red Grapes",
+    "flavor": "Red Grapes",
+    "alt_name": "",
+    "brand": "Leyla",
+    "line": "Основная",
+    "slug": "leyla/leyla-main/red-grapes",
+    "source_url": "https://htreviews.org/tobaccos/leyla/leyla-main/red-grapes",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 235,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 195986,
+    "name": "Dopomine",
+    "flavor": "Dopomine",
+    "alt_name": "",
+    "brand": "Overdozz",
+    "line": "Основная",
+    "slug": "overdozz/main/dopomine",
+    "source_url": "https://htreviews.org/tobaccos/overdozz/main/dopomine",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 233,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 21,
+        "name": "Черника",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Черника"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 199087,
+    "name": "Ice Grape and mint",
+    "flavor": "Ice Grape and mint",
+    "alt_name": "Ледяной виноград и мята",
+    "brand": "Nakhla",
+    "line": "Основная",
+    "slug": "nakhla/nakhla-main/ice-grape-and-mint",
+    "source_url": "https://htreviews.org/tobaccos/nakhla/nakhla-main/ice-grape-and-mint",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 227,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 80091,
+    "name": "Pomegranate Bellini",
+    "flavor": "Pomegranate Bellini",
+    "alt_name": "",
+    "brand": "Argelini",
+    "line": "Основная",
+    "slug": "argelini/argelini-main/pomegranate-bellini",
+    "source_url": "https://htreviews.org/tobaccos/argelini/argelini-main/pomegranate-bellini",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 226,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 20,
+        "name": "Ваниль",
+        "group": "Десертный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 51,
+        "name": "Гранат",
+        "group": "Фруктовый",
+        "taste": "Терпкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Ваниль",
+      "Гранат"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Десертный",
+      "Фруктовый"
+    ]
+  },
+  {
+    "id": 196158,
+    "name": "Чёрный виноград",
+    "flavor": "Чёрный виноград",
+    "alt_name": "",
+    "brand": "Good Goose",
+    "line": "Основная",
+    "slug": "good-goose/good-goose-main/chernyy-vinograd",
+    "source_url": "https://htreviews.org/tobaccos/good-goose/good-goose-main/chernyy-vinograd",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 226,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 80342,
+    "name": "Cobra Khan",
+    "flavor": "Cobra Khan",
+    "alt_name": "",
+    "brand": "Starbuzz",
+    "line": "Starbuzz Serpent",
+    "slug": "starbuzz/starbuzz-serpent/cobra-khan",
+    "source_url": "https://htreviews.org/tobaccos/starbuzz/starbuzz-serpent/cobra-khan",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 223,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      },
+      {
+        "id": 22,
+        "name": "Ягоды",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята",
+      "Ягоды"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 101352,
+    "name": "Guava Dark Grape (with nicotine)",
+    "flavor": "Guava Dark Grape (with nicotine)",
+    "alt_name": "Гуава-виноград (с никотином)",
+    "brand": "Plazma",
+    "line": "Основная",
+    "slug": "plazma/plazma-main/guava-dark-grape-with-nicotine",
+    "source_url": "https://htreviews.org/tobaccos/plazma/plazma-main/guava-dark-grape-with-nicotine",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 218,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 57,
+        "name": "Гуава",
+        "group": "Фруктовый",
+        "taste": "Терпкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Гуава"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Фруктовый"
+    ]
+  },
+  {
+    "id": 184451,
+    "name": "White Grape",
+    "flavor": "White Grape",
+    "alt_name": "Белый виноград",
+    "brand": "Zapp",
+    "line": "Zapp (линейка Black)",
+    "slug": "zapp/zapp-lineika-black/white-grape",
+    "source_url": "https://htreviews.org/tobaccos/zapp/zapp-lineika-black/white-grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 216,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 100743,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "Виноград",
+    "brand": "Fresh",
+    "line": "Основная",
+    "slug": "fresh/fresh-main/grape",
+    "source_url": "https://htreviews.org/tobaccos/fresh/fresh-main/grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 211,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 98788,
+    "name": "White Grape",
+    "flavor": "White Grape",
+    "alt_name": "Белый виноград",
+    "brand": "Al Saha",
+    "line": "Основная",
+    "slug": "al-saha/al-saha-main/white-grape",
+    "source_url": "https://htreviews.org/tobaccos/al-saha/al-saha-main/white-grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 209,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 108940,
+    "name": "Grape Mint (tea blend)",
+    "flavor": "Grape Mint (tea blend)",
+    "alt_name": "Виноград-Мята (чайная смесь)",
+    "brand": "M18: Smoke Grenade",
+    "line": "Основная",
+    "slug": "m18-smoke-grenade/m18-smoke-grenade-main/grape-mint-tea-blend",
+    "source_url": "https://htreviews.org/tobaccos/m18-smoke-grenade/m18-smoke-grenade-main/grape-mint-tea-blend",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 209,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 69256,
+    "name": "Золотая мечта",
+    "flavor": "Золотая мечта",
+    "alt_name": "Нирвана",
+    "brand": "Al-Mawardi",
+    "line": "Основная",
+    "slug": "al-mawardi/al-mawardi-main/zolotaia-mechta",
+    "source_url": "https://htreviews.org/tobaccos/al-mawardi/al-mawardi-main/zolotaia-mechta",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 207,
+    "strength": "",
+    "tags": [
+      {
+        "id": 4,
+        "name": "Дыня",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      },
+      {
+        "id": 18,
+        "name": "Апельсин",
+        "group": "Цитрусовый",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Дыня",
+      "Виноград",
+      "Мята",
+      "Апельсин"
+    ],
+    "taste_groups": [
+      "Фруктовый",
+      "Ягодный",
+      "Освежающий",
+      "Цитрусовый"
+    ]
+  },
+  {
+    "id": 78707,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "",
+    "brand": "Alchemist Blend",
+    "line": "Alchemist Blend - Straight",
+    "slug": "alchemist-blend/alchemist-blend-straight/grape",
+    "source_url": "https://htreviews.org/tobaccos/alchemist-blend/alchemist-blend-straight/grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 207,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 69975,
+    "name": "Blueberry Grape",
+    "flavor": "Blueberry Grape",
+    "alt_name": "",
+    "brand": "Layalina",
+    "line": "Golden Layalina",
+    "slug": "layalina/golden-layalina/blueberry-grape",
+    "source_url": "https://htreviews.org/tobaccos/layalina/golden-layalina/blueberry-grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 204,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 21,
+        "name": "Черника",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Черника"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 195989,
+    "name": "Go For Broke",
+    "flavor": "Go For Broke",
+    "alt_name": "",
+    "brand": "Overdozz",
+    "line": "Основная",
+    "slug": "overdozz/main/go-for-broke",
+    "source_url": "https://htreviews.org/tobaccos/overdozz/main/go-for-broke",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 200,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 196841,
+    "name": "Grapes with mint",
+    "flavor": "Grapes with mint",
+    "alt_name": "Виноград-мята",
+    "brand": "By Sanchez",
+    "line": "Основная",
+    "slug": "by-sanchez/main/grapes-with-mint",
+    "source_url": "https://htreviews.org/tobaccos/by-sanchez/main/grapes-with-mint",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 195,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 77215,
+    "name": "Pictus",
+    "flavor": "Pictus",
+    "alt_name": "",
+    "brand": "Nirvana",
+    "line": "Nirvana Eclipse",
+    "slug": "nirvana/nirvana-eclipse/pictus",
+    "source_url": "https://htreviews.org/tobaccos/nirvana/nirvana-eclipse/pictus",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 192,
+    "strength": "",
+    "tags": [
+      {
+        "id": 7,
+        "name": "Манго",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 32,
+        "name": "Яблоко",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Манго",
+      "Виноград",
+      "Яблоко"
+    ],
+    "taste_groups": [
+      "Фруктовый",
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 78709,
+    "name": "Grape Mint",
+    "flavor": "Grape Mint",
+    "alt_name": "",
+    "brand": "Alchemist Blend",
+    "line": "Alchemist Blend - Straight",
+    "slug": "alchemist-blend/alchemist-blend-straight/grape-mint",
+    "source_url": "https://htreviews.org/tobaccos/alchemist-blend/alchemist-blend-straight/grape-mint",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 191,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 80077,
+    "name": "Misti Grape TM",
+    "flavor": "Misti Grape TM",
+    "alt_name": "",
+    "brand": "Argelini",
+    "line": "Основная",
+    "slug": "argelini/argelini-main/misti-grape-tm",
+    "source_url": "https://htreviews.org/tobaccos/argelini/argelini-main/misti-grape-tm",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 191,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 79671,
+    "name": "True Grape",
+    "flavor": "True Grape",
+    "alt_name": "",
+    "brand": "Trifecta",
+    "line": "Trifecta Dark Blend",
+    "slug": "trifecta/trifecta-dark-blend/true-grape",
+    "source_url": "https://htreviews.org/tobaccos/trifecta/trifecta-dark-blend/true-grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 190,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 101530,
+    "name": "Grapes",
+    "flavor": "Grapes",
+    "alt_name": "Виноград",
+    "brand": "Twelve",
+    "line": "Основная",
+    "slug": "twelve/twelve-main/grapes",
+    "source_url": "https://htreviews.org/tobaccos/twelve/twelve-main/grapes",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 189,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 86278,
+    "name": "Isabel",
+    "flavor": "Isabel",
+    "alt_name": "Виноград Изабелла",
+    "brand": "ZR",
+    "line": "ZR Premium Silver",
+    "slug": "zr/zr-premium-silver/isabel",
+    "source_url": "https://htreviews.org/tobaccos/zr/zr-premium-silver/isabel",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 186,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 78180,
+    "name": "Grapdium",
+    "flavor": "Grapdium",
+    "alt_name": "",
+    "brand": "Wadge",
+    "line": "Основная",
+    "slug": "wadge/wadge-main/grapdium",
+    "source_url": "https://htreviews.org/tobaccos/wadge/wadge-main/grapdium",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 182,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 80172,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "",
+    "brand": "Black Lava",
+    "line": "Основная",
+    "slug": "black-lava/black-lava-main/grape",
+    "source_url": "https://htreviews.org/tobaccos/black-lava/black-lava-main/grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 182,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 78156,
+    "name": "Виноград",
+    "flavor": "Виноград",
+    "alt_name": "",
+    "brand": "Zodiac",
+    "line": "Основная",
+    "slug": "zodiac/zodiac-main/vinograd",
+    "source_url": "https://htreviews.org/tobaccos/zodiac/zodiac-main/vinograd",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 181,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 99123,
+    "name": "Green Mix",
+    "flavor": "Green Mix",
+    "alt_name": "Зеленый микс",
+    "brand": "HMT",
+    "line": "Основная",
+    "slug": "hmt/hmt-main/green-mix",
+    "source_url": "https://htreviews.org/tobaccos/hmt/hmt-main/green-mix",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 178,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 101241,
+    "name": "Galaxy",
+    "flavor": "Galaxy",
+    "alt_name": "",
+    "brand": "New Yorker Club",
+    "line": "New Yorker Club Red",
+    "slug": "new-yorker-club/new-yorker-club-lineika-red/galaxy",
+    "source_url": "https://htreviews.org/tobaccos/new-yorker-club/new-yorker-club-lineika-red/galaxy",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 178,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 196826,
+    "name": "Green grapes",
+    "flavor": "Green grapes",
+    "alt_name": "Зеленый виноград",
+    "brand": "By Sanchez",
+    "line": "Основная",
+    "slug": "by-sanchez/main/green-grapes",
+    "source_url": "https://htreviews.org/tobaccos/by-sanchez/main/green-grapes",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 176,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 97319,
+    "name": "Grapemania",
+    "flavor": "Grapemania",
+    "alt_name": "Виноградомания",
+    "brand": "Azure",
+    "line": "Azure (Black Line)",
+    "slug": "azure/azure-black-line/grapemania",
+    "source_url": "https://htreviews.org/tobaccos/azure/azure-black-line/grapemania",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 175,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 76899,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "Виноград",
+    "brand": "Aravia Platinum",
+    "line": "Основная",
+    "slug": "aravia-platinum/aravia-platinum-main/grape",
+    "source_url": "https://htreviews.org/tobaccos/aravia-platinum/aravia-platinum-main/grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 172,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 79968,
+    "name": "The Grape Story",
+    "flavor": "The Grape Story",
+    "alt_name": "",
+    "brand": "Agera",
+    "line": "Agera Strong",
+    "slug": "agera/agera-strong/the-grape-story",
+    "source_url": "https://htreviews.org/tobaccos/agera/agera-strong/the-grape-story",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 172,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 102432,
+    "name": "Black Grape",
+    "flavor": "Black Grape",
+    "alt_name": "Черный виноград",
+    "brand": "Vega",
+    "line": "Основная",
+    "slug": "vega/vega-main/black-grape",
+    "source_url": "https://htreviews.org/tobaccos/vega/vega-main/black-grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 168,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 199259,
+    "name": "Grape Mojito",
+    "flavor": "Grape Mojito",
+    "alt_name": "Виноградный Мохито",
+    "brand": "Afzal",
+    "line": "Основная",
+    "slug": "afzal/afzal-main/grape-mojito",
+    "source_url": "https://htreviews.org/tobaccos/afzal/afzal-main/grape-mojito",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 168,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 175,
+        "name": "Мохито",
+        "group": "Алкогольный",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мохито"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Алкогольный"
+    ]
+  },
+  {
+    "id": 100851,
+    "name": "Berry Blast",
+    "flavor": "Berry Blast",
+    "alt_name": "Ягодный взрыв",
+    "brand": "Morph",
+    "line": "Morph (линейка Soft)",
+    "slug": "morph/morph-lineika-soft/berry-blast",
+    "source_url": "https://htreviews.org/tobaccos/morph/morph-lineika-soft/berry-blast",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 162,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 21,
+        "name": "Черника",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Черника"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 139362,
+    "name": "Grapejuice",
+    "flavor": "Grapejuice",
+    "alt_name": "Винный букет",
+    "brand": "Just Original",
+    "line": "Основная",
+    "slug": "just-original/just-original-main/grapejuice",
+    "source_url": "https://htreviews.org/tobaccos/just-original/just-original-main/grapejuice",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 160,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 79946,
+    "name": "The Grape Story",
+    "flavor": "The Grape Story",
+    "alt_name": "",
+    "brand": "Agera",
+    "line": "Agera Medium",
+    "slug": "agera/agera-medium/the-grape-story",
+    "source_url": "https://htreviews.org/tobaccos/agera/agera-medium/the-grape-story",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 155,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 79055,
+    "name": "Grape mint",
+    "flavor": "Grape mint",
+    "alt_name": "",
+    "brand": "Buta",
+    "line": "Dark",
+    "slug": "buta/buta-dark/grape-mint",
+    "source_url": "https://htreviews.org/tobaccos/buta/buta-dark/grape-mint",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 153,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 69068,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "Виноград",
+    "brand": "Al-Waha",
+    "line": "Основная",
+    "slug": "al-waha/al-waha-main/grape",
+    "source_url": "https://htreviews.org/tobaccos/al-waha/al-waha-main/grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 150,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 79909,
+    "name": "The Grape Story",
+    "flavor": "The Grape Story",
+    "alt_name": "",
+    "brand": "Agera",
+    "line": "Agera Soft",
+    "slug": "agera/agera-soft/the-grape-story",
+    "source_url": "https://htreviews.org/tobaccos/agera/agera-soft/the-grape-story",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 143,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 101427,
+    "name": "Galaxy",
+    "flavor": "Galaxy",
+    "alt_name": "",
+    "brand": "New Yorker Club",
+    "line": "New Yorker Club Yellow",
+    "slug": "new-yorker-club/new-yorker-club-lineika-yellow/galaxy",
+    "source_url": "https://htreviews.org/tobaccos/new-yorker-club/new-yorker-club-lineika-yellow/galaxy",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 142,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 69208,
+    "name": "Виноград",
+    "flavor": "Виноград",
+    "alt_name": "Виноград",
+    "brand": "Al-Mawardi",
+    "line": "Основная",
+    "slug": "al-mawardi/al-mawardi-main/vinograd",
+    "source_url": "https://htreviews.org/tobaccos/al-mawardi/al-mawardi-main/vinograd",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 139,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 77202,
+    "name": "Janus",
+    "flavor": "Janus",
+    "alt_name": "",
+    "brand": "Nirvana",
+    "line": "Nirvana Eclipse",
+    "slug": "nirvana/nirvana-eclipse/janus",
+    "source_url": "https://htreviews.org/tobaccos/nirvana/nirvana-eclipse/janus",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 135,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      },
+      {
+        "id": 47,
+        "name": "Арбуз",
+        "group": "Фруктовый",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята",
+      "Арбуз"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий",
+      "Фруктовый"
+    ]
+  },
+  {
+    "id": 78983,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "",
+    "brand": "Buta",
+    "line": "Classic",
+    "slug": "buta/buta-classic/grape",
+    "source_url": "https://htreviews.org/tobaccos/buta/buta-classic/grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 134,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 69066,
+    "name": "Grape & Strawberry",
+    "flavor": "Grape & Strawberry",
+    "alt_name": "Виноград с клубникой",
+    "brand": "Al-Waha",
+    "line": "Основная",
+    "slug": "al-waha/al-waha-main/grape-amp-strawberry",
+    "source_url": "https://htreviews.org/tobaccos/al-waha/al-waha-main/grape-amp-strawberry",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 132,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 25,
+        "name": "Клубника",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Клубника"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 77194,
+    "name": "Dorado",
+    "flavor": "Dorado",
+    "alt_name": "",
+    "brand": "Nirvana",
+    "line": "Nirvana Eclipse",
+    "slug": "nirvana/nirvana-eclipse/dorado",
+    "source_url": "https://htreviews.org/tobaccos/nirvana/nirvana-eclipse/dorado",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 132,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 146,
+        "name": "Гвоздика",
+        "group": "Цветочный",
+        "taste": "Специфический"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Гвоздика"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Цветочный"
+    ]
+  },
+  {
+    "id": 79324,
+    "name": "Grape and Mint",
+    "flavor": "Grape and Mint",
+    "alt_name": "",
+    "brand": "Starry",
+    "line": "Основная",
+    "slug": "starry/starry-main/grape-and-mint",
+    "source_url": "https://htreviews.org/tobaccos/starry/starry-main/grape-and-mint",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 126,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 77198,
+    "name": "Fornax",
+    "flavor": "Fornax",
+    "alt_name": "",
+    "brand": "Nirvana",
+    "line": "Nirvana Eclipse",
+    "slug": "nirvana/nirvana-eclipse/fornax",
+    "source_url": "https://htreviews.org/tobaccos/nirvana/nirvana-eclipse/fornax",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 123,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 79053,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "",
+    "brand": "Buta",
+    "line": "Dark",
+    "slug": "buta/buta-dark/grape",
+    "source_url": "https://htreviews.org/tobaccos/buta/buta-dark/grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 119,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 77197,
+    "name": "Eridani",
+    "flavor": "Eridani",
+    "alt_name": "",
+    "brand": "Nirvana",
+    "line": "Nirvana Eclipse",
+    "slug": "nirvana/nirvana-eclipse/eridani",
+    "source_url": "https://htreviews.org/tobaccos/nirvana/nirvana-eclipse/eridani",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 118,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 69206,
+    "name": "Виноград и мята",
+    "flavor": "Виноград и мята",
+    "alt_name": "Виноград и мята",
+    "brand": "Al-Mawardi",
+    "line": "Основная",
+    "slug": "al-mawardi/al-mawardi-main/vinograd-i-miata",
+    "source_url": "https://htreviews.org/tobaccos/al-mawardi/al-mawardi-main/vinograd-i-miata",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 117,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 80023,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "",
+    "brand": "Argelini",
+    "line": "Основная",
+    "slug": "argelini/argelini-main/grape",
+    "source_url": "https://htreviews.org/tobaccos/argelini/argelini-main/grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 109,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 80027,
+    "name": "Grape Mint",
+    "flavor": "Grape Mint",
+    "alt_name": "",
+    "brand": "Argelini",
+    "line": "Основная",
+    "slug": "argelini/argelini-main/grape-mint",
+    "source_url": "https://htreviews.org/tobaccos/argelini/argelini-main/grape-mint",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 109,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 101692,
+    "name": "Black Grape",
+    "flavor": "Black Grape",
+    "alt_name": "Черный виноград",
+    "brand": "Daim",
+    "line": "Основная",
+    "slug": "daim/daim-main/black-grape",
+    "source_url": "https://htreviews.org/tobaccos/daim/daim-main/black-grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 108,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 72233,
+    "name": "Виноград",
+    "flavor": "Виноград",
+    "alt_name": "",
+    "brand": "D-Gastro",
+    "line": "Основная",
+    "slug": "d-gastro/d-gastro-main/vinograd",
+    "source_url": "https://htreviews.org/tobaccos/d-gastro/d-gastro-main/vinograd",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 107,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 79607,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "",
+    "brand": "Fasil",
+    "line": "Основная",
+    "slug": "fasil/fasil-main/grape",
+    "source_url": "https://htreviews.org/tobaccos/fasil/fasil-main/grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 105,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 80025,
+    "name": "Grape Isabella",
+    "flavor": "Grape Isabella",
+    "alt_name": "",
+    "brand": "Argelini",
+    "line": "Основная",
+    "slug": "argelini/argelini-main/grape-isabella",
+    "source_url": "https://htreviews.org/tobaccos/argelini/argelini-main/grape-isabella",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 104,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 80037,
+    "name": "Icy Grape",
+    "flavor": "Icy Grape",
+    "alt_name": "",
+    "brand": "Argelini",
+    "line": "Основная",
+    "slug": "argelini/argelini-main/icy-grape",
+    "source_url": "https://htreviews.org/tobaccos/argelini/argelini-main/icy-grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 103,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 120200,
+    "name": "Спелый виноград и смородина",
+    "flavor": "Спелый виноград и смородина",
+    "alt_name": "",
+    "brand": "Devil Cook (табак)",
+    "line": "Основная",
+    "slug": "devil-cook-tabak/devil-cook-tabak-main/spelyi-vinograd-i-smorodina",
+    "source_url": "https://htreviews.org/tobaccos/devil-cook-tabak/devil-cook-tabak-main/spelyi-vinograd-i-smorodina",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 103,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 69,
+        "name": "Черная смородина",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Черная смородина"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 69180,
+    "name": "Виноград и ягода",
+    "flavor": "Виноград и ягода",
+    "alt_name": "Виноград и ягода",
+    "brand": "Al-Mawardi",
+    "line": "Основная",
+    "slug": "al-mawardi/al-mawardi-main/vinograd-i-iagoda",
+    "source_url": "https://htreviews.org/tobaccos/al-mawardi/al-mawardi-main/vinograd-i-iagoda",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 100,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 22,
+        "name": "Ягоды",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Ягоды"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 71958,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "",
+    "brand": "Social Smoke",
+    "line": "Основная",
+    "slug": "social-smoke/social-smoke-main/grape",
+    "source_url": "https://htreviews.org/tobaccos/social-smoke/social-smoke-main/grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 100,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 80097,
+    "name": "Raspberry Grape",
+    "flavor": "Raspberry Grape",
+    "alt_name": "",
+    "brand": "Argelini",
+    "line": "Основная",
+    "slug": "argelini/argelini-main/raspberry-grape",
+    "source_url": "https://htreviews.org/tobaccos/argelini/argelini-main/raspberry-grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 99,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 56,
+        "name": "Малина",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Малина"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 199628,
+    "name": "Autumn Royale",
+    "flavor": "Autumn Royale",
+    "alt_name": "Виноград",
+    "brand": "Bali Hai",
+    "line": "Основная",
+    "slug": "bali-hai/bali-hai-main/autumn-royale",
+    "source_url": "https://htreviews.org/tobaccos/bali-hai/bali-hai-main/autumn-royale",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 98,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 79983,
+    "name": "Black Grape",
+    "flavor": "Black Grape",
+    "alt_name": "",
+    "brand": "Argelini",
+    "line": "Основная",
+    "slug": "argelini/argelini-main/black-grape",
+    "source_url": "https://htreviews.org/tobaccos/argelini/argelini-main/black-grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 94,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 101695,
+    "name": "Grape Mint",
+    "flavor": "Grape Mint",
+    "alt_name": "Виноград с мятой",
+    "brand": "Daim",
+    "line": "Основная",
+    "slug": "daim/daim-main/grape-mint",
+    "source_url": "https://htreviews.org/tobaccos/daim/daim-main/grape-mint",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 93,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 199328,
+    "name": "Black to Grape",
+    "flavor": "Black to Grape",
+    "alt_name": "Чёрный виноград",
+    "brand": "Future",
+    "line": "Основная",
+    "slug": "future/main/black-to-grape",
+    "source_url": "https://htreviews.org/tobaccos/future/main/black-to-grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 92,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 139125,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "Виноград",
+    "brand": "Cobra",
+    "line": "Cobra La Muerte",
+    "slug": "cobra/cobra-la-muerte/grape",
+    "source_url": "https://htreviews.org/tobaccos/cobra/cobra-la-muerte/grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 88,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 79322,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "",
+    "brand": "Starry",
+    "line": "Основная",
+    "slug": "starry/starry-main/grape",
+    "source_url": "https://htreviews.org/tobaccos/starry/starry-main/grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 84,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 70565,
+    "name": "White Boy Grape",
+    "flavor": "White Boy Grape",
+    "alt_name": "",
+    "brand": "Nirvana",
+    "line": "Nirvana Super Shisha",
+    "slug": "nirvana/nirvana-super-shisha/white-boy-grape",
+    "source_url": "https://htreviews.org/tobaccos/nirvana/nirvana-super-shisha/white-boy-grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 83,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 79338,
+    "name": "Ice Blueberry Grape",
+    "flavor": "Ice Blueberry Grape",
+    "alt_name": "",
+    "brand": "Starry",
+    "line": "Основная",
+    "slug": "starry/starry-main/ice-blueberry-grape",
+    "source_url": "https://htreviews.org/tobaccos/starry/starry-main/ice-blueberry-grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 83,
+    "strength": "",
+    "tags": [
+      {
+        "id": 21,
+        "name": "Черника",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Черника",
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 199341,
+    "name": "Mint Crape",
+    "flavor": "Mint Crape",
+    "alt_name": "Мята Виноград",
+    "brand": "LUNA",
+    "line": "Основная",
+    "slug": "luna/luna-main/mint-crape",
+    "source_url": "https://htreviews.org/tobaccos/luna/luna-main/mint-crape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 81,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 96766,
+    "name": "Grapes",
+    "flavor": "Grapes",
+    "alt_name": "Виноград",
+    "brand": "Sarkozy (SZ)",
+    "line": "Основная",
+    "slug": "sarkozy-sz/sarkozy-sz-main/grapes",
+    "source_url": "https://htreviews.org/tobaccos/sarkozy-sz/sarkozy-sz-main/grapes",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 80,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 98374,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "Виноград",
+    "brand": "Baccar tobacco",
+    "line": "Основная",
+    "slug": "baccar-tobacco/baccar-tobacco-main/grape",
+    "source_url": "https://htreviews.org/tobaccos/baccar-tobacco/baccar-tobacco-main/grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 76,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 79582,
+    "name": "Stum",
+    "flavor": "Stum",
+    "alt_name": "",
+    "brand": "Fasil",
+    "line": "Основная",
+    "slug": "fasil/fasil-main/stum",
+    "source_url": "https://htreviews.org/tobaccos/fasil/fasil-main/stum",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 75,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 39,
+        "name": "Алкоголь",
+        "group": "Алкогольный",
+        "taste": "Прочее"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Алкоголь"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Алкогольный"
+    ]
+  },
+  {
+    "id": 79330,
+    "name": "Grapes Cream",
+    "flavor": "Grapes Cream",
+    "alt_name": "",
+    "brand": "Starry",
+    "line": "Основная",
+    "slug": "starry/starry-main/grapes-cream",
+    "source_url": "https://htreviews.org/tobaccos/starry/starry-main/grapes-cream",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 73,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 96,
+        "name": "Мороженое",
+        "group": "Десертный",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мороженое"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Десертный"
+    ]
+  },
+  {
+    "id": 70164,
+    "name": "Grape Lemon",
+    "flavor": "Grape Lemon",
+    "alt_name": "",
+    "brand": "Layalina",
+    "line": "Основная",
+    "slug": "layalina/layalina-main/grape-lemon",
+    "source_url": "https://htreviews.org/tobaccos/layalina/layalina-main/grape-lemon",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 72,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 27,
+        "name": "Лимон",
+        "group": "Цитрусовый",
+        "taste": "Кислый"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Лимон"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Цитрусовый"
+    ]
+  },
+  {
+    "id": 70166,
+    "name": "Grape Mint",
+    "flavor": "Grape Mint",
+    "alt_name": "",
+    "brand": "Layalina",
+    "line": "Основная",
+    "slug": "layalina/layalina-main/grape-mint",
+    "source_url": "https://htreviews.org/tobaccos/layalina/layalina-main/grape-mint",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 72,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 79342,
+    "name": "Ice Grapes Cream",
+    "flavor": "Ice Grapes Cream",
+    "alt_name": "",
+    "brand": "Starry",
+    "line": "Основная",
+    "slug": "starry/starry-main/ice-grapes-cream",
+    "source_url": "https://htreviews.org/tobaccos/starry/starry-main/ice-grapes-cream",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 71,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 44,
+        "name": "Холодок",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      },
+      {
+        "id": 96,
+        "name": "Мороженое",
+        "group": "Десертный",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Холодок",
+      "Мороженое"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий",
+      "Десертный"
+    ]
+  },
+  {
+    "id": 199623,
+    "name": "Тёмный виноград",
+    "flavor": "Тёмный виноград",
+    "alt_name": "Black Grapes",
+    "brand": "Sweddishot",
+    "line": "Основная",
+    "slug": "sweddishot/main/temnyy-vinograd",
+    "source_url": "https://htreviews.org/tobaccos/sweddishot/main/temnyy-vinograd",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 71,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 70160,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "",
+    "brand": "Layalina",
+    "line": "Основная",
+    "slug": "layalina/layalina-main/grape",
+    "source_url": "https://htreviews.org/tobaccos/layalina/layalina-main/grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 68,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 70144,
+    "name": "Cranberry Grape",
+    "flavor": "Cranberry Grape",
+    "alt_name": "",
+    "brand": "Layalina",
+    "line": "Основная",
+    "slug": "layalina/layalina-main/cranberry-grape",
+    "source_url": "https://htreviews.org/tobaccos/layalina/layalina-main/cranberry-grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 67,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 23,
+        "name": "Клюква",
+        "group": "Ягодный",
+        "taste": "Кислый"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Клюква"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 79145,
+    "name": "Grape",
+    "flavor": "Grape",
+    "alt_name": "",
+    "brand": "Smyrna",
+    "line": "Основная",
+    "slug": "smyrna/smyrna-main/grape",
+    "source_url": "https://htreviews.org/tobaccos/smyrna/smyrna-main/grape",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 64,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      }
+    ],
+    "tastes": [
+      "Виноград"
+    ],
+    "taste_groups": [
+      "Ягодный"
+    ]
+  },
+  {
+    "id": 139337,
+    "name": "Grapes Mint",
+    "flavor": "Grapes Mint",
+    "alt_name": "Виноград с мятой",
+    "brand": "Just Original",
+    "line": "Основная",
+    "slug": "just-original/just-original-main/grapes-mint",
+    "source_url": "https://htreviews.org/tobaccos/just-original/just-original-main/grapes-mint",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 63,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
+  },
+  {
+    "id": 200075,
+    "name": "Виноград — мята",
+    "flavor": "Виноград — мята",
+    "alt_name": "",
+    "brand": "Papi",
+    "line": "Основная",
+    "slug": "papi/papi-main/vinograd-myata",
+    "source_url": "https://htreviews.org/tobaccos/papi/papi-main/vinograd-myata",
+    "rating": 0,
+    "ratings_count": 0,
+    "reviews_count": 0,
+    "views": 32,
+    "strength": "",
+    "tags": [
+      {
+        "id": 14,
+        "name": "Виноград",
+        "group": "Ягодный",
+        "taste": "Сладкий"
+      },
+      {
+        "id": 15,
+        "name": "Мята",
+        "group": "Освежающий",
+        "taste": "Освежающий"
+      }
+    ],
+    "tastes": [
+      "Виноград",
+      "Мята"
+    ],
+    "taste_groups": [
+      "Ягодный",
+      "Освежающий"
+    ]
   }
 ]

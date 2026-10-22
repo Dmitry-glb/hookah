@@ -1,180 +1,99 @@
+/** Собирает полный каталог HTReviews в flavors.json. Запуск: npm run scrape */
 const fs = require('fs');
 const path = require('path');
-const puppeteer = require('puppeteer');
+const axios = require('axios');
+const cheerio = require('cheerio');
 
-const TARGET_URL = 'https://htreviews.org/tobaccos';
-const filePath = path.join(__dirname, 'flavors.json');
+const CATALOG_URL = 'https://htreviews.org/tobaccos?r=discussed&s=rating&d=desc&k=3';
+const API_URL = 'https://htreviews.org/getData';
+const OUTPUT_PATH = path.join(__dirname, 'flavors.json');
+const PAGE_SIZE = 20;
 
-// Словарь каноничных брендов и мусорных подстрок для очистки
-const CANONICAL_BRANDS = [
-    { canon: 'Darkside', aliases: ['darkside', 'дарксайд', 'dark side'] },
-    { canon: 'Musthave', aliases: ['musthave', 'must have', 'мастхэв'] },
-    { canon: 'Blackburn', aliases: ['blackburn', 'блэкберн', 'black burn', 'burn'] },
-    { canon: 'Deus', aliases: ['deus', 'деус'] },
-    { canon: 'Северный', aliases: ['северный', 'severnyj', 'severny'] },
-    { canon: 'Наш', aliases: ['наш', 'nash'] },
-    { canon: 'Element', aliases: ['element', 'элемент'] },
-    { canon: 'Bonche', aliases: ['bonche', 'бонче'] },
-    { canon: 'Tangiers', aliases: ['tangiers', 'танж'] },
-    { canon: 'Overdose', aliases: ['overdose', 'овердоз'] },
-    { canon: 'Satyr', aliases: ['satyr', 'сатир'] },
-    { canon: 'Spectrum', aliases: ['spectrum', 'спектрум'] },
-    { canon: 'Sebero', aliases: ['sebero', 'себеро'] },
-    { canon: 'Chabacco', aliases: ['chabacco', 'чабакко'] },
-    { canon: 'Dogma', aliases: ['dogma', 'догма'] },
-    { canon: 'Banger', aliases: ['banger', 'бэнгер'] },
-    { canon: 'Trofimoff', aliases: ['trofimoff', 'трофимов'] },
-    { canon: 'Starline', aliases: ['starline', 'старлайн'] },
-    { canon: 'Сарма', aliases: ['сарма', 'sarma'] },
-    { canon: 'Chupa', aliases: ['chupa', 'чупа'] }
-];
+const http = axios.create({
+    timeout: 45_000,
+    headers: { 'User-Agent': 'DimHookah catalog importer/1.0', Accept: 'application/json, text/html;q=0.9, */*;q=0.8' },
+    responseType: 'text'
+});
 
-function normalizeBrand(rawBrand, rawName) {
-    const combined = `${rawBrand} ${rawName}`.toLowerCase();
-    for (const b of CANONICAL_BRANDS) {
-        for (const alias of b.aliases) {
-            if (combined.includes(alias)) {
-                return b.canon;
-            }
-        }
-    }
-    // Если бренд не распознан, аккуратно очищаем сырой
-    return rawBrand.replace(/(tobacco|табак|линейка|line|core|rare|shot)/gi, '').trim() || 'Custom';
+function numberOrNull(value) {
+    if (value === null || value === undefined || value === '') return null;
+    const number = Number(String(value).replace(',', '.').replace(/k$/i, '000'));
+    return Number.isFinite(number) ? number : null;
 }
 
-function cleanFlavorName(rawName, brand) {
-    let clean = rawName;
-    // Убираем имя бренда из названия вкуса, если ChatGPT их склеил
-    const regBrand = new RegExp(`^${brand}\\s*[-/]?\\s*`, 'i');
-    clean = clean.replace(regBrand, '');
-    // Убираем пометки граммовок и крепости в скобках: (25г), (Medium)
-    clean = clean.replace(/\(\d+\s*г\)/gi, '');
-    clean = clean.replace(/\((rare\vert{}core\vert{}base\vert{}strong\vert{}medium\vert{}shot)\)/gi, '');
-    return clean.trim();
+function cleanText(value) { return String(value || '').replace(/\s+/g, ' ').trim(); }
+
+function getExpectedCount(html) {
+    const $ = cheerio.load(html);
+    const counts = $('.tobacco_list_items[data-count]').map((_, el) => Number($(el).attr('data-count'))).get();
+    return Math.max(...counts.filter(Number.isFinite), 0);
 }
 
-async function scrapeWithPuppeteer() {
-    console.log('🕷️ Запуск чистого парсера HTReviews...');
-
-    const browser = await puppeteer.launch({
-        headless: "new",
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
-
+async function getPage(offset) {
+    // `flavor` — полный каталог вкусов. `discussed` из URL пользователя —
+    // рейтинговая выборка и содержит только часть всех позиций.
+    const response = await http.get(API_URL, { params: { r: 'flavor', s: 'rating', d: 'desc', k: 3, o: offset, action: 'tobaccos' } });
     try {
-        const page = await browser.newPage();
-        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36');
-
-        console.log('🌐 Загрузка каталога...');
-        await page.goto(TARGET_URL, { waitUntil: 'networkidle2', timeout: 60000 });
-
-        // Автоскролл страницы вниз для подгрузки динамических элементов
-        await page.evaluate(async () => {
-            await new Promise((resolve) => {
-                let totalHeight = 0;
-                const distance = 400;
-                const timer = setInterval(() => {
-                    window.scrollBy(0, distance);
-                    totalHeight += distance;
-                    if (totalHeight >= 2400) {
-                        clearInterval(timer);
-                        resolve();
-                    }
-                }, 200);
-            });
-        });
-
-        const rawData = await page.evaluate(() => {
-            const results = [];
-            // Ищем карточки и ссылки каталога
-            const elements = document.querySelectorAll('a[href*="/tobaccos/"], div[class*="tobacco-card"], div[class*="item"]');
-
-            elements.forEach(el => {
-                const text = el.innerText || '';
-                const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-
-                // Извлекаем рейтинг (число с точкой 4.x)
-                const ratingMatch = text.match(/([4-5]\.[0-9])/);
-                const rating = ratingMatch ? parseFloat(ratingMatch[1]) : 4.5;
-
-                if (lines.length >= 2) {
-                    results.push({
-                        line0: lines[0],
-                        line1: lines[1],
-                        line2: lines[2] || '',
-                        rating
-                    });
-                }
-            });
-            return results;
-        });
-
-        console.log(`🔍 Собрано сырых блоков: ${rawData.length}`);
-
-        // Загружаем существующую базу
-        let existingFlavors = [];
-        if (fs.existsSync(filePath)) {
-            try {
-                existingFlavors = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-            } catch (e) {
-                existingFlavors = [];
-            }
-        }
-
-        const cleanedBatch = [];
-        for (const item of rawData) {
-            // Анализируем структуру строк
-            let rawBrand = item.line0;
-            let rawName = item.line1;
-
-            const brand = normalizeBrand(rawBrand, rawName);
-            const name = cleanFlavorName(rawName, brand);
-
-            if (name.length > 2 && item.rating >= 4.0) {
-                cleanedBatch.push({
-                    brand,
-                    name,
-                    category: "Популярное",
-                    rating: item.rating,
-                    reviews_count: 120,
-                    description: `Топовый вкус от ${brand} с рейтингом ${item.rating} на HTReviews.`
-                });
-            }
-        }
-
-        // Объединяем со старой базой с удалением дубликатов и чисткой
-        const map = new Map();
-
-        // Сначала нормализуем то, что уже было в базе (лечим старые косяки)
-        existingFlavors.forEach(f => {
-            const normBrand = normalizeBrand(f.brand || '', f.name || '');
-            const normName = cleanFlavorName(f.name || '', normBrand);
-            if (normName.length > 1) {
-                const key = `${normBrand.toLowerCase()}:::${normName.toLowerCase()}`;
-                map.set(key, { ...f, brand: normBrand, name: normName });
-            }
-        });
-
-        // Накатываем новые спарсенные позиции
-        cleanedBatch.forEach(f => {
-            const key = `${f.brand.toLowerCase()}:::${f.name.toLowerCase()}`;
-            if (!map.has(key) || f.rating >= map.get(key).rating) {
-                map.set(key, f);
-            }
-        });
-
-        const finalFlavors = Array.from(map.values())
-            .filter(f => f.brand !== 'Custom' && f.name.length >= 3)
-            .sort((a, b) => b.rating - a.rating);
-
-        fs.writeFileSync(filePath, JSON.stringify(finalFlavors, null, 2), 'utf8');
-        console.log(`✅ База успешно вычищена и обновлена! Реальных чистых табаков: ${finalFlavors.length}`);
-
-    } catch (err) {
-        console.error('❌ Ошибка парсера:', err);
-    } finally {
-        await browser.close();
+        const data = JSON.parse(response.data);
+        if (!Array.isArray(data)) throw new Error('ответ не является массивом');
+        return data;
+    } catch (error) {
+        throw new Error(`Не удалось разобрать ответ на offset=${offset}: ${error.message}`);
     }
 }
 
-scrapeWithPuppeteer();
+function normalizeRecord(item) {
+    const tags = Array.isArray(item.tags) ? item.tags.map(tag => ({
+        id: numberOrNull(tag.id), name: cleanText(tag.name), group: cleanText(tag.group), taste: cleanText(tag.taste)
+    })).filter(tag => tag.name) : [];
+    const name = cleanText(item.name);
+    const brand = cleanText(item.brand);
+    if (!item.id || !name || !brand || !item.slug) return null;
+    return {
+        id: numberOrNull(item.id), name, flavor: name, alt_name: cleanText(item.alt_name), brand,
+        line: cleanText(item.line), slug: item.slug, source_url: `https://htreviews.org/tobaccos/${item.slug}`,
+        rating: numberOrNull(item.rating), ratings_count: numberOrNull(item.ratings_count),
+        reviews_count: numberOrNull(item.reviews), views: numberOrNull(item.views), strength: cleanText(item.strength),
+        tags, tastes: tags.map(tag => tag.name), taste_groups: [...new Set(tags.map(tag => tag.group).filter(Boolean))]
+    };
+}
+
+async function scrape() {
+    console.log('🌐 Проверяю каталог HTReviews...');
+    const catalogResponse = await http.get(CATALOG_URL);
+    const htmlCount = getExpectedCount(catalogResponse.data);
+    if (!htmlCount) throw new Error('Не удалось определить размер каталога');
+    console.log(`📚 В HTML каталога заявлено позиций: ${htmlCount}`);
+
+    const records = new Map();
+    // getData отдаёт фактические страницы полного каталога. У HTReviews
+    // data-count в HTML относится к выбранной вкладке, поэтому заканчиваем
+    // на короткой/пустой странице и дополнительно проверяем полноту.
+    for (let offset = 0; offset < 1000; offset += PAGE_SIZE) {
+        let page;
+        let lastError;
+        for (let attempt = 1; attempt <= 3; attempt += 1) {
+            try { page = await getPage(offset); break; }
+            catch (error) { lastError = error; if (attempt < 3) await new Promise(resolve => setTimeout(resolve, 700 * attempt)); }
+        }
+        if (!page) throw lastError;
+        if (!page.length) break;
+        page.map(normalizeRecord).filter(Boolean).forEach(record => records.set(record.id || record.slug, record));
+        console.log(`  ✓ получено ${records.size} позиций`);
+        if (page.length < PAGE_SIZE) break;
+    }
+
+    const result = [...records.values()];
+    if (!result.length) throw new Error('Проверка полноты не пройдена: каталог пуст');
+    if (result.length < Math.max(1, Math.floor(htmlCount * 0.95))) {
+        throw new Error(`Проверка полноты не пройдена: собрано ${result.length} из ${htmlCount}`);
+    }
+    if (result.some(item => !item.brand || !item.name || !Number.isFinite(item.rating))) {
+        throw new Error('Проверка полей не пройдена: найдены неполные записи');
+    }
+    result.sort((a, b) => (b.rating - a.rating) || (b.reviews_count - a.reviews_count));
+    fs.writeFileSync(OUTPUT_PATH, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
+    console.log(`✅ Готово: ${result.length} вкусов записано в ${path.basename(OUTPUT_PATH)}`);
+}
+
+scrape().catch(error => { console.error(`❌ Парсер остановлен: ${error.message}`); process.exitCode = 1; });

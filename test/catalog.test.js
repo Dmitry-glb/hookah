@@ -9,16 +9,23 @@ function isDiscontinued(item) {
   return item.discontinued === true || Number(item.status_id) === 4 || /снят\s+с\s+производства/i.test(String(item.status || ''));
 }
 
-test('flavors.json: каталог непустой и содержит MUSTHAVE', () => {
+test('flavors.json: каталог непустой и содержит MUSTHAVE и Black Burn', () => {
   assert.ok(Array.isArray(catalog));
-  assert.ok(catalog.length >= 2000, `ожидалось >= 2000 вкусов, получено ${catalog.length}`);
+  assert.ok(catalog.length >= 4500, `ожидалось >= 4500 вкусов, получено ${catalog.length}`);
 
   const brands = new Set(catalog.map((item) => item.brand_slug));
-  assert.ok(brands.size >= 40, `ожидалось >= 40 брендов, получено ${brands.size}`);
+  assert.ok(brands.size >= 56, `ожидалось >= 56 брендов, получено ${brands.size}`);
   assert.ok(brands.has('musthave'), 'MUSTHAVE должен быть в каталоге');
+  assert.ok(brands.has('black-burn'), 'Black Burn должен быть в каталоге');
+  assert.equal(catalog.some((item) => isDiscontinued(item)), false, 'в каталоге не должно быть снятых с производства вкусов');
+  assert.equal(
+    catalog.every((item) => Number(item.status_id) === 1 || Number(item.status_id) === 2),
+    true,
+    'в каталоге должны быть только выпускаемые и лимитированные вкусы'
+  );
 
   const musthave = catalog.filter((item) => item.brand_slug === 'musthave');
-  assert.ok(musthave.length >= 90, `MUSTHAVE: ожидалось >= 90, получено ${musthave.length}`);
+  assert.ok(musthave.length >= 85, `MUSTHAVE: ожидалось >= 85, получено ${musthave.length}`);
   assert.ok(musthave.filter((item) => !isDiscontinued(item)).length >= 85, 'активных вкусов MUSTHAVE должно быть >= 85');
   assert.ok(musthave.some((item) => item.slug === 'musthave/main/earl-grey'), 'Earl Grey должен быть в каталоге');
 });

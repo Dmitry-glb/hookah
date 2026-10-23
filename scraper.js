@@ -7,7 +7,7 @@
  *   npm run scrape                       # обновить текущий flavors.json + MUSTHAVE
  *   npm run scrape -- --dry-run          # показать, что изменится, не писать файл
  *   npm run scrape -- --only-brand musthave --out debug/musthave.json
- *   npm run scrape -- --clean            # собрать топ-40 брендов заново
+ *   npm run scrape -- --clean            # собрать топ-60 брендов заново
  *   npm run scrape -- --clean --all-brands
  */
 
@@ -21,7 +21,7 @@ const {
 } = require('./lib/htreviews');
 
 const DEFAULT_OUTPUT = 'flavors.json';
-const DEFAULT_LIMIT_BRANDS = 40;
+const DEFAULT_LIMIT_BRANDS = 60;
 const DEFAULT_DELAY_MS = 250;
 
 function splitList(value) {
@@ -129,7 +129,7 @@ function printHelp() {
   --out <file>              куда писать каталог (по умолчанию flavors.json)
   --merge                   обновить бренды, уже присутствующие в файле, + MUSTHAVE
   --clean                   собрать каталог заново из текущего рейтинга брендов
-  --limit-brands <n>        сколько брендов брать в режиме --clean (по умолчанию 40; 0 = все)
+  --limit-brands <n>        сколько брендов брать в режиме --clean (по умолчанию 60; 0 = все)
   --all-brands              взять все бренды из рейтинга (то же, что --limit-brands 0)
   --brand <slug[,slug]>     дополнительно включить бренды (по умолчанию уже включён musthave)
   --only-brand <slug,...>   собрать только указанные бренды, игнорируя остальные

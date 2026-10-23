@@ -155,6 +155,16 @@ test('normalizeFlavor по умолчанию исключает снятые с
   assert.equal(included.status, 'Снят с производства');
 });
 
+test('normalizeFlavor исключает неподтверждённые и шуточные статусы', () => {
+  const unknown = makeFlavor(3, 102, { status: 'Не известен', status_id: '3' });
+  const joke = makeFlavor(4, 103, { status: 'Шуточный 🙃', status_id: '5' });
+
+  assert.equal(normalizeFlavor(unknown, { slug: 'musthave', position: 36 }), null);
+  assert.equal(normalizeFlavor(joke, { slug: 'musthave', position: 36 }), null);
+  assert.equal(normalizeFlavor(unknown, { slug: 'musthave', position: 36 }, { includeUnknown: true }).status, 'Не известен');
+  assert.equal(normalizeFlavor(joke, { slug: 'musthave', position: 36 }, { includeUnknown: true }).status, 'Шуточный 🙃');
+});
+
 test('normalizeFlavor возвращает null без slug/name', () => {
   assert.equal(normalizeFlavor({ name: 'Без слота' }, { slug: 'musthave' }), null);
   assert.equal(normalizeFlavor({ slug: 'musthave/main/x' }, { slug: 'musthave' }), null);
@@ -199,15 +209,15 @@ test('selectTargets: merge берёт бренды из существующег
   assert.equal(targets[1].id, '37');
 });
 
-test('selectTargets: без limitBrands по умолчанию берёт 40 брендов', () => {
-  const directory = Array.from({ length: 60 }, (_, index) =>
+test('selectTargets: без limitBrands по умолчанию берёт 60 брендов', () => {
+  const directory = Array.from({ length: 70 }, (_, index) =>
     makeBrand(index + 1, `brand-${index + 1}`, index + 1)
   );
   const targets = selectTargets({ directory, mode: 'clean' });
 
-  assert.equal(targets.length, 40);
+  assert.equal(targets.length, 60);
   assert.equal(targets[0].slug, 'brand-1');
-  assert.equal(targets[39].slug, 'brand-40');
+  assert.equal(targets[59].slug, 'brand-60');
 });
 
 test('selectTargets: onlyBrands имеет приоритет', () => {

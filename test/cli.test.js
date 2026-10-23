@@ -13,7 +13,7 @@ test('parseArgs: значения по умолчанию', () => {
 
   assert.equal(options.out, 'flavors.json');
   assert.equal(options.mode, 'auto');
-  assert.equal(options.limitBrands, 40);
+  assert.equal(options.limitBrands, 60);
   assert.equal(options.delay, 250);
   assert.equal(options.retries, 3);
   assert.deepEqual(options.extraBrands, ['musthave']);

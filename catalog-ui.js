@@ -19,7 +19,7 @@
     spins: 'hookah_roulette_spins'
   };
 
-  const TABS = ['home', 'roulette', 'collection', 'stats', 'session'];
+  const TABS = ['home', 'roulette'];
   const numberFormatter = new Intl.NumberFormat('ru-RU');
 
   const state = {
@@ -68,18 +68,6 @@
       nav: byId('main-nav'),
       headerStatus: byId('header-catalog-status'),
       headerLabel: byId('header-catalog-label'),
-      homeTotal: byId('hero-total'),
-      homeBrands: byId('hero-brands'),
-      homeActive: byId('hero-active'),
-      homeCollectionCount: byId('hero-collection-count'),
-      homeStatTotal: byId('home-stat-total'),
-      homeStatBrands: byId('home-stat-brands'),
-      homeStatActive: byId('home-stat-active'),
-      homeStatLimited: byId('home-stat-limited'),
-      homeStatStrength: byId('home-stat-strength'),
-      homeStatImages: byId('home-stat-images'),
-      homeTopBrands: byId('home-top-brands'),
-      homeTopCategories: byId('home-top-categories'),
       rouletteBrand: byId('roulette-brand'),
       rouletteStrength: byId('roulette-strength'),
       rouletteCategory: byId('roulette-category'),
@@ -102,12 +90,6 @@
       collectionAll: byId('collection-count-all'),
       collectionWish: byId('collection-count-wish'),
       collectionTried: byId('collection-count-tried'),
-      navCollectionCount: byId('nav-collection-count'),
-      statsCatalogPill: byId('stats-catalog-pill'),
-      statsBrands: byId('stats-brands'),
-      statsStrengths: byId('stats-strengths'),
-      statsCategories: byId('stats-categories'),
-      statsStatuses: byId('stats-statuses'),
       userSpins: byId('user-spins'),
       userCollection: byId('user-collection'),
       userTried: byId('user-tried'),
@@ -308,11 +290,9 @@
       }
     }
 
-    if (target === 'home') renderHome();
-    if (target === 'collection') renderCollection();
-    if (target === 'stats') renderStats();
-    if (target === 'roulette' && state.ready && !el.rouletteTrack.children.length) {
-      renderIdleReel();
+    if (target === 'roulette' && state.ready) {
+      if (!el.rouletteTrack.children.length) renderIdleReel();
+      renderCollection();
     }
 
     if (settings.scroll !== false) {
@@ -320,50 +300,33 @@
     }
   }
 
-  function fillSelect(select, rows, allLabel) {
-    if (!select) return;
-    const previous = select.value;
-    const fragment = document.createDocumentFragment();
-    fragment.append(new Option(allLabel, 'all'));
-    for (const row of rows) {
-      fragment.append(new Option(row.label, row.value));
-    }
-    select.replaceChildren(fragment);
-    const exists = [...select.options].some((option) => option.value === previous);
-    select.value = exists ? previous : 'all';
+  function facetLabel(dimension, value) {
+    if (dimension === 'strength' && value === Core.NO_STRENGTH) return 'Без крепости';
+    if (dimension === 'category' && value === Core.NO_CATEGORY) return 'Без направления';
+    if (dimension === 'rating') return `От ${Number(value).toFixed(1)}`;
+    return value;
   }
 
-  function populateFilterOptions() {
-    const active = state.catalog.filter((item) => !Core.isDiscontinued(item));
-    const brands = Core.brandDistribution(active).sort(
-      (a, b) => b.count - a.count || a.key.localeCompare(b.key, 'ru')
-    );
-    fillSelect(
-      el.rouletteBrand,
-      brands.map((row) => ({ value: row.key, label: `${row.key} · ${row.count}` })),
-      'Все бренды'
-    );
-
-    const strengths = Core.strengthDistribution(active);
-    fillSelect(
-      el.rouletteStrength,
-      strengths.map((row) => ({
-        value: row.key === 'Не указана' ? Core.NO_STRENGTH : row.key,
-        label: row.key === 'Не указана' ? 'Без крепости' : `${row.key} · ${row.count}`
-      })),
-      'Любая крепость'
-    );
-
-    const categories = Core.categoryDistribution(active);
-    const categoryRows = categories.map((row) => ({
-      value: row.key,
-      label: `${row.key} · ${row.count}`
-    }));
-    const withoutCategory = active.filter((item) => !item.groups.length).length;
-    if (withoutCategory) {
-      categoryRows.push({ value: Core.NO_CATEGORY, label: `Без направления · ${withoutCategory}` });
+  function fillFacetSelect(select, values, allLabel, dimension) {
+    if (!select) return;
+    const previous = select.value;
+    const rows = values.map((value) => ({ value, label: facetLabel(dimension, value) }));
+    if (dimension === 'rating') {
+      rows.sort((a, b) => Number(a.value) - Number(b.value));
+    } else {
+      rows.sort((a, b) => a.label.localeCompare(b.label, 'ru'));
     }
-    fillSelect(el.rouletteCategory, categoryRows, 'Любое направление');
+
+    const fragment = document.createDocumentFragment();
+    fragment.append(new Option(allLabel, 'all'));
+    for (const row of rows) fragment.append(new Option(row.label, row.value));
+    select.replaceChildren(fragment);
+
+    const exists = [...select.options].some((option) => option.value === previous);
+    select.value = exists ? previous : 'all';
+
+    const field = select.closest('.field');
+    if (field) field.hidden = rows.length === 0;
   }
 
   function updateHeaderStatus() {
@@ -379,139 +342,68 @@
       el.headerStatus.classList.toggle('is-loading', state.loading);
       el.headerStatus.classList.toggle('is-error', Boolean(state.error));
     }
-  }
-
-  function renderHome() {
-    if (!state.ready || !state.stats) {
-      updateHeaderStatus();
-      return;
-    }
-
-    const stats = state.stats;
-    const activeItems = state.catalog.filter((item) => !Core.isDiscontinued(item));
-
-    if (el.homeTotal) el.homeTotal.textContent = formatNumber(stats.total);
-    if (el.homeBrands) el.homeBrands.textContent = formatNumber(stats.brands);
-    if (el.homeActive) el.homeActive.textContent = formatNumber(stats.active);
-    if (el.homeStatTotal) el.homeStatTotal.textContent = formatNumber(stats.total);
-    if (el.homeStatBrands) el.homeStatBrands.textContent = formatNumber(stats.brands);
-    if (el.homeStatActive) el.homeStatActive.textContent = formatNumber(stats.active);
-    if (el.homeStatLimited) el.homeStatLimited.textContent = formatNumber(stats.limited);
-    if (el.homeStatStrength) el.homeStatStrength.textContent = formatNumber(stats.withStrength);
-    if (el.homeStatImages) el.homeStatImages.textContent = formatNumber(stats.withImage);
-
-    renderRankList(el.homeTopBrands, Core.brandDistribution(activeItems, 6), 'brand');
-    renderRankList(el.homeTopCategories, Core.categoryDistribution(activeItems, 6), 'category');
-
     if (el.footerCatalogCount) {
-      el.footerCatalogCount.textContent = `${countLabel(stats.total)} · ${brandLabel(stats.brands)}`;
-    }
-    if (el.statsCatalogPill) {
-      el.statsCatalogPill.textContent = `${countLabel(stats.total)} · ${brandLabel(stats.brands)}`;
-    }
-    updateHeaderStatus();
-  }
-
-  function renderRankList(container, rows, type) {
-    if (!container) return;
-    container.replaceChildren();
-    if (!rows.length) {
-      const empty = document.createElement('p');
-      empty.className = 'muted';
-      empty.textContent = 'Недостаточно данных.';
-      container.append(empty);
-      return;
-    }
-
-    const max = Math.max(...rows.map((row) => row.count), 1);
-    for (const row of rows) {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'rank-row';
-      button.dataset[type === 'brand' ? 'brandFilter' : 'categoryFilter'] = row.key;
-      button.setAttribute('aria-label', `${row.key}: ${row.count} вкусов`);
-
-      const head = document.createElement('span');
-      head.className = 'rank-row-head';
-
-      const name = document.createElement('span');
-      name.className = 'rank-name';
-      name.textContent = row.key;
-
-      const count = document.createElement('span');
-      count.className = 'rank-count';
-      count.textContent = formatNumber(row.count);
-
-      head.append(name, count);
-
-      const track = document.createElement('span');
-      track.className = 'rank-track';
-      const fill = document.createElement('span');
-      fill.className = 'rank-fill';
-      fill.style.width = `${Math.max(5, Math.round((row.count / max) * 100))}%`;
-      track.append(fill);
-
-      button.append(head, track);
-      container.append(button);
+      el.footerCatalogCount.textContent = state.ready && state.stats
+        ? `${countLabel(state.stats.total)} · ${brandLabel(state.stats.brands)}`
+        : state.error
+          ? 'Каталог недоступен'
+          : 'Локальный каталог';
     }
   }
 
-  function renderBars(container, rows, options) {
-    if (!container) return;
-    const settings = options || {};
-    container.replaceChildren();
-    if (!rows.length) {
-      const empty = document.createElement('p');
-      empty.className = 'muted';
-      empty.textContent = settings.emptyText || 'Недостаточно данных.';
-      container.append(empty);
-      return;
+  /**
+   * Пересобирает варианты всех фильтров под текущий запрос:
+   * у MUSTHAVE не появится направление, которого у бренда нет.
+   */
+  function updateFacetedFilters(priority) {
+    if (!state.ready) return;
+
+    syncFiltersFromControls();
+    const resolved = Core.resolveFilters(state.catalog, state.filters, priority);
+    state.filters = { ...state.filters, ...resolved };
+    filteredKey = null;
+
+    const facets = [
+      {
+        dimension: 'brand',
+        select: el.rouletteBrand,
+        allLabel: 'Все бренды'
+      },
+      {
+        dimension: 'strength',
+        select: el.rouletteStrength,
+        allLabel: 'Любая крепость'
+      },
+      {
+        dimension: 'category',
+        select: el.rouletteCategory,
+        allLabel: 'Любое направление'
+      },
+      {
+        dimension: 'rating',
+        select: el.rouletteRating,
+        allLabel: 'Любой рейтинг'
+      }
+    ];
+
+    for (const facet of facets) {
+      const values = Core.getFacetOptions(state.catalog, state.filters, facet.dimension);
+      fillFacetSelect(facet.select, values, facet.allLabel, facet.dimension);
     }
 
-    const max = Math.max(...rows.map((row) => row.count), 1);
-    for (const row of rows) {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'bar-row';
+    setSelectValue(el.rouletteBrand, state.filters.brand);
+    setSelectValue(el.rouletteStrength, state.filters.strength);
+    setSelectValue(el.rouletteCategory, state.filters.category);
+    setSelectValue(el.rouletteRating, state.filters.rating);
 
-      const head = document.createElement('div');
-      head.className = 'bar-head';
-
-      const label = document.createElement('span');
-      label.className = 'bar-label';
-      label.textContent = row.key;
-
-      const value = document.createElement('span');
-      value.className = 'bar-value';
-      value.textContent = formatNumber(row.count);
-
-      head.append(label, value);
-
-      const track = document.createElement('div');
-      track.className = 'bar-track';
-      const fill = document.createElement('div');
-      fill.className = 'bar-fill';
-      fill.style.width = `${Math.max(4, Math.round((row.count / max) * 100))}%`;
-      track.append(fill);
-      wrapper.append(head, track);
-      container.append(wrapper);
-    }
-  }
-
-  function renderStats() {
-    if (!state.ready || !state.stats) return;
-    const activeItems = state.catalog.filter((item) => !Core.isDiscontinued(item));
-
-    renderBars(el.statsBrands, Core.brandDistribution(activeItems, 10));
-    renderBars(el.statsStrengths, Core.strengthDistribution(activeItems));
-    renderBars(el.statsCategories, Core.categoryDistribution(activeItems, 12), {
-      emptyText: 'Ни у одной позиции не указано направление.'
-    });
-    renderBars(el.statsStatuses, Core.statusDistribution(state.catalog));
-
-    if (el.statsCatalogPill) {
-      el.statsCatalogPill.textContent = `${countLabel(state.stats.total)} · ${brandLabel(state.stats.brands)}`;
-    }
-    updateUserStats();
+    state.filters = {
+      ...state.filters,
+      brand: el.rouletteBrand ? el.rouletteBrand.value : 'all',
+      strength: el.rouletteStrength ? el.rouletteStrength.value : 'all',
+      category: el.rouletteCategory ? el.rouletteCategory.value : 'all',
+      rating: el.rouletteRating ? el.rouletteRating.value : 'all'
+    };
+    filteredKey = null;
   }
 
   function updateUserStats() {
@@ -519,11 +411,6 @@
     if (el.userSpins) el.userSpins.textContent = formatNumber(state.spinCount);
     if (el.userCollection) el.userCollection.textContent = formatNumber(stats.total);
     if (el.userTried) el.userTried.textContent = formatNumber(stats.tried);
-    if (el.homeCollectionCount) el.homeCollectionCount.textContent = formatNumber(stats.total);
-    if (el.navCollectionCount) {
-      el.navCollectionCount.textContent = formatNumber(stats.total);
-      el.navCollectionCount.classList.toggle('hidden', stats.total === 0);
-    }
     if (el.collectionPill) el.collectionPill.textContent = countLabel(stats.total);
     if (el.collectionAll) el.collectionAll.textContent = formatNumber(stats.total);
     if (el.collectionWish) el.collectionWish.textContent = formatNumber(stats.wish);
@@ -648,7 +535,7 @@
 
     const meta = document.createElement('span');
     meta.className = 'reel-meta';
-    meta.textContent = [item.strength, Number.isFinite(item.rating) ? `★ ${item.rating}` : '']
+    meta.textContent = [item.strength, Number.isFinite(item.rating) && item.rating > 0 ? `★ ${item.rating}` : '']
       .filter(Boolean)
       .join(' · ') || item.alt_name || '—';
 
@@ -721,9 +608,13 @@
     el.rouletteTrack.style.transform = 'translate3d(0, 0, 0)';
   }
 
-  function refreshRoulette() {
+  function refreshRoulette(priority) {
     if (state.running) return;
-    syncFiltersFromControls();
+    if (!state.ready) {
+      updateAvailable();
+      return;
+    }
+    updateFacetedFilters(priority);
     if (el.rouletteResult) el.rouletteResult.classList.add('hidden');
     updateAvailable();
     renderIdleReel();
@@ -759,7 +650,7 @@
     const meta = document.createElement('div');
     meta.className = 'result-meta';
     const metaParts = [];
-    if (Number.isFinite(item.rating)) metaParts.push(`★ ${item.rating}`);
+    if (Number.isFinite(item.rating) && item.rating > 0) metaParts.push(`★ ${item.rating}`);
     if (item.strength) metaParts.push(item.strength);
     if (Number.isFinite(item.reviews_count) && item.reviews_count > 0) {
       metaParts.push(`${formatNumber(item.reviews_count)} ${plural(item.reviews_count, 'отзыв', 'отзыва', 'отзывов')}`);
@@ -950,7 +841,7 @@
     const meta = document.createElement('div');
     meta.className = 'collection-meta';
     const metaParts = [];
-    if (Number.isFinite(item.rating)) metaParts.push(`★ ${item.rating}`);
+    if (Number.isFinite(item.rating) && item.rating > 0) metaParts.push(`★ ${item.rating}`);
     if (item.strength) metaParts.push(item.strength);
     if (entry.addedAt) metaParts.push(`добавлен ${formatDate(entry.addedAt)}`);
     meta.textContent = metaParts.join(' · ');
@@ -1034,41 +925,14 @@
     updateUserStats();
   }
 
-  function renderMessage(container, message, retry) {
-    if (!container) return;
-    container.replaceChildren();
-    const text = document.createElement('p');
-    text.className = 'muted';
-    text.textContent = message;
-    container.append(text);
-    if (retry) {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'btn btn-small btn-ghost';
-      button.textContent = 'Повторить';
-      button.addEventListener('click', () => window.location.reload());
-      container.append(button);
-    }
-  }
-
   function renderErrorState(error) {
     const message = window.location.protocol === 'file:'
       ? 'Каталог не загрузился. Откройте проект через локальный HTTP-сервер.'
       : 'Не удалось загрузить flavors.json. Проверьте соединение и попробуйте ещё раз.';
 
     updateHeaderStatus();
-    if (el.homeTotal) el.homeTotal.textContent = '—';
-    if (el.homeBrands) el.homeBrands.textContent = '—';
-    if (el.homeActive) el.homeActive.textContent = '—';
-    renderMessage(el.homeTopBrands, message, true);
-    renderMessage(el.homeTopCategories, message, true);
-    renderMessage(el.statsBrands, message, true);
-    renderMessage(el.statsStrengths, message, true);
-    renderMessage(el.statsCategories, message, true);
-    renderMessage(el.statsStatuses, message, true);
 
     if (el.rouletteAvailable) el.rouletteAvailable.textContent = '0 вкусов';
-    if (el.statsCatalogPill) el.statsCatalogPill.textContent = 'Каталог недоступен';
     if (el.rouletteSpin) el.rouletteSpin.disabled = true;
     if (el.rouletteTrack) el.rouletteTrack.replaceChildren();
     if (el.rouletteResult) el.rouletteResult.classList.add('hidden');
@@ -1119,11 +983,9 @@
       filteredKey = null;
       filteredItems = [];
 
-      populateFilterOptions();
-      renderHome();
-      renderStats();
+      updateHeaderStatus();
       renderCollection();
-      refreshRoulette();
+      refreshRoulette(null);
       updateUserStats();
     } catch (error) {
       state.loading = false;
@@ -1136,17 +998,18 @@
   }
 
   function initRouletteControls() {
-    const filterControls = [
-      el.rouletteBrand,
-      el.rouletteStrength,
-      el.rouletteCategory,
-      el.rouletteRating,
-      el.roulettePhoto,
-      el.rouletteLimited,
-      el.rouletteDiscontinued
+    const facetControls = [
+      [el.rouletteBrand, 'brand'],
+      [el.rouletteStrength, 'strength'],
+      [el.rouletteCategory, 'category'],
+      [el.rouletteRating, 'rating']
     ];
-    for (const control of filterControls) {
-      if (control) control.addEventListener('change', refreshRoulette);
+    for (const [control, dimension] of facetControls) {
+      if (control) control.addEventListener('change', () => refreshRoulette(dimension));
+    }
+
+    for (const control of [el.roulettePhoto, el.rouletteLimited, el.rouletteDiscontinued]) {
+      if (control) control.addEventListener('change', () => refreshRoulette(null));
     }
 
     if (el.rouletteFast) {
@@ -1228,28 +1091,6 @@
     }
   }
 
-  function initHomeInteractions() {
-    if (el.homeTopBrands) {
-      el.homeTopBrands.addEventListener('click', (event) => {
-        const button = event.target.closest('[data-brand-filter]');
-        if (!button) return;
-        setSelectValue(el.rouletteBrand, button.dataset.brandFilter);
-        refreshRoulette();
-        showTab('roulette');
-      });
-    }
-
-    if (el.homeTopCategories) {
-      el.homeTopCategories.addEventListener('click', (event) => {
-        const button = event.target.closest('[data-category-filter]');
-        if (!button) return;
-        setSelectValue(el.rouletteCategory, button.dataset.categoryFilter);
-        refreshRoulette();
-        showTab('roulette');
-      });
-    }
-  }
-
   function initStorageSync() {
     window.addEventListener('storage', (event) => {
       if (event.key === KEYS.collection) {
@@ -1277,7 +1118,6 @@
     initTabs();
     initRouletteControls();
     initCollectionControls();
-    initHomeInteractions();
     initStorageSync();
 
     renderCollection();
@@ -1301,3 +1141,4 @@
     addWinnerToCollection
   };
 })();
+

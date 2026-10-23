@@ -133,6 +133,87 @@ test('filterItems возвращает пустой массив при несо
   assert.deepEqual(core.filterItems(catalog, { brand: 'Brand', strength: 'Крепкая', category: 'Цитрусовый' }), []);
 });
 
+const facetCatalog = core.normalizeCatalog([
+  makeRaw({
+    slug: 'a/main/citrus',
+    brand: 'A',
+    strength: 'Средняя',
+    rating: 4.6,
+    taste_groups: ['Цитрусовый'],
+    tastes: ['Лимон'],
+    tags: [{ name: 'Лимон', group: 'Цитрусовый', taste: 'Кислый' }]
+  }),
+  makeRaw({
+    slug: 'a/main/berry',
+    brand: 'A',
+    strength: 'Средняя',
+    rating: 4.2,
+    taste_groups: ['Ягодный'],
+    tastes: ['Малина'],
+    tags: [{ name: 'Малина', group: 'Ягодный', taste: 'Сладкий' }]
+  }),
+  makeRaw({
+    slug: 'b/main/citrus',
+    brand: 'B',
+    strength: 'Лёгкая',
+    rating: 4.1,
+    taste_groups: ['Цитрусовый'],
+    tastes: ['Лайм'],
+    tags: [{ name: 'Лайм', group: 'Цитрусовый', taste: 'Кислый' }]
+  }),
+  makeRaw({
+    slug: 'b/main/nut',
+    brand: 'B',
+    strength: 'Крепкая',
+    rating: 3.8,
+    taste_groups: ['Ореховый'],
+    tastes: ['Миндаль'],
+    tags: [{ name: 'Миндаль', group: 'Ореховый', taste: 'Сладкий' }]
+  }),
+  makeRaw({
+    slug: 'c/main/none',
+    brand: 'C',
+    strength: '',
+    rating: null,
+    taste_groups: [],
+    tastes: [],
+    tags: []
+  })
+]);
+
+test('getFacetOptions учитывает остальные фильтры и скрывает недоступные значения', () => {
+  assert.deepEqual(core.getFacetOptions(facetCatalog, { brand: 'A' }, 'category').sort(), ['Цитрусовый', 'Ягодный']);
+  assert.deepEqual(core.getFacetOptions(facetCatalog, { category: 'Ореховый' }, 'brand'), ['B']);
+  assert.deepEqual(core.getFacetOptions(facetCatalog, { brand: 'A' }, 'strength'), ['Средняя']);
+  assert.deepEqual(core.getFacetOptions(facetCatalog, { brand: 'B' }, 'rating'), ['3.5', '4']);
+  assert.deepEqual(core.getFacetOptions(facetCatalog, { brand: 'A' }, 'rating'), ['3.5', '4', '4.5']);
+  assert.deepEqual(core.getFacetOptions(facetCatalog, { brand: 'C' }, 'category'), [core.NO_CATEGORY]);
+});
+
+test('resolveFilters сбрасывает конфликтующий фильтр, сохраняя только что измененный', () => {
+  const byBrand = core.resolveFilters(facetCatalog, { brand: 'A', category: 'Ореховый' }, 'brand');
+  assert.equal(byBrand.brand, 'A');
+  assert.equal(byBrand.category, 'all');
+
+  const byCategory = core.resolveFilters(facetCatalog, { brand: 'A', category: 'Ореховый' }, 'category');
+  assert.equal(byCategory.brand, 'all');
+  assert.equal(byCategory.category, 'Ореховый');
+
+  const byStrength = core.resolveFilters(facetCatalog, { brand: 'A', strength: 'Крепкая' }, 'strength');
+  assert.equal(byStrength.brand, 'all');
+  assert.equal(byStrength.strength, 'Крепкая');
+});
+
+test('getFacetOptions не показывает недоступные сочетания бренд + крепость + направление', () => {
+  const options = core.getFacetOptions(
+    facetCatalog,
+    { brand: 'A', strength: 'Средняя' },
+    'category'
+  );
+  assert.deepEqual(options.sort(), ['Цитрусовый', 'Ягодный']);
+  assert.equal(options.includes('Ореховый'), false);
+});
+
 test('pickRandomItem выбирает равномерно и возвращает null для пустого списка', () => {
   const items = ['a', 'b', 'c', 'd'];
   assert.equal(core.pickRandomItem(items, () => 0), 'a');

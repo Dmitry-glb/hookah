@@ -44,10 +44,6 @@ function isDiscontinued(item) {
   return item.discontinued === true || Number(item.status_id) === 4 || /снят\s+с\s+производства/i.test(String(item.status || ''));
 }
 
-function isLimited(item) {
-  return item.limited === true || Number(item.status_id) === 2 || /лимит/i.test(String(item.status || ''));
-}
-
 function groupsOf(item) {
   const groups = new Set(Array.isArray(item.taste_groups) ? item.taste_groups : []);
   for (const tag of Array.isArray(item.tags) ? item.tags : []) {
@@ -56,29 +52,26 @@ function groupsOf(item) {
   return [...groups];
 }
 
-function expectedStats() {
-  const active = catalog.filter((item) => !isDiscontinued(item));
-  return {
-    total: catalog.length,
-    brands: new Set(catalog.map((item) => item.brand_slug || item.brand)).size,
-    active: active.length,
-    limited: catalog.filter(isLimited).length,
-    withStrength: catalog.filter((item) => String(item.strength || '').trim()).length,
-    withImage: catalog.filter((item) => String(item.image_url || '').trim()).length
-  };
-}
+const activeCatalog = catalog.filter((item) => !isDiscontinued(item));
 
-function findImpossibleFilter() {
-  const active = catalog.filter((item) => !isDiscontinued(item));
-  const brands = [...new Set(active.map((item) => item.brand))];
-  const categories = [...new Set(active.flatMap(groupsOf))];
+function findBrandWithoutCategory() {
+  const brands = [...new Set(activeCatalog.map((item) => item.brand))].sort((a, b) => a.localeCompare(b, 'ru'));
+  const categories = [...new Set(activeCatalog.flatMap(groupsOf))].sort((a, b) => a.localeCompare(b, 'ru'));
   for (const brand of brands) {
-    for (const category of categories) {
-      const matches = active.some((item) => item.brand === brand && groupsOf(item).includes(category));
-      if (!matches) return { brand, category };
+    const brandCategories = new Set(activeCatalog.filter((item) => item.brand === brand).flatMap(groupsOf));
+    if (brandCategories.size < 2) continue;
+    const missing = categories.find((category) => !brandCategories.has(category));
+    if (missing) {
+      return { brand, missing, available: [...brandCategories].sort((a, b) => a.localeCompare(b, 'ru')) };
     }
   }
   return null;
+}
+
+function countFor(brand, category) {
+  return activeCatalog.filter(
+    (item) => item.brand === brand && groupsOf(item).includes(category)
+  ).length;
 }
 
 function createStaticServer() {
@@ -106,7 +99,41 @@ function numericText(value) {
   return Number(String(value || '').replace(/[^\d]/g, ''));
 }
 
-test('e2e: рулетка, быстрый выбор, коллекция, статистика и PWA-каталог', { skip, timeout: 120000 }, async () => {
+async function waitCatalog(page) {
+  await page.waitForFunction(
+    () => {
+      const label = document.getElementById('header-catalog-label');
+      return label && /вкус/i.test(label.textContent) && !/Загрузка/.test(label.textContent);
+    },
+    null,
+    { timeout: 30000 }
+  );
+}
+
+async function optionLabels(page, selector) {
+  return page.$$eval(`${selector} option`, (options) =>
+    options.slice(1).map((option) => option.textContent.trim())
+  );
+}
+
+async function optionValues(page, selector) {
+  return page.$$eval(`${selector} option`, (options) =>
+    options.slice(1).map((option) => option.value)
+  );
+}
+
+function assertAlphabetical(labels) {
+  const sorted = [...labels].sort((a, b) => a.localeCompare(b, 'ru'));
+  assert.deepEqual(labels, sorted, `ожидалась алфавитная сортировка: ${labels.join(', ')}`);
+}
+
+function assertNoCounts(labels) {
+  for (const label of labels) {
+    assert.doesNotMatch(label, /\s·\s\d+$/, `в подписи фильтра остался счётчик: ${label}`);
+  }
+}
+
+test('e2e: две вкладки, каскадные фильтры, рулетка, коллекция и трекер', { skip, timeout: 150000 }, async () => {
   const { chromium } = require('playwright');
   const server = createStaticServer();
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
@@ -131,32 +158,74 @@ test('e2e: рулетка, быстрый выбор, коллекция, ста
     });
 
     await page.goto(`http://127.0.0.1:${port}/index.html`, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    await page.waitForFunction(
-      () => {
-        const label = document.getElementById('header-catalog-label');
-        return label && /вкус/i.test(label.textContent) && !/Загрузка/.test(label.textContent);
-      },
-      null,
-      { timeout: 30000 }
-    );
+    await waitCatalog(page);
 
-    const stats = expectedStats();
-    assert.equal(numericText(await page.textContent('#home-stat-total')), stats.total);
-    assert.equal(numericText(await page.textContent('#home-stat-brands')), stats.brands);
-    assert.equal(numericText(await page.textContent('#home-stat-active')), stats.active);
-    assert.equal(numericText(await page.textContent('#home-stat-limited')), stats.limited);
-    assert.equal(numericText(await page.textContent('#home-stat-strength')), stats.withStrength);
-    assert.equal(numericText(await page.textContent('#home-stat-images')), stats.withImage);
-
-    const tabCount = await page.locator('.nav-tab').count();
-    assert.equal(tabCount, 5);
+    assert.equal(numericText(await page.textContent('#header-catalog-label')), catalog.length);
+    assert.equal(await page.locator('.nav-tab').count(), 2);
+    assert.equal(await page.isVisible('#setup-form'), true);
+    assert.equal(await page.isVisible('#analytics-card'), true);
+    assert.equal(await page.locator('#history-list').count(), 1);
 
     fs.mkdirSync(path.join(ROOT, 'debug'), { recursive: true });
     await page.screenshot({ path: path.join(ROOT, 'debug', 'e2e-home.png'), fullPage: true });
 
-    // --- Рулетка: полный цикл на 5 секунд ---
+    // --- Каскадные фильтры ---
     await page.click('#tab-roulette');
     await page.waitForSelector('#roulette-window', { state: 'visible' });
+
+    const brandCase = findBrandWithoutCategory();
+    assert.ok(brandCase, 'не найден бренд без одного из направлений');
+
+    const initialBrandLabels = await optionLabels(page, '#roulette-brand');
+    const initialCategoryLabels = await optionLabels(page, '#roulette-category');
+    assertAlphabetical(initialBrandLabels);
+    assertNoCounts(initialBrandLabels);
+    assertAlphabetical(initialCategoryLabels);
+    assertNoCounts(initialCategoryLabels);
+
+    await page.selectOption('#roulette-brand', brandCase.brand);
+    await page.waitForFunction(
+      (missing) =>
+        ![...document.querySelectorAll('#roulette-category option')].some((option) => option.value === missing),
+      brandCase.missing,
+      { timeout: 5000 }
+    );
+
+    const categoryLabels = await optionLabels(page, '#roulette-category');
+    const categoryValues = await optionValues(page, '#roulette-category');
+    assertAlphabetical(categoryLabels);
+    assertNoCounts(categoryLabels);
+    assert.equal(categoryValues.includes(brandCase.missing), false, `у ${brandCase.brand} не должно быть «${brandCase.missing}»`);
+
+    const chosenCategory = categoryValues.find((value) => value !== 'all' && value !== '__none__');
+    assert.ok(chosenCategory);
+    await page.selectOption('#roulette-category', chosenCategory);
+    await page.waitForFunction(
+      (expected) => {
+        const text = document.getElementById('roulette-available')?.textContent || '';
+        return Number(text.replace(/[^\d]/g, '')) === expected;
+      },
+      countFor(brandCase.brand, chosenCategory),
+      { timeout: 5000 }
+    );
+
+    const expectedCount = countFor(brandCase.brand, chosenCategory);
+    assert.equal(numericText(await page.textContent('#roulette-available')), expectedCount);
+    assert.equal(expectedCount > 0, true);
+
+    const strengthLabels = await optionLabels(page, '#roulette-strength');
+    const ratingLabels = await optionLabels(page, '#roulette-rating');
+    assertAlphabetical(strengthLabels);
+    assertNoCounts(strengthLabels);
+    assertAlphabetical(ratingLabels);
+    assertNoCounts(ratingLabels);
+
+    await page.selectOption('#roulette-brand', 'all');
+    await page.selectOption('#roulette-category', 'all');
+    await page.selectOption('#roulette-strength', 'all');
+    await page.selectOption('#roulette-rating', 'all');
+
+    // --- Полная рулетка на 5 секунд ---
     await page.evaluate(() => {
       const fast = document.getElementById('roulette-fast');
       if (fast.checked) {
@@ -165,15 +234,6 @@ test('e2e: рулетка, быстрый выбор, коллекция, ста
       }
     });
     await page.selectOption('#roulette-brand', 'MUSTHAVE');
-    await page.waitForFunction(
-      () => {
-        const text = document.getElementById('roulette-available')?.textContent || '';
-        const value = Number(text.replace(/[^\d]/g, ''));
-        return value > 0;
-      },
-      null,
-      { timeout: 10000 }
-    );
 
     const fullStart = Date.now();
     await page.click('#roulette-spin');
@@ -187,7 +247,6 @@ test('e2e: рулетка, быстрый выбор, коллекция, ста
     assert.ok(winnerSlug, 'должна быть карточка-победитель');
     const resultLink = await page.getAttribute('#roulette-result a[target="_blank"]', 'href');
     assert.ok(resultLink && resultLink.endsWith(`/${winnerSlug}`), `${resultLink} не заканчивается на /${winnerSlug}`);
-    assert.equal(await page.locator('#roulette-result').isVisible(), true);
 
     await page.screenshot({ path: path.join(ROOT, 'debug', 'e2e-roulette.png'), fullPage: true });
 
@@ -197,7 +256,8 @@ test('e2e: рулетка, быстрый выбор, коллекция, ста
       null,
       { timeout: 5000 }
     );
-    assert.equal(numericText(await page.textContent('#nav-collection-count')), 1);
+    assert.equal(numericText(await page.textContent('#user-collection')), 1);
+    assert.equal(await page.locator('#collection-list .collection-item').count(), 1);
 
     // --- Быстрый выбор ---
     await page.evaluate(() => {
@@ -227,42 +287,16 @@ test('e2e: рулетка, быстрый выбор, коллекция, ста
     assert.ok(afterFirst === beforeDuplicate || afterFirst === beforeDuplicate + 1);
     assert.equal(afterSecond, afterFirst, 'повторное добавление не должно создавать дубликат');
 
-    // --- Фильтры без результатов ---
-    const impossible = findImpossibleFilter();
-    assert.ok(impossible, 'не найден пример несовместимых фильтров');
-    await page.selectOption('#roulette-brand', impossible.brand);
-    await page.selectOption('#roulette-category', impossible.category);
-    await page.waitForSelector('#roulette-empty:not(.hidden)', { timeout: 5000 });
-    assert.equal(await page.isDisabled('#roulette-spin'), true);
-    await page.selectOption('#roulette-brand', 'all');
-    await page.selectOption('#roulette-category', 'all');
-    await page.waitForFunction(
-      () => document.getElementById('roulette-empty')?.classList.contains('hidden'),
-      null,
-      { timeout: 5000 }
-    );
-
     // --- Коллекция и сохранение после перезагрузки ---
-    await page.click('#tab-collection');
-    await page.waitForSelector('#collection-list .collection-item', { timeout: 5000 });
     const collectionCount = await page.locator('#collection-list .collection-item').count();
     assert.ok(collectionCount >= 1);
-    assert.equal(numericText(await page.textContent('#nav-collection-count')), collectionCount);
-
     await page.click('#collection-list .collection-item [data-collection-action="tried"]');
     await page.waitForSelector('#collection-list .collection-item.is-tried', { timeout: 5000 });
     await page.screenshot({ path: path.join(ROOT, 'debug', 'e2e-collection.png'), fullPage: true });
 
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(
-      () => {
-        const label = document.getElementById('header-catalog-label');
-        return label && /вкус/i.test(label.textContent) && !/Загрузка/.test(label.textContent);
-      },
-      null,
-      { timeout: 30000 }
-    );
-    await page.click('#tab-collection');
+    await waitCatalog(page);
+    await page.click('#tab-roulette');
     await page.waitForSelector('#collection-list .collection-item', { timeout: 5000 });
     assert.equal(await page.locator('#collection-list .collection-item').count(), collectionCount);
     assert.equal(await page.locator('#collection-list .collection-item.is-tried').count() > 0, true);
@@ -276,32 +310,16 @@ test('e2e: рулетка, быстрый выбор, коллекция, ста
     await page.waitForSelector('#collection-empty:not(.hidden)', { timeout: 5000 });
 
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(
-      () => {
-        const label = document.getElementById('header-catalog-label');
-        return label && /вкус/i.test(label.textContent) && !/Загрузка/.test(label.textContent);
-      },
-      null,
-      { timeout: 30000 }
-    );
-    await page.click('#tab-collection');
+    await waitCatalog(page);
+    await page.click('#tab-roulette');
     await page.waitForSelector('#collection-empty:not(.hidden)', { timeout: 5000 });
     assert.equal(await page.locator('#collection-list .collection-item').count(), 0);
 
-    // --- Статистика ---
-    await page.click('#tab-stats');
-    await page.waitForSelector('#stats-brands .bar-row', { timeout: 5000 });
-    assert.ok((await page.locator('#stats-brands .bar-row').count()) > 0);
-    assert.ok((await page.locator('#stats-strengths .bar-row').count()) > 0);
-    assert.ok((await page.locator('#stats-categories .bar-row').count()) > 0);
-    const statusText = await page.textContent('#stats-statuses');
-    assert.match(statusText, /Снят с производства/);
+    // --- Действия в приложении и трекер на главной ---
     assert.ok(Number(await page.textContent('#user-spins')) >= 2);
     assert.equal(numericText(await page.textContent('#user-collection')), 0);
-    await page.screenshot({ path: path.join(ROOT, 'debug', 'e2e-stats.png'), fullPage: true });
 
-    // --- Старый трекер сессий остаётся рабочим ---
-    await page.click('#tab-session');
+    await page.click('#tab-home');
     await page.waitForSelector('#setup-form', { state: 'visible' });
     assert.equal(await page.isVisible('#start-btn'), true);
     await page.click('#toggle-all-steps-btn');
@@ -309,7 +327,6 @@ test('e2e: рулетка, быстрый выбор, коллекция, ста
     await page.waitForTimeout(700);
     await page.screenshot({ path: path.join(ROOT, 'debug', 'e2e-session.png'), fullPage: true });
 
-    await page.click('#tab-stats');
     await page.click('button[onclick="openManualAddModal()"]');
     await page.waitForFunction(
       () => !document.getElementById('manual-add-modal')?.classList.contains('hidden'),
@@ -323,9 +340,8 @@ test('e2e: рулетка, быстрый выбор, коллекция, ста
       { timeout: 5000 }
     );
 
-    // --- Мобильная адаптивность и отсутствие горизонтального переполнения ---
+    // --- Мобильная адаптивность ---
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.click('#tab-home');
     await page.waitForTimeout(200);
     assert.equal(
       await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1),
@@ -334,18 +350,6 @@ test('e2e: рулетка, быстрый выбор, коллекция, ста
     );
 
     await page.click('#tab-roulette');
-    await page.evaluate(() => {
-      const fast = document.getElementById('roulette-fast');
-      if (!fast.checked) {
-        fast.checked = true;
-        fast.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-    });
-    await page.selectOption('#roulette-brand', 'all');
-    await page.selectOption('#roulette-strength', 'all');
-    await page.selectOption('#roulette-category', 'all');
-    await page.click('#roulette-spin');
-    await page.waitForSelector('#roulette-result.is-visible', { timeout: 5000 });
     await page.waitForTimeout(200);
     assert.equal(
       await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1),

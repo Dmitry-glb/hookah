@@ -317,6 +317,28 @@ h1 {
     min-height: 50vh;
 }
 
+.home-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.home-stack .session-stack {
+    max-width: none;
+    margin: 0;
+}
+
+#panel-roulette > .card {
+    margin-bottom: 16px;
+}
+
+#panel-roulette > .card:last-of-type {
+    margin-bottom: 0;
+}
+
 .tab-panel {
     animation: panel-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -2200,7 +2222,21 @@ textarea:focus {
     }
 
     .user-stat-grid {
-        grid-template-columns: minmax(0, 1fr);
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .user-stat {
+        padding: 10px;
+    }
+
+    .user-stat strong {
+        font-size: 1.2rem;
+    }
+
+    .user-stat span {
+        font-size: 0.62rem;
+        line-height: 1.25;
     }
 
     .app-footer {

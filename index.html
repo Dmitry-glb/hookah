@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>DimHookah — рулетка вкусов для кальяна</title>
     <meta name="description"
-        content="DimHookah: случайный подбор вкуса табака для кальяна, рулетка, личная коллекция и трекер покурок.">
+        content="DimHookah: случайный подбор вкуса табака для кальяна, личная коллекция и трекер покурок.">
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,16 +21,11 @@
 
 <body>
 
-    <!-- Живой анимированный фон -->
     <canvas id="liquid-bg-canvas" aria-hidden="true"></canvas>
-
-    <!-- Фоновый аудио-трек для удержания PWA активным и работы MediaSession -->
     <audio id="bg-audio" loop playsinline style="display:none;"></audio>
 
-    <!-- Всплывающий тост -->
     <div id="toast-notification" class="toast-banner hidden" role="status" aria-live="polite"></div>
 
-    <!-- Анимация сохранения сессии -->
     <div id="save-success-overlay" class="save-overlay hidden">
         <div class="save-overlay-card">
             <div class="save-check-circle">✓</div>
@@ -76,130 +71,379 @@
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M21 3v6h-6"/><circle cx="12" cy="12" r="2.6"/></svg>
                 <span>Рулетка</span>
             </button>
-            <button type="button" class="nav-tab" id="tab-collection" role="tab" aria-selected="false"
-                aria-controls="panel-collection" data-tab="collection">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12a1 1 0 0 1 1 1v16l-7-4-7 4V5a1 1 0 0 1 1-1z"/></svg>
-                <span>Коллекция</span>
-                <span class="nav-badge hidden" id="nav-collection-count">0</span>
-            </button>
-            <button type="button" class="nav-tab" id="tab-stats" role="tab" aria-selected="false"
-                aria-controls="panel-stats" data-tab="stats">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg>
-                <span>Статистика</span>
-            </button>
-            <button type="button" class="nav-tab" id="tab-session" role="tab" aria-selected="false"
-                aria-controls="panel-session" data-tab="session">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c2.5 3.4 4.2 5.8 4.2 8.5A4.2 4.2 0 0 1 12 15.7a4.2 4.2 0 0 1-4.2-4.2C7.8 8.8 9.5 6.4 12 3z"/><path d="M6 15.5c2.5 1.1 4.2 2.3 6 4.5 1.8-2.2 3.5-3.4 6-4.5"/></svg>
-                <span>Покур</span>
-            </button>
         </nav>
 
         <main class="app-main">
 
-            <!-- ГЛАВНАЯ -->
+            <!-- ГЛАВНАЯ: ПОКУР, СТАТИСТИКА И БЮДЖЕТ, ИСТОРИЯ -->
             <section class="tab-panel is-active" id="panel-home" data-panel="home" role="tabpanel"
                 aria-labelledby="tab-home">
-                <div class="hero card">
-                    <div class="hero-content">
-                        <span class="eyebrow">HTReviews · локальный каталог</span>
-                        <h2>Какой вкус попробуем сегодня?</h2>
-                        <p class="hero-text">Крутите рулетку, чтобы получить случайную позицию из реального каталога,
-                            или сохраните интересные вкусы в личную коллекцию.</p>
-                        <div class="hero-actions">
-                            <button class="btn btn-primary" type="button" data-open-tab="roulette">
-                                Крутить рулетку
-                            </button>
-                            <button class="btn btn-ghost" type="button" data-open-tab="collection">
-                                Моя коллекция <span class="inline-badge" id="hero-collection-count">0</span>
-                            </button>
-                        </div>
-                        <div class="hero-meta" aria-label="Кратко о каталоге">
-                            <span><strong id="hero-total">—</strong> вкусов</span>
-                            <span><strong id="hero-brands">—</strong> брендов</span>
-                            <span><strong id="hero-active">—</strong> актуальных</span>
+                <div class="home-stack">
+                    <div class="section-head">
+                        <div>
+                            <span class="eyebrow">Трекер</span>
+                            <h2>Главная</h2>
+                            <p class="section-sub">Покур, бюджет и история сессий. Всё считается локально.</p>
                         </div>
                     </div>
-                    <div class="hero-visual" aria-hidden="true">
-                        <div class="hero-orbit">
-                            <span class="hero-orbit-core">DH</span>
-                        </div>
-                        <p class="hero-visual-note">Каталог HTReviews</p>
-                    </div>
-                </div>
 
-                <div class="stat-grid" id="home-stats" aria-label="Статистика каталога">
-                    <article class="stat-card">
-                        <span class="stat-icon">✦</span>
-                        <span class="stat-label">Всего вкусов</span>
-                        <strong class="stat-value" id="home-stat-total">—</strong>
-                    </article>
-                    <article class="stat-card">
-                        <span class="stat-icon">◎</span>
-                        <span class="stat-label">Брендов</span>
-                        <strong class="stat-value" id="home-stat-brands">—</strong>
-                    </article>
-                    <article class="stat-card">
-                        <span class="stat-icon">●</span>
-                        <span class="stat-label">Актуальные</span>
-                        <strong class="stat-value" id="home-stat-active">—</strong>
-                    </article>
-                    <article class="stat-card">
-                        <span class="stat-icon">◈</span>
-                        <span class="stat-label">Лимитированные</span>
-                        <strong class="stat-value" id="home-stat-limited">—</strong>
-                    </article>
-                    <article class="stat-card">
-                        <span class="stat-icon">◒</span>
-                        <span class="stat-label">С крепостью</span>
-                        <strong class="stat-value" id="home-stat-strength">—</strong>
-                    </article>
-                    <article class="stat-card">
-                        <span class="stat-icon">▣</span>
-                        <span class="stat-label">С изображением</span>
-                        <strong class="stat-value" id="home-stat-images">—</strong>
-                    </article>
-                </div>
-
-                <div class="home-grid">
-                    <section class="card list-card">
-                        <div class="card-head">
-                            <div>
-                                <span class="eyebrow">Каталог</span>
-                                <h3>Топ брендов</h3>
+                    <div class="session-stack">
+                        <!-- Покур: настройка -->
+                        <section class="card" id="setup-form">
+                            <div class="card-header-line">
+                                <h2>Новая сессия</h2>
+                                <button type="button" class="pill-btn accent-pill" id="toggle-all-steps-btn"
+                                    onclick="toggleAllSetupSteps()">
+                                    ✨ Развернуть все
+                                </button>
                             </div>
-                            <button class="text-link" type="button" data-open-tab="stats">Вся статистика</button>
+
+                            <div class="wizard-step step-visible" id="setup-step-1">
+                                <div class="form-group" style="margin-bottom: 8px;">
+                                    <div class="label-row">
+                                        <label>1. Выбери чашу</label>
+                                        <div class="inline-actions">
+                                            <button type="button" class="text-action-btn" onclick="toggleQuickAddBowl()">+
+                                                Добавить</button>
+                                            <button type="button" class="text-action-btn danger-text"
+                                                onclick="deleteSelectedBowl()">Удалить</button>
+                                        </div>
+                                    </div>
+                                    <select id="bowl-select" class="control-h" onchange="onStep1BowlSelect()"></select>
+                                    <div id="quick-bowl-box" class="quick-add-box hidden">
+                                        <input type="text" id="new-bowl-input" class="control-h" placeholder="Название чаши"
+                                            onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomBowl();}">
+                                        <button type="button" class="btn btn-inline" onclick="addCustomBowl()">ОК</button>
+                                    </div>
+                                </div>
+                                <button type="button" class="step-next-Trigger" id="step-1-next-btn"
+                                    onclick="revealSetupStep(2)">
+                                    К выбору табака ↓
+                                </button>
+                            </div>
+
+                            <div class="wizard-step step-collapsed" id="setup-step-2">
+                                <div class="step-divider"></div>
+                                <div class="form-group">
+                                    <button type="button" class="mode-click-bar" id="mode-toggle-btn"
+                                        onclick="toggleMixMode()">
+                                        <div class="mode-switch-info">
+                                            <span class="mode-title" id="mode-label">🍂 Режим: Соло (1 табак)</span>
+                                            <span class="mode-sub" id="mode-sub-label">Нажми для переключения в Микс</span>
+                                        </div>
+                                        <span class="mode-pill-indicator" id="mode-pill-badge">Соло ⇄</span>
+                                    </button>
+                                </div>
+
+                                <div class="form-group" style="margin-bottom: 8px;">
+                                    <div class="label-row">
+                                        <label>2. Табак, граммовка и пачка</label>
+                                        <div class="inline-actions">
+                                            <button type="button" class="text-action-btn"
+                                                onclick="toggleQuickAddBrand()">+
+                                                Бренд</button>
+                                            <button type="button" class="text-action-btn danger-text"
+                                                onclick="openBrandManagerModal()">Список</button>
+                                        </div>
+                                    </div>
+                                    <div id="quick-brand-box" class="quick-add-box hidden" style="margin-bottom: 10px;">
+                                        <input type="text" id="new-brand-input" class="control-h" placeholder="Название бренда"
+                                            onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomBrandFromBar();}">
+                                        <button type="button" class="btn btn-inline" onclick="addCustomBrandFromBar()">ОК</button>
+                                    </div>
+
+                                    <div id="solo-container">
+                                        <div class="tobacco-card-box">
+                                            <div class="tobacco-grid-solo">
+                                                <select id="solo-tobacco-brand" class="brand-select control-h"
+                                                    onchange="onBrandSelectChange(this); revealSetupStep(3);"></select>
+                                                <input type="text" id="solo-tobacco-flavor" class="flavor-input control-h"
+                                                    placeholder="Вкус" oninput="onTobaccoFlavorInput()" onfocus="revealSetupStep(3)">
+                                                <div class="unit-input-box control-h">
+                                                    <input type="number" id="solo-tobacco-weight" value="18" min="1" max="100"
+                                                        oninput="recalcLiveBowlCost(); revealSetupStep(3);">
+                                                    <span>г</span>
+                                                </div>
+                                            </div>
+                                            <input type="text" id="solo-custom-brand" class="custom-brand-input control-h hidden"
+                                                placeholder="Введите название нового бренда..." oninput="recalcLiveBowlCost()">
+
+                                            <div class="pack-price-grid">
+                                                <div class="pack-field">
+                                                    <span class="pack-field-label">Цена пачки</span>
+                                                    <div class="pack-field-control">
+                                                        <input type="number" id="solo-pack-price" placeholder="0" min="0"
+                                                            oninput="onPackInfoChange('solo')">
+                                                        <span>₽</span>
+                                                    </div>
+                                                </div>
+                                                <div class="pack-field">
+                                                    <span class="pack-field-label">Вес пачки</span>
+                                                    <div class="pack-field-control">
+                                                        <input type="number" id="solo-pack-weight" placeholder="25" min="1"
+                                                            oninput="onPackInfoChange('solo')">
+                                                        <span>г</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="mix-container" class="hidden">
+                                        <div class="mix-header-bar">
+                                            <span>Компоненты микса</span>
+                                            <span id="mix-total-weight" class="weight-badge">Всего: 0 г</span>
+                                        </div>
+                                        <div id="mix-rows-list"></div>
+                                        <button type="button" class="btn btn-secondary btn-dashed"
+                                            onclick="addMixRow(); revealSetupStep(3);">+ Добавить табак в микс</button>
+                                    </div>
+                                </div>
+
+                                <button type="button" class="step-next-Trigger" id="step-2-next-btn"
+                                    onclick="revealSetupStep(3)">
+                                    К углям и прогреву ↓
+                                </button>
+                            </div>
+
+                            <div class="wizard-step step-collapsed" id="setup-step-3">
+                                <div class="step-divider"></div>
+                                <div class="setup-dual-grid">
+                                    <div class="setup-mini-card">
+                                        <div class="mini-card-top">
+                                            <span class="mini-card-label">🔥 3. Угли на старт</span>
+                                        </div>
+                                        <div class="unit-input-box control-h">
+                                            <input type="number" id="start-coals-input" value="3" min="1" max="10"
+                                                oninput="recalcLiveBowlCost()">
+                                            <span>шт</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="setup-mini-card">
+                                        <div class="mini-card-top">
+                                            <span class="mini-card-label">⏱ Прогрев</span>
+                                            <div class="mini-presets">
+                                                <button type="button" class="mini-pill"
+                                                    onclick="setWarmupPreset(5)">5м</button>
+                                                <button type="button" class="mini-pill"
+                                                    onclick="setWarmupPreset(6)">6м</button>
+                                                <button type="button" class="mini-pill"
+                                                    onclick="setWarmupPreset(7)">7м</button>
+                                            </div>
+                                        </div>
+                                        <div class="unit-input-box control-h">
+                                            <input type="number" id="warmup-min" value="5" min="1" max="59">
+                                            <span>мин</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="live-cost-banner" id="live-cost-banner">
+                                    <div class="live-cost-left">
+                                        <span class="live-cost-title">💰 Себестоимость забивки</span>
+                                        <span class="live-cost-sub" id="live-cost-details">Табак: 0 ₽ • Угли: 0 ₽</span>
+                                    </div>
+                                    <div class="live-cost-value" id="live-cost-total">0 ₽</div>
+                                </div>
+
+                                <button class="btn btn-primary-lg" id="start-btn" onclick="startWarmupSession()">🔥 Начать
+                                    прогрев</button>
+                            </div>
+                        </section>
+
+                        <!-- Покур: активная сессия -->
+                        <section class="card hidden" id="active-session">
+                            <div id="warmup-box" class="timer-container">
+                                <div class="status-badge" id="status-title">🔥 Прогрев чаши...</div>
+                                <div class="active-mix-subtitle" id="active-mix-label"></div>
+                                <div class="timer-display" id="timer">05:00</div>
+                                <div class="overtime-sub-badge hidden" id="warmup-overtime-label">Общий прогрев: 05:00</div>
+
+                                <div id="warmup-controls" class="session-btn-stack">
+                                    <button class="btn btn-secondary" onclick="addWarmupMinute()">+1 минута к таймеру</button>
+                                    <button class="btn btn-success" id="start-smoking-btn"
+                                        onclick="startSmokingFromWarmup()">💨 Начать
+                                        курить</button>
+                                    <button class="btn btn-text-Cancel" onclick="cancelActiveSession()">Отменить сессию</button>
+                                </div>
+
+                                <div id="smoking-controls" class="session-btn-stack hidden">
+                                    <button class="btn btn-danger" onclick="finishSmokingSession()">🛑 Завершить сессию</button>
+                                </div>
+                            </div>
+
+                            <div id="rating-form" class="hidden">
+                                <div id="forgotten-timer-box" class="sub-timer-box hidden">
+                                    <div class="forgotten-title">🤔 Забыл выключить таймер?</div>
+                                    <div class="forgotten-sub">
+                                        Таймер насчитал <b id="forgotten-raw-time">02:15:00</b>. Выбери реальное время покура:
+                                    </div>
+                                    <div class="forgotten-pills">
+                                        <button type="button" class="pill-btn" onclick="applyQuickSmokeDuration(45)">45 мин</button>
+                                        <button type="button" class="pill-btn" onclick="applyQuickSmokeDuration(60)">1 час</button>
+                                        <button type="button" class="pill-btn" onclick="applyQuickSmokeDuration(75)">1 ч 15 м</button>
+                                        <button type="button" class="pill-btn" onclick="applyQuickSmokeDuration(90)">1 ч 30 м</button>
+                                    </div>
+                                </div>
+
+                                <h3 class="rating-heading">Оцените покур</h3>
+                                <div class="stars" id="star-rating">
+                                    <span class="star" data-value="1">★</span>
+                                    <span class="star" data-value="2">★</span>
+                                    <span class="star" data-value="3">★</span>
+                                    <span class="star" data-value="4">★</span>
+                                    <span class="star" data-value="5">★</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Расстановка углей</label>
+                                    <select id="coal-placement" class="control-h">
+                                        <option value="2 + 1">2 + 1</option>
+                                        <option value="3 в колодке">3 в колодке</option>
+                                        <option value="пирамида">пирамида</option>
+                                        <option value="чебурашка">чебурашка</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Заметки о покуре</label>
+                                    <textarea id="comment" rows="3" placeholder="Как курилось? Что по жару и вкусу?..."></textarea>
+                                </div>
+                                <button class="btn btn-primary-lg" onclick="saveCompletedSession()">💾 Сохранить в историю</button>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Статистика и бюджет -->
+                    <section class="card" id="analytics-card">
+                        <div class="card-header-line">
+                            <h2>🏆 Статистика и Бюджет</h2>
+                            <div class="period-dropdown-wrap" id="period-dropdown-wrap">
+                                <button type="button" class="period-dropdown-btn" id="period-dropdown-btn"
+                                    onclick="togglePeriodDropdown(event)">
+                                    <span id="period-dropdown-label">За всё время</span>
+                                    <span class="dropdown-chevron">▾</span>
+                                </button>
+                                <div class="period-dropdown-menu hidden" id="period-dropdown-menu"></div>
+                            </div>
                         </div>
-                        <div class="rank-list" id="home-top-brands">
-                            <p class="muted">Загрузка каталога…</p>
+
+                        <div class="bento-stats-grid" id="hookah-stats-grid">
+                            <div class="bento-item">
+                                <div class="bento-top">
+                                    <span class="bento-icon">💨</span>
+                                    <span class="bento-label">Время в дыму</span>
+                                </div>
+                                <span class="bento-val" id="stat-total-hours">0 ч 0 м</span>
+                            </div>
+                            <div class="bento-item">
+                                <div class="bento-top">
+                                    <span class="bento-icon">💸</span>
+                                    <span class="bento-label" id="stat-avg-cost">Средняя: 0 ₽</span>
+                                </div>
+                                <span class="bento-val" id="stat-total-money">0 ₽</span>
+                            </div>
+                            <div class="bento-item">
+                                <div class="bento-top">
+                                    <span class="bento-icon">❤️</span>
+                                    <span class="bento-label" id="stat-total-grams">Табака: 0 г</span>
+                                </div>
+                                <span class="bento-val" id="stat-fav-brand">—</span>
+                            </div>
+                            <div class="bento-item">
+                                <div class="bento-top">
+                                    <span class="bento-icon">🏺</span>
+                                    <span class="bento-label" id="stat-total-sessions">Сессий: 0</span>
+                                </div>
+                                <span class="bento-val" id="stat-fav-bowl">—</span>
+                            </div>
+                        </div>
+
+                        <div class="coal-inventory-box">
+                            <div class="coal-inv-header">
+                                <div class="coal-inv-titles">
+                                    <div class="coal-inv-title">📦 Склад углей</div>
+                                    <div class="coal-inv-sub" id="coal-price-info">1 шт ≈ 9.7 ₽ (Пачка 72 шт = 700 ₽)</div>
+                                </div>
+                                <button type="button" class="pill-btn" onclick="toggleCoalSettings()">⚙️ Настроить</button>
+                            </div>
+
+                            <div class="coal-stock-bar">
+                                <div class="coal-stock-status">
+                                    <span>Остаток:</span>
+                                    <strong id="coal-stock-remaining">72</strong>
+                                    <span>шт.</span>
+                                    <span id="coal-low-badge" class="low-stock-badge hidden">Мало!</span>
+                                </div>
+                                <button type="button" class="btn-buy-coal" onclick="buyNewCoalPack()">+ Пачка</button>
+                            </div>
+
+                            <div id="coal-settings-panel" class="coal-settings-panel hidden">
+                                <div class="pack-price-grid">
+                                    <div class="pack-field">
+                                        <span class="pack-field-label">Штук в пачке</span>
+                                        <div class="pack-field-control">
+                                            <input type="number" id="coal-pack-size-input" value="72" min="1">
+                                            <span>шт</span>
+                                        </div>
+                                    </div>
+                                    <div class="pack-field">
+                                        <span class="pack-field-label">Цена пачки</span>
+                                        <div class="pack-field-control">
+                                            <input type="number" id="coal-pack-price-input" value="700" min="0">
+                                            <span>₽</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="coal-save-row">
+                                    <div class="pack-field" style="flex:1;">
+                                        <span class="pack-field-label">Сейчас дома</span>
+                                        <div class="pack-field-control">
+                                            <input type="number" id="coal-current-stock-input" value="72" min="0">
+                                            <span>шт</span>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-inline"
+                                        onclick="saveCoalInventorySettings()">Сохранить</button>
+                                </div>
+                            </div>
                         </div>
                     </section>
-                    <section class="card list-card">
-                        <div class="card-head">
-                            <div>
-                                <span class="eyebrow">Профиль</span>
-                                <h3>Популярные направления</h3>
+
+                    <!-- История -->
+                    <section class="card">
+                        <div class="history-header">
+                            <h2>История</h2>
+                            <div class="backup-actions">
+                                <button class="pill-btn accent-pill" onclick="openManualAddModal()">➕ Внести</button>
+                                <button class="pill-btn" onclick="exportToAppleNotes()" title="Скопировать для Заметок">📋
+                                    Заметки</button>
+                                <button class="pill-btn" onclick="exportHistoryData()" title="Скачать JSON">📊 Экспорт</button>
+                                <button class="pill-btn" onclick="document.getElementById('import-file').click()"
+                                    title="Загрузить JSON">📂 Импорт</button>
+                                <input type="file" id="import-file" accept=".json" style="display:none"
+                                    onchange="importHistoryData(event)">
                             </div>
-                            <button class="text-link" type="button" data-open-tab="roulette">К фильтрам</button>
                         </div>
-                        <div class="rank-list" id="home-top-categories">
-                            <p class="muted">Загрузка каталога…</p>
+
+                        <div class="filter-bar">
+                            <input type="text" id="search-input" class="control-h"
+                                placeholder="🔍 Поиск по вкусу, бренду, чаше..." oninput="applyFilters()">
+                            <select id="filter-rating" class="control-h" onchange="applyFilters()">
+                                <option value="all">Все ★</option>
+                                <option value="5">Только ★ 5</option>
+                                <option value="4">★ 4+</option>
+                                <option value="3">★ 3+</option>
+                            </select>
                         </div>
+
+                        <div id="history-list"></div>
                     </section>
                 </div>
-
-                <section class="card about-card">
-                    <div>
-                        <span class="eyebrow">О приложении</span>
-                        <h3>Подбор без сюрпризов</h3>
-                        <p>Рулетка выбирает только из подходящих под фильтры вкусов, исключает снятые с производства
-                            позиции и запоминает вашу коллекцию в браузере. Данные каталога — HTReviews, приложение
-                            работает без сервера и регистрации.</p>
-                    </div>
-                    <button class="btn btn-ghost" type="button" data-open-tab="roulette">Открыть рулетку</button>
-                </section>
             </section>
 
-            <!-- РУЛЕТКА -->
+            <!-- РУЛЕТКА: РУЛЕТКА, КОЛЛЕКЦИЯ, ДЕЙСТВИЯ -->
             <section class="tab-panel" id="panel-roulette" data-panel="roulette" role="tabpanel"
                 aria-labelledby="tab-roulette" hidden>
                 <div class="section-head">
@@ -213,28 +457,25 @@
                 </div>
 
                 <section class="card roulette-card">
-                    <div class="roulette-filters">
-                        <label class="field">Бренд
+                    <div class="roulette-filters" id="roulette-filters">
+                        <label class="field" id="field-brand">Бренд
                             <select id="roulette-brand" class="control-h">
                                 <option value="all">Все бренды</option>
                             </select>
                         </label>
-                        <label class="field">Крепость
+                        <label class="field" id="field-strength">Крепость
                             <select id="roulette-strength" class="control-h">
                                 <option value="all">Любая крепость</option>
                             </select>
                         </label>
-                        <label class="field">Направление
+                        <label class="field" id="field-category">Направление
                             <select id="roulette-category" class="control-h">
                                 <option value="all">Любое направление</option>
                             </select>
                         </label>
-                        <label class="field">Рейтинг
+                        <label class="field" id="field-rating">Рейтинг
                             <select id="roulette-rating" class="control-h">
                                 <option value="all">Любой рейтинг</option>
-                                <option value="4.5">От 4.5</option>
-                                <option value="4">От 4.0</option>
-                                <option value="3.5">От 3.5</option>
                             </select>
                         </label>
                     </div>
@@ -280,22 +521,17 @@
 
                     <div class="roulette-result hidden" id="roulette-result" aria-live="polite"></div>
                 </section>
-            </section>
 
-            <!-- КОЛЛЕКЦИЯ -->
-            <section class="tab-panel" id="panel-collection" data-panel="collection" role="tabpanel"
-                aria-labelledby="tab-collection" hidden>
-                <div class="section-head">
-                    <div>
-                        <span class="eyebrow">Личный список</span>
-                        <h2>Моя коллекция</h2>
-                        <p class="section-sub">Вкусы, которые вы отметили «Хочу покурить». Список хранится в этом
-                            браузере.</p>
+                <!-- Коллекция -->
+                <section class="card collection-card" id="collection-card">
+                    <div class="card-head">
+                        <div>
+                            <span class="eyebrow">Личный список</span>
+                            <h3>Моя коллекция</h3>
+                        </div>
+                        <span class="count-pill" id="collection-count-pill">0 вкусов</span>
                     </div>
-                    <span class="count-pill" id="collection-count-pill">0 вкусов</span>
-                </div>
 
-                <section class="card collection-card">
                     <div class="collection-toolbar">
                         <div class="segmented" role="group" aria-label="Фильтр коллекции">
                             <button type="button" class="segment is-active" data-collection-filter="all">
@@ -317,77 +553,13 @@
                     <div class="empty-state" id="collection-empty">
                         <span class="empty-icon">☆</span>
                         <strong>Коллекция пока пуста</strong>
-                        <p>Откройте рулетку и нажмите «Хочу покурить» — вкус появится здесь.</p>
-                        <button class="btn btn-primary" type="button" data-open-tab="roulette">Перейти к рулетке</button>
+                        <p>Нажмите «Хочу покурить» на карточке выпавшего вкуса — он появится здесь.</p>
+                        <button class="btn btn-primary" type="button" data-open-tab="roulette">К рулетке</button>
                     </div>
                 </section>
-            </section>
 
-            <!-- СТАТИСТИКА -->
-            <section class="tab-panel" id="panel-stats" data-panel="stats" role="tabpanel"
-                aria-labelledby="tab-stats" hidden>
-                <div class="section-head">
-                    <div>
-                        <span class="eyebrow">Данные</span>
-                        <h2>Статистика</h2>
-                        <p class="section-sub">Распределение реального каталога и ваши действия в приложении.</p>
-                    </div>
-                    <span class="count-pill" id="stats-catalog-pill">Каталог</span>
-                </div>
-
-                <div class="stats-grid">
-                    <section class="card chart-card">
-                        <div class="card-head">
-                            <div>
-                                <span class="eyebrow">Вкусы</span>
-                                <h3>По брендам</h3>
-                            </div>
-                            <span class="chart-note">топ-10</span>
-                        </div>
-                        <div class="bar-list" id="stats-brands">
-                            <p class="muted">Загрузка каталога…</p>
-                        </div>
-                    </section>
-                    <section class="card chart-card">
-                        <div class="card-head">
-                            <div>
-                                <span class="eyebrow">Крепость</span>
-                                <h3>По шкале</h3>
-                            </div>
-                            <span class="chart-note">все значения</span>
-                        </div>
-                        <div class="bar-list" id="stats-strengths">
-                            <p class="muted">Загрузка каталога…</p>
-                        </div>
-                    </section>
-                    <section class="card chart-card">
-                        <div class="card-head">
-                            <div>
-                                <span class="eyebrow">Профиль</span>
-                                <h3>По направлениям</h3>
-                            </div>
-                            <span class="chart-note">топ-12</span>
-                        </div>
-                        <div class="bar-list" id="stats-categories">
-                            <p class="muted">Загрузка каталога…</p>
-                        </div>
-                        <p class="chart-footnote">Одна позиция может входить в несколько направлений.</p>
-                    </section>
-                    <section class="card chart-card">
-                        <div class="card-head">
-                            <div>
-                                <span class="eyebrow">Статус</span>
-                                <h3>По доступности</h3>
-                            </div>
-                            <span class="chart-note">каталог</span>
-                        </div>
-                        <div class="bar-list" id="stats-statuses">
-                            <p class="muted">Загрузка каталога…</p>
-                        </div>
-                    </section>
-                </div>
-
-                <section class="card user-stats-card">
+                <!-- Действия в приложении -->
+                <section class="card user-stats-card" id="user-stats-card">
                     <div class="card-head">
                         <div>
                             <span class="eyebrow">Вы</span>
@@ -400,374 +572,6 @@
                         <div class="user-stat"><strong id="user-tried">0</strong><span>уже попробовано</span></div>
                     </div>
                 </section>
-
-                <!-- Существующая статистика сессий -->
-                <section class="card" id="analytics-card">
-                    <div class="card-header-line">
-                        <h2>🏆 Статистика и Бюджет</h2>
-                        <div class="period-dropdown-wrap" id="period-dropdown-wrap">
-                            <button type="button" class="period-dropdown-btn" id="period-dropdown-btn"
-                                onclick="togglePeriodDropdown(event)">
-                                <span id="period-dropdown-label">За всё время</span>
-                                <span class="dropdown-chevron">▾</span>
-                            </button>
-                            <div class="period-dropdown-menu hidden" id="period-dropdown-menu"></div>
-                        </div>
-                    </div>
-
-                    <div class="bento-stats-grid" id="hookah-stats-grid">
-                        <div class="bento-item">
-                            <div class="bento-top">
-                                <span class="bento-icon">💨</span>
-                                <span class="bento-label">Время в дыму</span>
-                            </div>
-                            <span class="bento-val" id="stat-total-hours">0 ч 0 м</span>
-                        </div>
-                        <div class="bento-item">
-                            <div class="bento-top">
-                                <span class="bento-icon">💸</span>
-                                <span class="bento-label" id="stat-avg-cost">Средняя: 0 ₽</span>
-                            </div>
-                            <span class="bento-val" id="stat-total-money">0 ₽</span>
-                        </div>
-                        <div class="bento-item">
-                            <div class="bento-top">
-                                <span class="bento-icon">❤️</span>
-                                <span class="bento-label" id="stat-total-grams">Табака: 0 г</span>
-                            </div>
-                            <span class="bento-val" id="stat-fav-brand">—</span>
-                        </div>
-                        <div class="bento-item">
-                            <div class="bento-top">
-                                <span class="bento-icon">🏺</span>
-                                <span class="bento-label" id="stat-total-sessions">Сессий: 0</span>
-                            </div>
-                            <span class="bento-val" id="stat-fav-bowl">—</span>
-                        </div>
-                    </div>
-
-                    <div class="coal-inventory-box">
-                        <div class="coal-inv-header">
-                            <div class="coal-inv-titles">
-                                <div class="coal-inv-title">📦 Склад углей</div>
-                                <div class="coal-inv-sub" id="coal-price-info">1 шт ≈ 9.7 ₽ (Пачка 72 шт = 700 ₽)</div>
-                            </div>
-                            <button type="button" class="pill-btn" onclick="toggleCoalSettings()">⚙️ Настроить</button>
-                        </div>
-
-                        <div class="coal-stock-bar">
-                            <div class="coal-stock-status">
-                                <span>Остаток:</span>
-                                <strong id="coal-stock-remaining">72</strong>
-                                <span>шт.</span>
-                                <span id="coal-low-badge" class="low-stock-badge hidden">Мало!</span>
-                            </div>
-                            <button type="button" class="btn-buy-coal" onclick="buyNewCoalPack()">+ Пачка</button>
-                        </div>
-
-                        <div id="coal-settings-panel" class="coal-settings-panel hidden">
-                            <div class="pack-price-grid">
-                                <div class="pack-field">
-                                    <span class="pack-field-label">Штук в пачке</span>
-                                    <div class="pack-field-control">
-                                        <input type="number" id="coal-pack-size-input" value="72" min="1">
-                                        <span>шт</span>
-                                    </div>
-                                </div>
-                                <div class="pack-field">
-                                    <span class="pack-field-label">Цена пачки</span>
-                                    <div class="pack-field-control">
-                                        <input type="number" id="coal-pack-price-input" value="700" min="0">
-                                        <span>₽</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="coal-save-row">
-                                <div class="pack-field" style="flex:1;">
-                                    <span class="pack-field-label">Сейчас дома</span>
-                                    <div class="pack-field-control">
-                                        <input type="number" id="coal-current-stock-input" value="72" min="0">
-                                        <span>шт</span>
-                                    </div>
-                                </div>
-                                <button type="button" class="btn btn-inline"
-                                    onclick="saveCoalInventorySettings()">Сохранить</button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- История и бекапы -->
-                <section class="card">
-                    <div class="history-header">
-                        <h2>История</h2>
-                        <div class="backup-actions">
-                            <button class="pill-btn accent-pill" onclick="openManualAddModal()">➕ Внести</button>
-                            <button class="pill-btn" onclick="exportToAppleNotes()" title="Скопировать для Заметок">📋
-                                Заметки</button>
-                            <button class="pill-btn" onclick="exportHistoryData()" title="Скачать JSON">📊 Экспорт</button>
-                            <button class="pill-btn" onclick="document.getElementById('import-file').click()"
-                                title="Загрузить JSON">📂 Импорт</button>
-                            <input type="file" id="import-file" accept=".json" style="display:none"
-                                onchange="importHistoryData(event)">
-                        </div>
-                    </div>
-
-                    <div class="filter-bar">
-                        <input type="text" id="search-input" class="control-h"
-                            placeholder="🔍 Поиск по вкусу, бренду, чаше..." oninput="applyFilters()">
-                        <select id="filter-rating" class="control-h" onchange="applyFilters()">
-                            <option value="all">Все ★</option>
-                            <option value="5">Только ★ 5</option>
-                            <option value="4">★ 4+</option>
-                            <option value="3">★ 3+</option>
-                        </select>
-                    </div>
-
-                    <div id="history-list"></div>
-                </section>
-            </section>
-
-            <!-- ПОКУР / СЕССИЯ -->
-            <section class="tab-panel" id="panel-session" data-panel="session" role="tabpanel"
-                aria-labelledby="tab-session" hidden>
-                <div class="section-head">
-                    <div>
-                        <span class="eyebrow">Трекер</span>
-                        <h2>Покур</h2>
-                        <p class="section-sub">Прогрев, таймер, угли и история сессий. Всё считается локально.</p>
-                    </div>
-                </div>
-
-                <div class="session-stack">
-                    <!-- Настройка новой сессии -->
-                    <section class="card" id="setup-form">
-                        <div class="card-header-line">
-                            <h2>Новая сессия</h2>
-                            <button type="button" class="pill-btn accent-pill" id="toggle-all-steps-btn"
-                                onclick="toggleAllSetupSteps()">
-                                ✨ Развернуть все
-                            </button>
-                        </div>
-
-                        <!-- ШАГ 1: Выбор чаши -->
-                        <div class="wizard-step step-visible" id="setup-step-1">
-                            <div class="form-group" style="margin-bottom: 8px;">
-                                <div class="label-row">
-                                    <label>1. Выбери чашу</label>
-                                    <div class="inline-actions">
-                                        <button type="button" class="text-action-btn" onclick="toggleQuickAddBowl()">+
-                                            Добавить</button>
-                                        <button type="button" class="text-action-btn danger-text"
-                                            onclick="deleteSelectedBowl()">Удалить</button>
-                                    </div>
-                                </div>
-                                <select id="bowl-select" class="control-h" onchange="onStep1BowlSelect()"></select>
-                                <div id="quick-bowl-box" class="quick-add-box hidden">
-                                    <input type="text" id="new-bowl-input" class="control-h" placeholder="Название чаши"
-                                        onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomBowl();}">
-                                    <button type="button" class="btn btn-inline" onclick="addCustomBowl()">ОК</button>
-                                </div>
-                            </div>
-                            <button type="button" class="step-next-Trigger" id="step-1-next-btn"
-                                onclick="revealSetupStep(2)">
-                                К выбору табака ↓
-                            </button>
-                        </div>
-
-                        <!-- ШАГ 2: Режим и Табак -->
-                        <div class="wizard-step step-collapsed" id="setup-step-2">
-                            <div class="step-divider"></div>
-                            <div class="form-group">
-                                <button type="button" class="mode-click-bar" id="mode-toggle-btn"
-                                    onclick="toggleMixMode()">
-                                    <div class="mode-switch-info">
-                                        <span class="mode-title" id="mode-label">🍂 Режим: Соло (1 табак)</span>
-                                        <span class="mode-sub" id="mode-sub-label">Нажми для переключения в Микс</span>
-                                    </div>
-                                    <span class="mode-pill-indicator" id="mode-pill-badge">Соло ⇄</span>
-                                </button>
-                            </div>
-
-                            <div class="form-group" style="margin-bottom: 8px;">
-                                <div class="label-row">
-                                    <label>2. Табак, граммовка и пачка</label>
-                                    <div class="inline-actions">
-                                        <button type="button" class="text-action-btn" onclick="toggleQuickAddBrand()">+
-                                            Бренд</button>
-                                        <button type="button" class="text-action-btn danger-text"
-                                            onclick="openBrandManagerModal()">Список</button>
-                                    </div>
-                                </div>
-                                <div id="quick-brand-box" class="quick-add-box hidden" style="margin-bottom: 10px;">
-                                    <input type="text" id="new-brand-input" class="control-h" placeholder="Название бренда"
-                                        onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomBrandFromBar();}">
-                                    <button type="button" class="btn btn-inline" onclick="addCustomBrandFromBar()">ОК</button>
-                                </div>
-
-                                <!-- Режим СОЛО -->
-                                <div id="solo-container">
-                                    <div class="tobacco-card-box">
-                                        <div class="tobacco-grid-solo">
-                                            <select id="solo-tobacco-brand" class="brand-select control-h"
-                                                onchange="onBrandSelectChange(this); revealSetupStep(3);"></select>
-                                            <input type="text" id="solo-tobacco-flavor" class="flavor-input control-h"
-                                                placeholder="Вкус" oninput="onTobaccoFlavorInput()" onfocus="revealSetupStep(3)">
-                                            <div class="unit-input-box control-h">
-                                                <input type="number" id="solo-tobacco-weight" value="18" min="1" max="100"
-                                                    oninput="recalcLiveBowlCost(); revealSetupStep(3);">
-                                                <span>г</span>
-                                            </div>
-                                        </div>
-                                        <input type="text" id="solo-custom-brand" class="custom-brand-input control-h hidden"
-                                            placeholder="Введите название нового бренда..." oninput="recalcLiveBowlCost()">
-
-                                        <div class="pack-price-grid">
-                                            <div class="pack-field">
-                                                <span class="pack-field-label">Цена пачки</span>
-                                                <div class="pack-field-control">
-                                                    <input type="number" id="solo-pack-price" placeholder="0" min="0"
-                                                        oninput="onPackInfoChange('solo')">
-                                                    <span>₽</span>
-                                                </div>
-                                            </div>
-                                            <div class="pack-field">
-                                                <span class="pack-field-label">Вес пачки</span>
-                                                <div class="pack-field-control">
-                                                    <input type="number" id="solo-pack-weight" placeholder="25" min="1"
-                                                        oninput="onPackInfoChange('solo')">
-                                                    <span>г</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Режим МИКС -->
-                                <div id="mix-container" class="hidden">
-                                    <div class="mix-header-bar">
-                                        <span>Компоненты микса</span>
-                                        <span id="mix-total-weight" class="weight-badge">Всего: 0 г</span>
-                                    </div>
-                                    <div id="mix-rows-list"></div>
-                                    <button type="button" class="btn btn-secondary btn-dashed"
-                                        onclick="addMixRow(); revealSetupStep(3);">+ Добавить табак в микс</button>
-                                </div>
-                            </div>
-
-                            <button type="button" class="step-next-Trigger" id="step-2-next-btn"
-                                onclick="revealSetupStep(3)">
-                                К углям и прогреву ↓
-                            </button>
-                        </div>
-
-                        <!-- ШАГ 3: Угли, прогрев, себестоимость -->
-                        <div class="wizard-step step-collapsed" id="setup-step-3">
-                            <div class="step-divider"></div>
-                            <div class="setup-dual-grid">
-                                <div class="setup-mini-card">
-                                    <div class="mini-card-top">
-                                        <span class="mini-card-label">🔥 3. Угли на старт</span>
-                                    </div>
-                                    <div class="unit-input-box control-h">
-                                        <input type="number" id="start-coals-input" value="3" min="1" max="10"
-                                            oninput="recalcLiveBowlCost()">
-                                        <span>шт</span>
-                                    </div>
-                                </div>
-
-                                <div class="setup-mini-card">
-                                    <div class="mini-card-top">
-                                        <span class="mini-card-label">⏱ Прогрев</span>
-                                        <div class="mini-presets">
-                                            <button type="button" class="mini-pill" onclick="setWarmupPreset(5)">5м</button>
-                                            <button type="button" class="mini-pill" onclick="setWarmupPreset(6)">6м</button>
-                                            <button type="button" class="mini-pill" onclick="setWarmupPreset(7)">7м</button>
-                                        </div>
-                                    </div>
-                                    <div class="unit-input-box control-h">
-                                        <input type="number" id="warmup-min" value="5" min="1" max="59">
-                                        <span>мин</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="live-cost-banner" id="live-cost-banner">
-                                <div class="live-cost-left">
-                                    <span class="live-cost-title">💰 Себестоимость забивки</span>
-                                    <span class="live-cost-sub" id="live-cost-details">Табак: 0 ₽ • Угли: 0 ₽</span>
-                                </div>
-                                <div class="live-cost-value" id="live-cost-total">0 ₽</div>
-                            </div>
-
-                            <button class="btn btn-primary-lg" id="start-btn" onclick="startWarmupSession()">🔥 Начать
-                                прогрев</button>
-                        </div>
-                    </section>
-
-                    <!-- Активная сессия -->
-                    <section class="card hidden" id="active-session">
-                        <div id="warmup-box" class="timer-container">
-                            <div class="status-badge" id="status-title">🔥 Прогрев чаши...</div>
-                            <div class="active-mix-subtitle" id="active-mix-label"></div>
-                            <div class="timer-display" id="timer">05:00</div>
-                            <div class="overtime-sub-badge hidden" id="warmup-overtime-label">Общий прогрев: 05:00</div>
-
-                            <div id="warmup-controls" class="session-btn-stack">
-                                <button class="btn btn-secondary" onclick="addWarmupMinute()">+1 минута к таймеру</button>
-                                <button class="btn btn-success" id="start-smoking-btn"
-                                    onclick="startSmokingFromWarmup()">💨 Начать
-                                    курить</button>
-                                <button class="btn btn-text-Cancel" onclick="cancelActiveSession()">Отменить сессию</button>
-                            </div>
-
-                            <div id="smoking-controls" class="session-btn-stack hidden">
-                                <button class="btn btn-danger" onclick="finishSmokingSession()">🛑 Завершить сессию</button>
-                            </div>
-                        </div>
-
-                        <!-- Оценка после завершения -->
-                        <div id="rating-form" class="hidden">
-                            <div id="forgotten-timer-box" class="sub-timer-box hidden">
-                                <div class="forgotten-title">🤔 Забыл выключить таймер?</div>
-                                <div class="forgotten-sub">
-                                    Таймер насчитал <b id="forgotten-raw-time">02:15:00</b>. Выбери реальное время покура:
-                                </div>
-                                <div class="forgotten-pills">
-                                    <button type="button" class="pill-btn" onclick="applyQuickSmokeDuration(45)">45 мин</button>
-                                    <button type="button" class="pill-btn" onclick="applyQuickSmokeDuration(60)">1 час</button>
-                                    <button type="button" class="pill-btn" onclick="applyQuickSmokeDuration(75)">1 ч 15 м</button>
-                                    <button type="button" class="pill-btn" onclick="applyQuickSmokeDuration(90)">1 ч 30 м</button>
-                                </div>
-                            </div>
-
-                            <h3 class="rating-heading">Оцените покур</h3>
-                            <div class="stars" id="star-rating">
-                                <span class="star" data-value="1">★</span>
-                                <span class="star" data-value="2">★</span>
-                                <span class="star" data-value="3">★</span>
-                                <span class="star" data-value="4">★</span>
-                                <span class="star" data-value="5">★</span>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Расстановка углей</label>
-                                <select id="coal-placement" class="control-h">
-                                    <option value="2 + 1">2 + 1</option>
-                                    <option value="3 в колодке">3 в колодке</option>
-                                    <option value="пирамида">пирамида</option>
-                                    <option value="чебурашка">чебурашка</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Заметки о покуре</label>
-                                <textarea id="comment" rows="3" placeholder="Как курилось? Что по жару и вкусу?..."></textarea>
-                            </div>
-                            <button class="btn btn-primary-lg" onclick="saveCompletedSession()">💾 Сохранить в историю</button>
-                        </div>
-                    </section>
-                </div>
             </section>
 
         </main>
@@ -936,7 +740,7 @@
                     <option value="5">★ 5 — Идеально</option>
                     <option value="4">★ 4 — Хорошо</option>
                     <option value="3">★ 3 — Нормально</option>
-                    <option value="2">★ 2 — Такое себе</option>
+                    <option value="2">★ 2 — Так себе</option>
                     <option value="1">★ 1 — Ужасно</option>
                 </select>
             </div>

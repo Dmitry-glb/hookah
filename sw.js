@@ -1,9 +1,12 @@
-﻿const CACHE_NAME = 'dimhookah-pwa-v11';
+const CACHE_NAME = 'dimhookah-pwa-v13';
 const ASSETS = [
     './',
     './index.html',
     './style.css',
+    './ui.css',
+    './lib/catalog-core.js',
     './app.js',
+    './catalog-ui.js',
     './manifest.json',
     './icon.png',
     './flavors.json'

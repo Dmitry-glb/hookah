@@ -1,12 +1,15 @@
 {
-    "name": "DimHookah",
+    "name": "DimHookah — рулетка вкусов",
     "short_name": "DimHookah",
-    "description": "Трекер кальянных сессий и прогрева чаши",
+    "description": "Случайный подбор вкуса табака для кальяна, личная коллекция и трекер покурок",
     "start_url": "./index.html",
+    "scope": "./",
     "display": "standalone",
-    "background_color": "#F2F2F7",
-    "theme_color": "#F2F2F7",
-    "orientation": "portrait",
+    "background_color": "#07080c",
+    "theme_color": "#07080c",
+    "lang": "ru",
+    "categories": ["lifestyle", "food"],
+    "orientation": "any",
     "icons": [
         {
             "src": "icon.png",

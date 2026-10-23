@@ -1,27 +1,38 @@
 {
-  "dependencies": {
-    "axios": "^1.20.0",
-    "cheerio": "^1.2.0",
-    "puppeteer": "^25.14.0"
-  },
   "name": "hookah",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.1.0",
+  "description": "DimHookah — рулетка вкусов для кальяна, каталог HTReviews, личная коллекция и трекер покурок",
   "main": "app.js",
+  "type": "commonjs",
   "scripts": {
-    "test": "node --check app.js && node --check scraper.js",
+    "test": "node test/all.test.js && node --check app.js && node --check scraper.js && node --check lib/htreviews.js && node --check lib/catalog-core.js && node --check catalog-ui.js",
+    "test:live": "node test/live-run.js",
+    "test:e2e": "node test/e2e-run.js",
     "scrape": "node scraper.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Dmitry-glb/hookah.git"
   },
-  "keywords": [],
+  "keywords": [
+    "hookah",
+    "shisha",
+    "tobacco",
+    "flavors",
+    "roulette",
+    "pwa"
+  ],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/Dmitry-glb/hookah/issues"
   },
-  "homepage": "https://github.com/Dmitry-glb/hookah#readme"
+  "homepage": "https://github.com/Dmitry-glb/hookah#readme",
+  "dependencies": {
+    "axios": "^1.20.0",
+    "cheerio": "^1.2.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.64.1"
+  }
 }

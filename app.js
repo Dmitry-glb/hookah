@@ -1,4 +1,4 @@
-﻿// --- БАЗОВЫЕ КАТАЛОГИ (ЧАШИ ДОБАВЛЯЮТСЯ ТОЛЬКО ВРУЧНУЮ) ---
+// --- БАЗОВЫЕ КАТАЛОГИ (ЧАШИ ДОБАВЛЯЮТСЯ ТОЛЬКО ВРУЧНУЮ) ---
 const DEFAULT_BOWLS = [];
 
 const LEGACY_PRESET_BOWLS = [
@@ -51,7 +51,6 @@ let activeCoalsUsed = 3;
 let alarmAlreadyPlayed = false;
 let smokeReminder60Sent = false;
 let smokeReminder90Sent = false;
-let flavorCatalog = [];
 
 let audioCtx = null;
 let silentAudioUrl = null;
@@ -308,11 +307,11 @@ function showIosNotice(title, text) {
 
 // --- ТЕМА ОФОРМЛЕНИЯ ---
 function initTheme() {
-    const savedMode = localStorage.getItem('hookah_theme_mode') || 'auto';
+    const savedMode = localStorage.getItem('hookah_theme_mode') || 'dark';
     applyThemeMode(savedMode);
 
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-        const currentMode = localStorage.getItem('hookah_theme_mode') || 'auto';
+        const currentMode = localStorage.getItem('hookah_theme_mode') || 'dark';
         if (currentMode === 'auto') applyThemeMode('auto');
     });
 }
@@ -2305,86 +2304,6 @@ function formatDurationHM(totalSeconds) {
     return `${hours} ч ${mins} м`;
 }
 
-async function initFlavorPicker() {
-    const card = document.getElementById('flavor-picker-card');
-    if (!card) return;
-    const brandSelect = document.getElementById('picker-brand');
-    const strengthSelect = document.getElementById('picker-strength');
-    const categorySelect = document.getElementById('picker-category');
-    const ratingSelect = document.getElementById('picker-rating');
-    const result = document.getElementById('flavor-picker-result');
-    const count = document.getElementById('flavor-picker-count');
-    const button = document.getElementById('pick-flavor-btn');
-    if (!brandSelect || !strengthSelect || !categorySelect || !ratingSelect || !result || !count || !button) return;
-    try {
-        const response = await fetch('flavors.json', { cache: 'no-store' });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
-        flavorCatalog = Array.isArray(data) ? data.filter(item => item && String(item.name).trim() && String(item.brand).trim()) : [];
-        if (!flavorCatalog.length) throw new Error('empty catalog');
-        const brands = [...new Set(flavorCatalog.map(item => String(item.brand).trim()).filter(Boolean))];
-        const categories = [...new Set(flavorCatalog.flatMap(item => {
-            const tags = Array.isArray(item.tags) ? item.tags : [];
-            return [
-                ...(Array.isArray(item.taste_groups) ? item.taste_groups : []),
-                ...(Array.isArray(item.tastes) ? item.tastes : []),
-                ...tags.flatMap(tag => [tag?.taste, tag?.group])
-            ];
-        }).filter(Boolean))];
-        const strengths = [...new Set(flavorCatalog.map(item => String(item.strength || '').trim()).filter(Boolean))];
-        brands.sort((a, b) => a.localeCompare(b, 'ru')).forEach(brand => brandSelect.add(new Option(brand, brand)));
-        strengths.sort((a, b) => a.localeCompare(b, 'ru')).forEach(value => strengthSelect.add(new Option(value, value)));
-        categories.sort((a, b) => a.localeCompare(b, 'ru')).forEach(category => categorySelect.add(new Option(category, category)));
-        count.textContent = `${flavorCatalog.length} позиций`;
-        button.addEventListener('click', pickRandomFlavor);
-        brandSelect.addEventListener('change', updatePickerCount);
-        categorySelect.addEventListener('change', updatePickerCount);
-        strengthSelect.addEventListener('change', updatePickerCount);
-        ratingSelect.addEventListener('change', updatePickerCount);
-    } catch (error) {
-        count.textContent = 'Каталог недоступен';
-        button.disabled = true;
-        result.textContent = 'Не удалось загрузить flavors.json. Откройте проект через локальный HTTP-сервер.';
-    }
-}
-
-function getPickerItems() {
-    const brand = document.getElementById('picker-brand')?.value || 'all';
-    const category = document.getElementById('picker-category')?.value || 'all';
-    const strength = document.getElementById('picker-strength')?.value || 'all';
-    const rating = document.getElementById('picker-rating')?.value || 'all';
-    return flavorCatalog.filter(item => {
-        const tags = Array.isArray(item.tags) ? item.tags : [];
-        const categories = [
-            ...(Array.isArray(item.taste_groups) ? item.taste_groups : []),
-            ...(Array.isArray(item.tastes) ? item.tastes : []),
-            ...tags.flatMap(tag => [tag?.taste, tag?.group])
-        ].filter(Boolean);
-        return (brand === 'all' || item.brand === brand) && (strength === 'all' || item.strength === strength) && (category === 'all' || categories.includes(category)) && (rating === 'all' || Number(item.rating) >= Number(rating));
-    });
-}
-
-function updatePickerCount() {
-    const count = document.getElementById('flavor-picker-count');
-    if (count) count.textContent = `${getPickerItems().length} позиций`;
-}
-
-function pickRandomFlavor() {
-    const items = getPickerItems();
-    const result = document.getElementById('flavor-picker-result');
-    if (!result) return;
-    if (!items.length) { result.textContent = 'По этим фильтрам ничего не найдено. Измените профиль.'; return; }
-    const index = window.crypto?.getRandomValues ? window.crypto.getRandomValues(new Uint32Array(1))[0] % items.length : Math.floor(Math.random() * items.length);
-    const item = items[index];
-    result.replaceChildren();
-    const icon = document.createElement('span'); icon.className = 'picker-result-icon'; icon.textContent = '✦';
-    const content = document.createElement('div');
-    const title = document.createElement('strong'); title.textContent = item.name;
-    const meta = document.createElement('p'); meta.textContent = [item.brand, item.line, Number.isFinite(Number(item.rating)) ? `★ ${item.rating}` : ''].filter(Boolean).join(' · ');
-    const details = document.createElement('small'); details.textContent = (item.tastes || []).join(', ') || item.alt_name || 'Профиль вкуса не указан';
-    const link = document.createElement('a'); link.href = item.source_url || `https://htreviews.org/tobaccos/${item.slug}`; link.target = '_blank'; link.rel = 'noopener'; link.textContent = 'Открыть вкус на HTReviews ↗';
-    content.append(title, meta, details, link); result.append(icon, content);
-}
 function syncActiveTimerOnWake() {
     const isWarmup = !document.getElementById('warmup-controls').classList.contains('hidden');
     const isSmoking = !document.getElementById('smoking-controls').classList.contains('hidden');
@@ -2400,7 +2319,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initLiquidBackgroundCanvas();
     initCatalogs();
     restoreActiveSessionIfAny();
-    initFlavorPicker();
 
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {

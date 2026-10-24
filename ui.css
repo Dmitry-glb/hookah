@@ -1765,6 +1765,78 @@ option {
     padding: clamp(16px, 2.6vw, 24px);
 }
 
+#active-session {
+    order: -1;
+}
+
+.rating-heading-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.rating-heading-row .rating-heading {
+    margin: 0;
+}
+
+.rating-value {
+    min-width: 34px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--ui-gold);
+    font-variant-numeric: tabular-nums;
+}
+
+.stars:focus-visible {
+    outline: 2px solid var(--ui-gold);
+    outline-offset: 6px;
+    border-radius: 8px;
+}
+
+.stars .star.half {
+    color: transparent;
+    background: linear-gradient(90deg, var(--ui-gold) 0 50%, var(--ui-text-dim) 50% 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
+}
+
+.chip-state {
+    border-color: color-mix(in srgb, var(--ui-gold) 42%, transparent);
+    background: color-mix(in srgb, var(--ui-gold) 12%, transparent);
+    color: var(--ui-gold);
+}
+
+.chip-wish {
+    border-color: color-mix(in srgb, #e8b95f 55%, transparent);
+}
+
+.chip-tried {
+    border-color: color-mix(in srgb, #7ec9a1 50%, transparent);
+    background: color-mix(in srgb, #7ec9a1 12%, transparent);
+    color: #9fe0bd;
+}
+
+.chip-history {
+    border-color: color-mix(in srgb, #8fa9d8 48%, transparent);
+    background: color-mix(in srgb, #8fa9d8 10%, transparent);
+    color: #b8c9e8;
+}
+
+#clear-user-stats {
+    margin-left: auto;
+    flex: 0 0 auto;
+    color: #e08b7f;
+    font-size: 0.72rem;
+}
+
+#clear-user-stats:hover {
+    color: #ffb0a3;
+}
+
 .form-group {
     margin-bottom: 14px;
 }

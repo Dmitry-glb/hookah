@@ -3,14 +3,17 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>DimHookah — рулетка вкусов для кальяна</title>
     <meta name="description"
         content="DimHookah: случайный подбор вкуса табака для кальяна, личная коллекция и трекер покурок.">
 
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="DimHookah">
+    <meta name="format-detection" content="telephone=no">
     <meta name="theme-color" content="#07080c">
 
     <link rel="manifest" href="manifest.json">
@@ -92,10 +95,6 @@
                         <section class="card" id="setup-form">
                             <div class="card-header-line">
                                 <h2>Новая сессия</h2>
-                                <button type="button" class="pill-btn accent-pill" id="toggle-all-steps-btn"
-                                    onclick="toggleAllSetupSteps()">
-                                    ✨ Развернуть все
-                                </button>
                             </div>
 
                             <div class="wizard-step step-visible" id="setup-step-1">
@@ -116,13 +115,9 @@
                                         <button type="button" class="btn btn-inline" onclick="addCustomBowl()">ОК</button>
                                     </div>
                                 </div>
-                                <button type="button" class="step-next-Trigger" id="step-1-next-btn"
-                                    onclick="revealSetupStep(2)">
-                                    К выбору табака ↓
-                                </button>
                             </div>
 
-                            <div class="wizard-step step-collapsed" id="setup-step-2">
+                            <div class="wizard-step step-visible" id="setup-step-2">
                                 <div class="step-divider"></div>
                                 <div class="form-group">
                                     <button type="button" class="mode-click-bar" id="mode-toggle-btn"
@@ -138,35 +133,21 @@
                                 <div class="form-group" style="margin-bottom: 8px;">
                                     <div class="label-row">
                                         <label>2. Табак, граммовка и пачка</label>
-                                        <div class="inline-actions">
-                                            <button type="button" class="text-action-btn"
-                                                onclick="toggleQuickAddBrand()">+
-                                                Бренд</button>
-                                            <button type="button" class="text-action-btn danger-text"
-                                                onclick="openBrandManagerModal()">Список</button>
-                                        </div>
-                                    </div>
-                                    <div id="quick-brand-box" class="quick-add-box hidden" style="margin-bottom: 10px;">
-                                        <input type="text" id="new-brand-input" class="control-h" placeholder="Название бренда"
-                                            onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomBrandFromBar();}">
-                                        <button type="button" class="btn btn-inline" onclick="addCustomBrandFromBar()">ОК</button>
                                     </div>
 
                                     <div id="solo-container">
                                         <div class="tobacco-card-box">
                                             <div class="tobacco-grid-solo">
                                                 <select id="solo-tobacco-brand" class="brand-select control-h"
-                                                    onchange="onBrandSelectChange(this); revealSetupStep(3);"></select>
-                                                <input type="text" id="solo-tobacco-flavor" class="flavor-input control-h"
-                                                    placeholder="Вкус" oninput="onTobaccoFlavorInput()" onfocus="revealSetupStep(3)">
+                                                    onchange="onBrandSelectChange(this)"></select>
+                                                <select id="solo-tobacco-flavor" class="flavor-select control-h"
+                                                    onchange="revealSetupStep(3)"></select>
                                                 <div class="unit-input-box control-h">
                                                     <input type="number" id="solo-tobacco-weight" value="18" min="1" max="100"
-                                                        oninput="recalcLiveBowlCost(); revealSetupStep(3);">
+                                                        oninput="recalcLiveBowlCost()">
                                                     <span>г</span>
                                                 </div>
                                             </div>
-                                            <input type="text" id="solo-custom-brand" class="custom-brand-input control-h hidden"
-                                                placeholder="Введите название нового бренда..." oninput="recalcLiveBowlCost()">
 
                                             <div class="pack-price-grid">
                                                 <div class="pack-field">
@@ -199,14 +180,9 @@
                                             onclick="addMixRow(); revealSetupStep(3);">+ Добавить табак в микс</button>
                                     </div>
                                 </div>
-
-                                <button type="button" class="step-next-Trigger" id="step-2-next-btn"
-                                    onclick="revealSetupStep(3)">
-                                    К углям и прогреву ↓
-                                </button>
                             </div>
 
-                            <div class="wizard-step step-collapsed" id="setup-step-3">
+                            <div class="wizard-step step-visible" id="setup-step-3">
                                 <div class="step-divider"></div>
                                 <div class="setup-dual-grid">
                                     <div class="setup-mini-card">
@@ -287,13 +263,18 @@
                                     </div>
                                 </div>
 
-                                <h3 class="rating-heading">Оцените покур</h3>
-                                <div class="stars" id="star-rating">
-                                    <span class="star" data-value="1">★</span>
-                                    <span class="star" data-value="2">★</span>
-                                    <span class="star" data-value="3">★</span>
-                                    <span class="star" data-value="4">★</span>
-                                    <span class="star" data-value="5">★</span>
+                                <div class="rating-heading-row">
+                                    <h3 class="rating-heading">Оцените покур</h3>
+                                    <span class="rating-value" id="rating-value">0.0</span>
+                                </div>
+                                <div class="stars" id="star-rating" role="slider" tabindex="0"
+                                    aria-label="Оценка покура от 0.5 до 5" aria-valuemin="0.5" aria-valuemax="5"
+                                    aria-valuenow="0">
+                                    <span class="star" data-value="1" role="presentation">★</span>
+                                    <span class="star" data-value="2" role="presentation">★</span>
+                                    <span class="star" data-value="3" role="presentation">★</span>
+                                    <span class="star" data-value="4" role="presentation">★</span>
+                                    <span class="star" data-value="5" role="presentation">★</span>
                                 </div>
 
                                 <div class="form-group">
@@ -565,6 +546,7 @@
                             <span class="eyebrow">Вы</span>
                             <h3>Действия в приложении</h3>
                         </div>
+                        <button type="button" class="text-link danger-text" id="clear-user-stats">Очистить</button>
                     </div>
                     <div class="user-stat-grid">
                         <div class="user-stat"><strong id="user-spins">0</strong><span>вращений рулетки</span></div>
@@ -632,13 +614,18 @@
             </div>
 
             <div class="form-group">
-                <label>Оценка (1–5)</label>
+                <label>Оценка (0.5–5)</label>
                 <select id="edit-rating" class="control-h">
-                    <option value="5">★★★★★ (5 — Идеально)</option>
-                    <option value="4">★★★★☆ (4 — Хорошо)</option>
-                    <option value="3">★★★☆☆ (3 — Норм)</option>
-                    <option value="2">★★☆☆☆ (2 — Такое себе)</option>
-                    <option value="1">★☆☆☆☆ (1 — Плохо)</option>
+                    <option value="5">★ 5.0 — Идеально</option>
+                    <option value="4.5">★ 4.5 — Отлично</option>
+                    <option value="4">★ 4.0 — Хорошо</option>
+                    <option value="3.5">★ 3.5 — Выше среднего</option>
+                    <option value="3">★ 3.0 — Нормально</option>
+                    <option value="2.5">★ 2.5 — Слабо</option>
+                    <option value="2">★ 2.0 — Так себе</option>
+                    <option value="1.5">★ 1.5 — Плохо</option>
+                    <option value="1">★ 1.0 — Очень плохо</option>
+                    <option value="0.5">★ 0.5 — Ужасно</option>
                 </select>
             </div>
 
@@ -695,10 +682,8 @@
                 <label>Табак и вкус</label>
                 <div class="manual-grid-2" style="margin-bottom: 8px;">
                     <select id="manual-brand-select" class="control-h" onchange="onManualBrandChange(this)"></select>
-                    <input type="text" id="manual-flavor-input" class="control-h" placeholder="Вкус">
+                    <select id="manual-flavor-input" class="control-h"></select>
                 </div>
-                <input type="text" id="manual-custom-brand" class="custom-brand-input control-h hidden"
-                    placeholder="Введите название бренда..." style="margin-bottom: 8px;">
 
                 <div class="pack-price-grid" style="margin-top:0;">
                     <div class="pack-field">
@@ -737,11 +722,16 @@
             <div class="form-group">
                 <label>Оценка покура</label>
                 <select id="manual-rating-select" class="control-h">
-                    <option value="5">★ 5 — Идеально</option>
-                    <option value="4">★ 4 — Хорошо</option>
-                    <option value="3">★ 3 — Нормально</option>
-                    <option value="2">★ 2 — Так себе</option>
-                    <option value="1">★ 1 — Ужасно</option>
+                    <option value="5">★ 5.0 — Идеально</option>
+                    <option value="4.5">★ 4.5 — Отлично</option>
+                    <option value="4">★ 4.0 — Хорошо</option>
+                    <option value="3.5">★ 3.5 — Выше среднего</option>
+                    <option value="3">★ 3.0 — Нормально</option>
+                    <option value="2.5">★ 2.5 — Слабо</option>
+                    <option value="2">★ 2.0 — Так себе</option>
+                    <option value="1.5">★ 1.5 — Плохо</option>
+                    <option value="1">★ 1.0 — Очень плохо</option>
+                    <option value="0.5">★ 0.5 — Ужасно</option>
                 </select>
             </div>
 

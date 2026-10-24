@@ -35,6 +35,10 @@ const DEFAULT_BRANDS = [
 
 let savedBowls = [];
 let savedBrands = [];
+let catalogSessionBrands = [];
+let catalogSessionFlavors = new Map();
+let sessionCatalogReady = false;
+let activeDraftSaveTimer = null;
 let brandPackDefaults = {};
 let coalInventory = { packSize: 72, packPrice: 700, remaining: 72 };
 let currentAnalyticsPeriod = 'all';
@@ -60,6 +64,26 @@ let lockedScrollY = 0;
 
 function stripRussianBrackets(name) {
     return String(name || '').replace(/\s*\([^)]*\)\s*$/g, '').trim();
+}
+
+function escapeHtml(value) {
+    return String(value === null || value === undefined ? '' : value).replace(/[&<>"']/g, ch => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[ch]));
+}
+
+function byId(id) {
+    return document.getElementById(id);
+}
+
+function setSelectValueIncludingLegacy(select, value) {
+    if (!select) return;
+    const clean = String(value || '').trim();
+    if (!clean) return;
+    if (![...select.options].some(option => option.value === clean)) {
+        select.append(new Option(clean, clean, true, true));
+    }
+    select.value = clean;
 }
 
 // --- ПРОГРАММНАЯ JS-АНИМАЦИЯ ЖИВОГО ФОНА НА CANVAS (РАБОТАЕТ НА 100% ДАЖЕ В IOS SAFARI) ---
@@ -352,7 +376,14 @@ function initAudio() {
 }
 
 function prepareKeepAliveAudio() {
-    if (silentAudioUrl) return;
+    const audioEl = document.getElementById('bg-audio');
+    if (silentAudioUrl) {
+        if (audioEl && !audioEl.getAttribute('src')) {
+            audioEl.src = silentAudioUrl;
+            audioEl.volume = 0.01;
+        }
+        return;
+    }
     const sampleRate = 8000;
     const numSamples = sampleRate;
     const buffer = new ArrayBuffer(44 + numSamples * 2);
@@ -382,7 +413,6 @@ function prepareKeepAliveAudio() {
 
     const blob = new Blob([buffer], { type: 'audio/wav' });
     silentAudioUrl = URL.createObjectURL(blob);
-    const audioEl = document.getElementById('bg-audio');
     if (audioEl) {
         audioEl.src = silentAudioUrl;
         audioEl.volume = 0.01;
@@ -461,9 +491,20 @@ function stopKeepAliveAudio() {
     const audioEl = document.getElementById('bg-audio');
     if (audioEl) {
         audioEl.pause();
+        try { audioEl.currentTime = 0; } catch (e) { }
+        try {
+            audioEl.removeAttribute('src');
+            audioEl.load();
+        } catch (e) { }
     }
     if ('mediaSession' in navigator) {
-        navigator.mediaSession.playbackState = 'none';
+        try {
+            navigator.mediaSession.playbackState = 'none';
+            navigator.mediaSession.metadata = null;
+            ['play', 'pause', 'seekbackward', 'seekforward', 'seekto', 'previoustrack', 'nexttrack'].forEach(action => {
+                try { navigator.mediaSession.setActionHandler(action, null); } catch (e) { }
+            });
+        } catch (e) { }
     }
     lastLockScreenTitle = '';
 }
@@ -730,14 +771,125 @@ function getBowlOptionsHtml(selectedVal = '') {
     return savedBowls.map(b => `<option value="${b}" ${b === target ? 'selected' : ''}>${b}</option>`).join('');
 }
 
+function sortedBrandList() {
+    const source = sessionCatalogReady && catalogSessionBrands.length
+        ? catalogSessionBrands
+        : (savedBrands.length ? savedBrands : DEFAULT_BRANDS);
+    return [...new Set(source.map(stripRussianBrackets).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b, 'ru'));
+}
+
+function isLegacyDefaultBrand(value) {
+    const key = stripRussianBrackets(value).toLowerCase().replace(/[’']/g, "'");
+    return DEFAULT_BRANDS.some(brand => stripRussianBrackets(brand).toLowerCase().replace(/[’']/g, "'") === key);
+}
+
 function getBrandOptionsHtml(selectedVal = '') {
-    if (savedBrands.length === 0) {
-        savedBrands = [...DEFAULT_BRANDS];
-    }
+    const list = sortedBrandList();
     const cleanSelected = stripRussianBrackets(selectedVal);
-    const target = savedBrands.includes(cleanSelected) ? cleanSelected : savedBrands[0];
-    const options = savedBrands.map(b => `<option value="${b}" ${b === target ? 'selected' : ''}>${b}</option>`).join('');
-    return `${options}<option value="__custom__">➕ Другой бренд...</option>`;
+    const optionsList = [...list];
+    if (cleanSelected && !optionsList.includes(cleanSelected)) optionsList.push(cleanSelected);
+    if (!optionsList.length) return `<option value="">Нет брендов</option>`;
+    const target = cleanSelected || optionsList[0];
+    return optionsList.map(b => {
+        const safe = escapeHtml(b);
+        return `<option value="${safe}" ${b === target ? 'selected' : ''}>${safe}</option>`;
+    }).join('');
+}
+
+function getFlavorOptionsHtml(brand, selected = '') {
+    const list = (catalogSessionFlavors.get(brand) || []).slice();
+    const cleanSelected = String(selected || '').trim();
+    const optionsList = [...list];
+    if (cleanSelected && !optionsList.includes(cleanSelected)) optionsList.unshift(cleanSelected);
+    if (!optionsList.length) return `<option value="">Нет вкусов</option>`;
+    const target = cleanSelected && optionsList.includes(cleanSelected) ? cleanSelected : optionsList[0];
+    return optionsList.map(flavor => {
+        const safe = escapeHtml(flavor);
+        return `<option value="${safe}" ${flavor === target ? 'selected' : ''}>${safe}</option>`;
+    }).join('');
+}
+
+function syncSoloFlavorOptions(selected) {
+    const select = document.getElementById('solo-tobacco-flavor');
+    if (!select) return;
+    const brand = document.getElementById('solo-tobacco-brand')?.value || '';
+    const previous = selected === undefined ? select.value : selected;
+    select.innerHTML = getFlavorOptionsHtml(brand, previous);
+    if (previous && [...select.options].some(option => option.value === previous)) {
+        select.value = previous;
+    } else {
+        select.value = select.options[0]?.value || '';
+    }
+}
+
+function syncMixFlavorOptions(card, selected) {
+    if (!card) return;
+    const select = card.querySelector('.flavor-select');
+    if (!select) return;
+    const brand = card.querySelector('.brand-select')?.value || '';
+    const previous = selected === undefined ? select.value : selected;
+    select.innerHTML = getFlavorOptionsHtml(brand, previous);
+    if (previous && [...select.options].some(option => option.value === previous)) {
+        select.value = previous;
+    } else {
+        select.value = select.options[0]?.value || '';
+    }
+}
+
+function syncManualFlavorOptions(selected) {
+    const select = document.getElementById('manual-flavor-input');
+    if (!select) return;
+    const brand = document.getElementById('manual-brand-select')?.value || '';
+    const previous = selected === undefined ? select.value : selected;
+    select.innerHTML = getFlavorOptionsHtml(brand, previous);
+    if (previous && [...select.options].some(option => option.value === previous)) {
+        select.value = previous;
+    } else {
+        select.value = select.options[0]?.value || '';
+    }
+}
+
+function applyCatalogToSession(catalog) {
+    if (!Array.isArray(catalog) || catalog.length === 0) return;
+    const byBrand = new Map();
+    for (const item of catalog) {
+        if (!item || !item.brand || !item.name) continue;
+        if (!byBrand.has(item.brand)) byBrand.set(item.brand, new Set());
+        byBrand.get(item.brand).add(item.name);
+    }
+    catalogSessionBrands = [...byBrand.keys()].sort((a, b) => a.localeCompare(b, 'ru'));
+    catalogSessionFlavors = new Map(
+        [...byBrand.entries()].map(([brand, flavors]) => [
+            brand,
+            [...flavors].sort((a, b) => a.localeCompare(b, 'ru'))
+        ])
+    );
+    sessionCatalogReady = true;
+    savedBrands = catalogSessionBrands.slice();
+    try { localStorage.setItem('hookah_brands', JSON.stringify(savedBrands)); } catch (e) { }
+
+    const manualBrand = document.getElementById('manual-brand-select');
+    if (manualBrand) {
+        const previous = manualBrand.value;
+        manualBrand.innerHTML = getBrandOptionsHtml(previous);
+        manualBrand.value = [...manualBrand.options].some(option => option.value === previous)
+            ? previous
+            : (manualBrand.options[0]?.value || '');
+        syncManualFlavorOptions();
+    }
+
+    populateSelects();
+    document.querySelectorAll('#edit-mix-rows .tobacco-grid-mix').forEach(row => {
+        const brandSelect = row.querySelector('.brand-select');
+        const flavorSelect = row.querySelector('.flavor-select');
+        if (!brandSelect) return;
+        const brand = brandSelect.value;
+        const flavor = flavorSelect?.value || '';
+        brandSelect.innerHTML = getBrandOptionsHtml(brand);
+        brandSelect.value = brand;
+        syncMixFlavorOptions(row, flavor);
+    });
 }
 
 function populateSelects() {
@@ -751,23 +903,36 @@ function populateSelects() {
     const soloBrand = document.getElementById('solo-tobacco-brand');
     if (soloBrand) {
         const prevBrand = stripRussianBrackets(soloBrand.value);
-        const targetBrand = (prevBrand && prevBrand !== '__custom__' && savedBrands.includes(prevBrand))
-            ? prevBrand
-            : (savedBrands[0] || DEFAULT_BRANDS[0]);
-
+        const keepPrev = prevBrand && (
+            !sessionCatalogReady ||
+            catalogSessionBrands.includes(prevBrand) ||
+            !isLegacyDefaultBrand(prevBrand)
+        );
+        const targetBrand = keepPrev ? prevBrand : (catalogSessionBrands[0] || sortedBrandList()[0] || '');
         soloBrand.innerHTML = getBrandOptionsHtml(targetBrand);
-        soloBrand.value = targetBrand;
-        if (soloBrand.selectedIndex === -1 && soloBrand.options.length > 0) {
-            soloBrand.selectedIndex = 0;
-        }
+        soloBrand.value = [...soloBrand.options].some(option => option.value === targetBrand)
+            ? targetBrand
+            : (soloBrand.options[0]?.value || '');
+        syncSoloFlavorOptions();
         fillPackInputsForBrand('solo', soloBrand.value);
     }
 
-    document.querySelectorAll('#mix-rows-list .brand-select').forEach(sel => {
+    document.querySelectorAll('#mix-rows-list .tobacco-card-box').forEach(card => {
+        const sel = card.querySelector('.brand-select');
+        if (!sel) return;
         const cur = stripRussianBrackets(sel.value);
-        const target = (cur && savedBrands.includes(cur)) ? cur : (savedBrands[0] || DEFAULT_BRANDS[0]);
-        sel.innerHTML = getBrandOptionsHtml(target);
-        sel.value = target;
+        const keepCur = cur && (
+            !sessionCatalogReady ||
+            catalogSessionBrands.includes(cur) ||
+            !isLegacyDefaultBrand(cur)
+        );
+        const targetCur = keepCur ? cur : (catalogSessionBrands[0] || sortedBrandList()[0] || '');
+        const currentFlavor = card.querySelector('.flavor-select')?.value || '';
+        sel.innerHTML = getBrandOptionsHtml(targetCur);
+        sel.value = [...sel.options].some(option => option.value === targetCur)
+            ? targetCur
+            : (sel.options[0]?.value || '');
+        syncMixFlavorOptions(card, currentFlavor);
     });
 
     recalcLiveBowlCost();
@@ -795,8 +960,7 @@ function fillPackInputsForBrand(mode, brandName, rowEl = null) {
 function onPackInfoChange(mode, inputEl = null) {
     if (mode === 'solo') {
         const brandSel = document.getElementById('solo-tobacco-brand');
-        const customBrand = document.getElementById('solo-custom-brand');
-        const brand = brandSel.value === '__custom__' ? customBrand.value.trim() : brandSel.value;
+        const brand = brandSel?.value || '';
         const price = parseFloat(document.getElementById('solo-pack-price').value) || 0;
         const weight = parseFloat(document.getElementById('solo-pack-weight').value) || 0;
         if (brand) {
@@ -807,8 +971,7 @@ function onPackInfoChange(mode, inputEl = null) {
         const card = inputEl.closest('.tobacco-card-box');
         if (card) {
             const sel = card.querySelector('.brand-select');
-            const custom = card.querySelector('.custom-brand-input');
-            const brand = sel.value === '__custom__' ? custom.value.trim() : sel.value;
+            const brand = sel?.value || '';
             const price = parseFloat(card.querySelector('.mix-pack-price').value) || 0;
             const weight = parseFloat(card.querySelector('.mix-pack-weight').value) || 0;
             if (brand) {
@@ -959,36 +1122,24 @@ function resetDefaultBrands() {
 }
 
 function onBrandSelectChange(selectEl) {
-    const card = selectEl.closest('.tobacco-card-box') || selectEl.parentElement.parentElement;
-    const customInput = card.querySelector('.custom-brand-input');
-    if (!customInput) return;
-
-    if (selectEl.value === '__custom__') {
-        customInput.classList.remove('hidden');
-        customInput.focus();
-    } else {
-        customInput.classList.add('hidden');
-        if (selectEl.id === 'solo-tobacco-brand') {
-            fillPackInputsForBrand('solo', selectEl.value);
-        } else {
-            fillPackInputsForBrand('mix', selectEl.value, card);
-        }
+    const card = selectEl.closest('.tobacco-card-box');
+    const mixRow = selectEl.closest('.tobacco-grid-mix');
+    if (selectEl.id === 'solo-tobacco-brand') {
+        syncSoloFlavorOptions();
+        fillPackInputsForBrand('solo', selectEl.value);
+    } else if (mixRow) {
+        syncMixFlavorOptions(mixRow);
+        if (card) fillPackInputsForBrand('mix', selectEl.value, card);
     }
     recalcLiveBowlCost();
 }
 
 function onManualBrandChange(selectEl) {
-    const customInput = document.getElementById('manual-custom-brand');
-    if (!customInput) return;
-    if (selectEl.value === '__custom__') {
-        customInput.classList.remove('hidden');
-        customInput.focus();
-    } else {
-        customInput.classList.add('hidden');
-    }
+    syncManualFlavorOptions();
 }
 
 function ensureBrandSaved(brandName) {
+    if (sessionCatalogReady) return;
     const clean = stripRussianBrackets(brandName);
     if (clean && clean !== '__custom__' && !savedBrands.includes(clean)) {
         savedBrands.unshift(clean);
@@ -1163,14 +1314,13 @@ function addMixRow(brand = '', flavor = '', weight = '') {
             <select class="brand-select control-h" onchange="onBrandSelectChange(this)">
                 ${getBrandOptionsHtml(selectedBrand)}
             </select>
-            <input type="text" class="flavor-input control-h" placeholder="Вкус" value="${flavor}" onfocus="revealSetupStep(3)" oninput="revealSetupStep(3)">
+            <select class="flavor-select control-h" onchange="revealSetupStep(3)"></select>
             <div class="unit-input-box control-h">
                 <input type="number" class="mix-weight-input" value="${defaultWeight}" placeholder="0" min="1" max="100" oninput="recalcLiveBowlCost()">
                 <span>г</span>
             </div>
             <button type="button" class="remove-mix-btn" onclick="removeMixRow(this)">✕</button>
         </div>
-        <input type="text" class="custom-brand-input control-h hidden" placeholder="Введите название бренда..." oninput="recalcLiveBowlCost()">
         <div class="pack-price-grid">
             <div class="pack-field">
                 <span class="pack-field-label">Цена пачки</span>
@@ -1191,6 +1341,7 @@ function addMixRow(brand = '', flavor = '', weight = '') {
     list.appendChild(card);
     const sel = card.querySelector('.brand-select');
     if (sel) sel.value = selectedBrand;
+    syncMixFlavorOptions(card, flavor);
     recalcLiveBowlCost();
 }
 
@@ -1207,9 +1358,8 @@ function removeMixRow(btn) {
 function getDraftMixFromForm() {
     if (!isMixMode) {
         const brandSelect = document.getElementById('solo-tobacco-brand');
-        const customBrand = document.getElementById('solo-custom-brand').value.trim();
-        const brand = stripRussianBrackets(brandSelect.value === '__custom__' ? (customBrand || 'Свой табак') : (brandSelect.value || savedBrands[0]));
-        const flavor = document.getElementById('solo-tobacco-flavor').value.trim();
+        const brand = stripRussianBrackets(brandSelect?.value || sortedBrandList()[0] || '');
+        const flavor = document.getElementById('solo-tobacco-flavor')?.value || '';
         const weight = parseFloat(document.getElementById('solo-tobacco-weight').value) || 0;
         const packPrice = parseFloat(document.getElementById('solo-pack-price').value) || 0;
         const packWeight = parseFloat(document.getElementById('solo-pack-weight').value) || 0;
@@ -1227,9 +1377,8 @@ function getDraftMixFromForm() {
         let sumW = 0;
         document.querySelectorAll('#mix-rows-list .tobacco-card-box').forEach(card => {
             const sel = card.querySelector('.brand-select');
-            const custom = card.querySelector('.custom-brand-input').value.trim();
-            const brand = stripRussianBrackets(sel.value === '__custom__' ? (custom || 'Свой табак') : (sel.value || savedBrands[0]));
-            const flavor = card.querySelector('.flavor-input').value.trim();
+            const brand = stripRussianBrackets(sel?.value || sortedBrandList()[0] || '');
+            const flavor = card.querySelector('.flavor-select')?.value || '';
             const weight = parseFloat(card.querySelector('.mix-weight-input').value) || 0;
             const packPrice = parseFloat(card.querySelector('.mix-pack-price').value) || 0;
             const packWeight = parseFloat(card.querySelector('.mix-pack-weight').value) || 0;
@@ -1321,8 +1470,25 @@ function restoreActiveSessionIfAny() {
             document.getElementById('coal-placement').value = state.placement;
         }
 
-        document.getElementById('setup-form').classList.add('hidden');
+        if (Array.isArray(state.mix) && state.mix.length > 0) {
+            if (state.mix.length === 1) {
+                const first = state.mix[0];
+                toggleMixMode(false);
+                populateSelects();
+                setSelectValueIncludingLegacy(document.getElementById('solo-tobacco-brand'), stripRussianBrackets(first.brand));
+                syncSoloFlavorOptions(first.flavor || '');
+                if (first.weight) document.getElementById('solo-tobacco-weight').value = first.weight;
+            } else {
+                toggleMixMode(true);
+                const list = document.getElementById('mix-rows-list');
+                list.innerHTML = '';
+                state.mix.forEach(m => addMixRow(stripRussianBrackets(m.brand), m.flavor, m.weight));
+            }
+        }
+
+        document.getElementById('setup-form').classList.remove('hidden');
         document.getElementById('active-session').classList.remove('hidden');
+        setStartButtonActive(true);
         document.getElementById('active-mix-label').innerText = formatMixPlainText(state.mix);
 
         if (state.stage === 'warmup') {
@@ -1364,8 +1530,68 @@ function restoreActiveSessionIfAny() {
     }
 }
 
+// --- ЖИВОЕ ЗАПОЛНЕНИЕ АКТИВНОЙ СЕССИИ ---
+function getActiveStage() {
+    const active = document.getElementById('active-session');
+    if (!active || active.classList.contains('hidden')) return null;
+    if (!document.getElementById('smoking-controls')?.classList.contains('hidden')) return 'smoking';
+    if (!document.getElementById('warmup-controls')?.classList.contains('hidden')) return 'warmup';
+    if (!document.getElementById('rating-form')?.classList.contains('hidden')) return 'rating';
+    return null;
+}
+
+function isWarmupOrSmokingActive() {
+    const stage = getActiveStage();
+    return stage === 'warmup' || stage === 'smoking';
+}
+
+function setStartButtonActive(active) {
+    const button = document.getElementById('start-btn');
+    if (!button) return;
+    button.disabled = Boolean(active);
+    button.innerText = active ? 'Сессия идёт…' : '🔥 Начать прогрев';
+}
+
+function updateActiveMixLabel() {
+    const label = document.getElementById('active-mix-label');
+    if (!label || !getActiveStage()) return;
+    const mixText = formatMixPlainText(getDraftMixFromForm());
+    label.innerText = mixText && mixText !== 'Без названия' && mixText !== 'Табак не указан'
+        ? mixText
+        : 'Данные сессии можно заполнить во время прогрева';
+}
+
+function setupActiveDraftTracking() {
+    const form = document.getElementById('setup-form');
+    if (!form) return;
+    const handler = () => {
+        const stage = getActiveStage();
+        if (!stage) return;
+        updateActiveMixLabel();
+        clearTimeout(activeDraftSaveTimer);
+        activeDraftSaveTimer = setTimeout(() => {
+            if (getActiveStage()) saveActiveSessionState(getActiveStage());
+        }, 250);
+    };
+    form.addEventListener('input', handler);
+    form.addEventListener('change', handler);
+}
+
+function scheduleIdleAudioCleanup() {
+    const cleanup = () => {
+        if (!isWarmupOrSmokingActive()) stopKeepAliveAudio();
+    };
+    setTimeout(cleanup, 60000);
+    setInterval(cleanup, 60000);
+}
+
 // --- ЛОГИКА ТАЙМЕРА ПРОГРЕВА И ПОКУРА ---
 function startWarmupSession() {
+    if (isWarmupOrSmokingActive() || getActiveStage() === 'rating') {
+        showBannerToast('Сессия уже идёт — заполните данные и завершите её');
+        return;
+    }
+
     const selectedBowl = document.getElementById('bowl-select')?.value;
     if (!selectedBowl) {
         document.getElementById('quick-bowl-box')?.classList.remove('hidden');
@@ -1393,7 +1619,6 @@ function startWarmupSession() {
     activeCoalsUsed = parseInt(document.getElementById('start-coals-input').value) || 3;
     consumeCoalsFromStock(activeCoalsUsed);
 
-    document.getElementById('setup-form').classList.add('hidden');
     document.getElementById('active-session').classList.remove('hidden');
     document.getElementById('warmup-controls').classList.remove('hidden');
     document.getElementById('smoking-controls').classList.add('hidden');
@@ -1401,10 +1626,14 @@ function startWarmupSession() {
     document.getElementById('warmup-box').classList.remove('alarm-active');
     document.getElementById('warmup-overtime-label')?.classList.add('hidden');
     document.getElementById('timer')?.classList.remove('overtime-text');
+    setStartButtonActive(true);
 
     document.getElementById('status-title').innerText = '🔥 Прогрев чаши...';
     const mixText = formatMixPlainText(mix);
-    document.getElementById('active-mix-label').innerText = mixText;
+    document.getElementById('active-mix-label').innerText =
+        mixText && mixText !== 'Без названия' && mixText !== 'Табак не указан'
+            ? mixText
+            : 'Данные сессии можно заполнить во время прогрева';
 
     stepStartTime = Date.now();
     targetTimestamp = stepStartTime + (totalSeconds * 1000);
@@ -1415,6 +1644,9 @@ function startWarmupSession() {
 
     startTimerTicker(updateWarmupTimer);
     updateWarmupTimer();
+    setTimeout(() => {
+        document.getElementById('active-session')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 120);
 }
 
 function updateWarmupTimer() {
@@ -1567,6 +1799,8 @@ async function cancelActiveSession() {
 
     document.getElementById('active-session').classList.add('hidden');
     document.getElementById('setup-form').classList.remove('hidden');
+    setStartButtonActive(false);
+    setCurrentRating(0);
 }
 
 function getCurrentMixSummaryText() {
@@ -1580,16 +1814,57 @@ function getCurrentMixSummaryText() {
     return formatMixPlainText(getDraftMixFromForm());
 }
 
-// --- СОХРАНЕНИЕ ЗАВЕРШЕННОЙ СЕССИИ ---
-document.querySelectorAll('.star').forEach(star => {
-    star.addEventListener('click', function () {
-        currentRating = parseInt(this.getAttribute('data-value'));
-        document.querySelectorAll('.star').forEach(s => {
-            s.classList.toggle('active', parseInt(s.getAttribute('data-value')) <= currentRating);
+// --- ОЦЕНКА ПОКУРА: ЗВЕЗДЫ С ШАГОМ 0.5 ---
+function setCurrentRating(value) {
+    const numeric = Number(value);
+    const clamped = Math.max(0, Math.min(5, Math.round((Number.isFinite(numeric) ? numeric : 0) * 2) / 2));
+    currentRating = clamped;
+    document.querySelectorAll('.star').forEach(star => {
+        const starValue = Number(star.dataset.value);
+        const full = clamped >= starValue;
+        const half = !full && clamped >= starValue - 0.5 && clamped > 0;
+        star.classList.toggle('active', full);
+        star.classList.toggle('half', half);
+    });
+    const display = document.getElementById('rating-value');
+    if (display) display.textContent = clamped.toFixed(1);
+    const container = document.getElementById('star-rating');
+    if (container) container.setAttribute('aria-valuenow', String(clamped));
+}
+
+function initStarRating() {
+    const stars = document.querySelectorAll('.star');
+    stars.forEach(star => {
+        star.addEventListener('click', event => {
+            const rect = star.getBoundingClientRect();
+            const value = Number(star.dataset.value) - ((event.clientX - rect.left) < rect.width / 2 ? 0.5 : 0);
+            setCurrentRating(value);
         });
     });
-});
+    const container = document.getElementById('star-rating');
+    if (container) {
+        container.addEventListener('keydown', event => {
+            if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
+                event.preventDefault();
+                setCurrentRating(currentRating - 0.5);
+            } else if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
+                event.preventDefault();
+                setCurrentRating(currentRating + 0.5);
+            } else if (event.key === 'Home') {
+                event.preventDefault();
+                setCurrentRating(0.5);
+            } else if (event.key === 'End') {
+                event.preventDefault();
+                setCurrentRating(5);
+            }
+        });
+    }
+    setCurrentRating(0);
+}
 
+initStarRating();
+
+// --- СОХРАНЕНИЕ ЗАВЕРШЕННОЙ СЕССИИ ---
 function showSaveSuccessOverlay() {
     const overlay = document.getElementById('save-success-overlay');
     if (!overlay) return;
@@ -1601,8 +1876,8 @@ function showSaveSuccessOverlay() {
 }
 
 function saveCompletedSession() {
-    if (currentRating === 0) {
-        showIosNotice("Оценка покура", "Пожалуйста, поставьте оценку от 1 до 5 звезд!");
+    if (currentRating < 0.5) {
+        showIosNotice("Оценка покура", "Пожалуйста, поставьте оценку от 0.5 до 5 звезд!");
         return;
     }
 
@@ -1611,8 +1886,8 @@ function saveCompletedSession() {
         savedState = JSON.parse(localStorage.getItem('hookah_active_session'));
     } catch (e) { }
 
-    const mix = (savedState && savedState.mix) ? savedState.mix : getDraftMixFromForm();
-    const bowl = (savedState && savedState.bowl) ? savedState.bowl : document.getElementById('bowl-select').value;
+    const mix = getDraftMixFromForm();
+    const bowl = document.getElementById('bowl-select')?.value || (savedState && savedState.bowl) || 'Не указана';
     const placement = document.getElementById('coal-placement')?.value || '2 + 1';
     const coalsUsed = activeCoalsUsed || 3;
 
@@ -1655,11 +1930,12 @@ function resetUI(sessions = null) {
     document.getElementById('setup-form').classList.remove('hidden');
     document.getElementById('active-session').classList.add('hidden');
     document.getElementById('comment').value = '';
-    document.getElementById('solo-tobacco-flavor').value = '';
-    currentRating = 0;
-    document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
+    const flavorSelect = document.getElementById('solo-tobacco-flavor');
+    if (flavorSelect && flavorSelect.options.length) flavorSelect.selectedIndex = 0;
+    setCurrentRating(0);
+    setStartButtonActive(false);
     applyLastUsedWeightToForm(sessions);
-    toggleAllSetupSteps(false);
+    populateSelects();
 }
 
 // --- ВЫПАДАЮЩИЙ КАЛЕНДАРЬ ПЕРИОДОВ И КАРТА ПОБЕД ---
@@ -1793,6 +2069,12 @@ function applyFilters() {
 }
 
 function renderData(sessions) {
+    window.DimHookahHistory = {
+        sessions: Array.isArray(sessions) ? sessions : [],
+        updatedAt: Date.now()
+    };
+    window.dispatchEvent(new CustomEvent('dimhookah:history-ready'));
+
     syncCatalogFromHistory(sessions);
     renderAnalyticsAndAchievements(sessions);
 
@@ -1858,7 +2140,7 @@ function syncCatalogFromHistory(sessions) {
         }
         getNormalizedMix(s).forEach(m => {
             const cleanB = stripRussianBrackets(m.brand);
-            if (cleanB && cleanB !== '__custom__' && !savedBrands.includes(cleanB)) {
+            if (!sessionCatalogReady && cleanB && cleanB !== '__custom__' && !savedBrands.includes(cleanB)) {
                 savedBrands.push(cleanB);
                 changed = true;
             }
@@ -1896,8 +2178,8 @@ function repeatSession(sessionId) {
             const cleanB = stripRussianBrackets(first.brand);
             ensureBrandSaved(cleanB);
             populateSelects();
-            document.getElementById('solo-tobacco-brand').value = cleanB;
-            document.getElementById('solo-tobacco-flavor').value = first.flavor || '';
+            setSelectValueIncludingLegacy(document.getElementById('solo-tobacco-brand'), cleanB);
+            syncSoloFlavorOptions(first.flavor || '');
             document.getElementById('solo-tobacco-weight').value = first.weight || getLastUsedWeights(sessions).soloWeight;
             fillPackInputsForBrand('solo', cleanB);
         } else {
@@ -1958,7 +2240,8 @@ function openEditModal(sessionId) {
         }
 
         document.getElementById('edit-coals-used').value = target.coalsUsed || 3;
-        document.getElementById('edit-rating').value = target.rating || 5;
+        const editRating = Math.round((Number(target.rating) || 5) * 2) / 2;
+        document.getElementById('edit-rating').value = String(editRating);
         document.getElementById('edit-comment').value = target.comment || '';
 
         const container = document.getElementById('edit-mix-rows');
@@ -1978,10 +2261,10 @@ function addEditMixRow(brand = '', flavor = '', weight = '') {
     row.className = 'tobacco-grid-mix';
     row.style.marginBottom = '8px';
     row.innerHTML = `
-        <select class="brand-select control-h">
+        <select class="brand-select control-h" onchange="onBrandSelectChange(this)">
             ${getBrandOptionsHtml(cleanB)}
         </select>
-        <input type="text" class="flavor-input control-h" placeholder="Вкус" value="${flavor}">
+        <select class="flavor-select control-h"></select>
         <div class="unit-input-box control-h">
             <input type="number" class="edit-weight-input" value="${weight || getLastUsedWeights().soloWeight}" min="1" max="100">
             <span>г</span>
@@ -1991,6 +2274,7 @@ function addEditMixRow(brand = '', flavor = '', weight = '') {
     container.appendChild(row);
     const sel = row.querySelector('.brand-select');
     if (sel) sel.value = cleanB;
+    syncMixFlavorOptions(row, flavor);
 }
 
 function closeEditModal() {
@@ -2003,13 +2287,13 @@ function saveEditedSession() {
     const bowl = document.getElementById('edit-bowl').value;
     const placement = document.getElementById('edit-placement').value;
     const coalsUsed = parseInt(document.getElementById('edit-coals-used').value) || 3;
-    const rating = parseInt(document.getElementById('edit-rating').value);
+    const rating = parseFloat(document.getElementById('edit-rating').value) || 5;
     const comment = document.getElementById('edit-comment').value.trim();
 
     const newMix = [];
     document.querySelectorAll('#edit-mix-rows .tobacco-grid-mix').forEach(row => {
         const brand = stripRussianBrackets(row.querySelector('.brand-select').value);
-        const flavor = row.querySelector('.flavor-input').value.trim();
+        const flavor = row.querySelector('.flavor-select')?.value || '';
         const weight = parseFloat(row.querySelector('.edit-weight-input').value) || 0;
         const pack = brandPackDefaults[brand] || { price: 0, weight: 0 };
         const cost = Math.round(calcSingleTobaccoCost(weight, pack.price, pack.weight));
@@ -2054,21 +2338,16 @@ function openManualAddModal() {
 
     const brandSelect = document.getElementById('manual-brand-select');
     if (brandSelect) {
-        const firstBrand = savedBrands[0] || DEFAULT_BRANDS[0];
+        const firstBrand = sortedBrandList()[0] || '';
         brandSelect.innerHTML = getBrandOptionsHtml(firstBrand);
         brandSelect.value = firstBrand;
-    }
-    const customBrand = document.getElementById('manual-custom-brand');
-    if (customBrand) {
-        customBrand.value = '';
-        customBrand.classList.add('hidden');
     }
 
     const { soloWeight } = getLastUsedWeights();
     const manualWeightInput = document.getElementById('manual-weight-input');
     if (manualWeightInput) manualWeightInput.value = soloWeight;
 
-    document.getElementById('manual-flavor-input').value = '';
+    syncManualFlavorOptions('');
     document.getElementById('manual-comment-input').value = '';
 
     modal.classList.remove('hidden');
@@ -2085,14 +2364,13 @@ function saveManualSession() {
     const dateVal = document.getElementById('manual-date-input').value;
     const bowl = document.getElementById('manual-bowl-select').value || 'Не указана';
     const brandSelectVal = document.getElementById('manual-brand-select').value;
-    const customBrandVal = document.getElementById('manual-custom-brand')?.value.trim();
-    const brand = stripRussianBrackets(brandSelectVal === '__custom__' ? (customBrandVal || 'Свой табак') : (brandSelectVal || savedBrands[0] || 'Без бренда'));
-    const flavor = document.getElementById('manual-flavor-input').value.trim();
+    const brand = stripRussianBrackets(brandSelectVal || sortedBrandList()[0] || 'Без бренда');
+    const flavor = document.getElementById('manual-flavor-input').value || '';
     const weight = parseFloat(document.getElementById('manual-weight-input').value) || getLastUsedWeights().soloWeight;
     const durMins = parseInt(document.getElementById('manual-duration-input').value) || 60;
     const coalsUsed = parseInt(document.getElementById('manual-coals-input')?.value) || 3;
     const placement = document.getElementById('manual-placement-select')?.value || '2 + 1';
-    const rating = parseInt(document.getElementById('manual-rating-select').value) || 5;
+    const rating = parseFloat(document.getElementById('manual-rating-select').value) || 5;
     const comment = document.getElementById('manual-comment-input').value.trim();
 
     if (!dateVal) {
@@ -2319,6 +2597,16 @@ document.addEventListener('DOMContentLoaded', () => {
     initLiquidBackgroundCanvas();
     initCatalogs();
     restoreActiveSessionIfAny();
+
+    window.addEventListener('dimhookah:catalog-ready', event => {
+        const catalog = event && event.detail && Array.isArray(event.detail.catalog)
+            ? event.detail.catalog
+            : [];
+        applyCatalogToSession(catalog);
+    });
+
+    setupActiveDraftTracking();
+    scheduleIdleAudioCleanup();
 
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {

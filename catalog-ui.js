@@ -90,6 +90,7 @@
       collectionAll: byId('collection-count-all'),
       collectionWish: byId('collection-count-wish'),
       collectionTried: byId('collection-count-tried'),
+      clearUserStats: byId('clear-user-stats'),
       userSpins: byId('user-spins'),
       userCollection: byId('user-collection'),
       userTried: byId('user-tried'),
@@ -193,6 +194,33 @@
 
   function isInCollection(slug) {
     return state.collection.some((entry) => entry.slug === slug);
+  }
+
+  function getCollectionEntry(slug) {
+    return state.collection.find((entry) => entry.slug === slug) || null;
+  }
+
+  function normalizeHistoryText(value) {
+    return String(value || '')
+      .toLowerCase()
+      .replace(/ё/g, 'е')
+      .replace(/[^a-zа-я0-9]+/gi, '');
+  }
+
+  function isInHistory(item) {
+    const history = window.DimHookahHistory;
+    if (!history || !Array.isArray(history.sessions) || !item) return false;
+    const brand = normalizeHistoryText(item.brand);
+    const names = [item.name, item.alt_name]
+      .map(normalizeHistoryText)
+      .filter(Boolean);
+    if (!brand || names.length === 0) return false;
+    return history.sessions.some((session) => (
+      Array.isArray(session.mix) && session.mix.some((mixItem) => (
+        normalizeHistoryText(mixItem.brand) === brand &&
+        names.includes(normalizeHistoryText(mixItem.flavor))
+      ))
+    ));
   }
 
   function getFilteredItems() {
@@ -415,6 +443,32 @@
     if (el.collectionAll) el.collectionAll.textContent = formatNumber(stats.total);
     if (el.collectionWish) el.collectionWish.textContent = formatNumber(stats.wish);
     if (el.collectionTried) el.collectionTried.textContent = formatNumber(stats.tried);
+  }
+
+  async function clearActionStats() {
+    const confirmed = typeof window.showIosConfirm === 'function'
+      ? await window.showIosConfirm(
+          'Очистить действия?',
+          'Будут сброшены вращения рулетки, коллекция и отметки «Попробовал». Это действие нельзя отменить.',
+          'Очистить',
+          true
+        )
+      : window.confirm('Сбросить вращения, коллекцию и отметки «Попробовал»?');
+    if (!confirmed) return;
+
+    state.collection = [];
+    state.spinCount = 0;
+    state.collectionFilter = 'all';
+    state.collectionSearch = '';
+    saveCollection();
+    saveSpins();
+    if (el.collectionSearch) el.collectionSearch.value = '';
+    renderCollection();
+    updateUserStats();
+    if (state.winner && el.rouletteResult && !el.rouletteResult.classList.contains('hidden')) {
+      renderResult(state.winner);
+    }
+    notify('Счётчики действий очищены');
   }
 
   function updateAvailable() {
@@ -647,6 +701,20 @@
     chips.className = 'chip-row';
     chips.append(createChips(item, 6));
 
+    const collectionEntry = getCollectionEntry(item.slug);
+    if (collectionEntry) {
+      const stateChip = document.createElement('span');
+      stateChip.className = `chip chip-state ${collectionEntry.tried ? 'chip-tried' : 'chip-wish'}`;
+      stateChip.textContent = collectionEntry.tried ? 'В коллекции · попробовал' : 'В коллекции · хочу';
+      chips.append(stateChip);
+    }
+    if (isInHistory(item)) {
+      const historyChip = document.createElement('span');
+      historyChip.className = 'chip chip-state chip-history';
+      historyChip.textContent = 'Уже был в истории покура';
+      chips.append(historyChip);
+    }
+
     const meta = document.createElement('div');
     meta.className = 'result-meta';
     const metaParts = [];
@@ -764,6 +832,7 @@
       renderCollection();
       updateUserStats();
       notify(`«${state.winner.name}» добавлен в коллекцию`);
+      if (el.rouletteResult && !el.rouletteResult.classList.contains('hidden')) renderResult(state.winner);
       const button = byId('roulette-wish');
       if (button) {
         button.textContent = 'В коллекции ✓';
@@ -968,7 +1037,7 @@
     const timeout = setTimeout(() => controller.abort(), 30000);
 
     try {
-      const response = await fetch('flavors.json', { cache: 'no-store', signal: controller.signal });
+      const response = await fetch('flavors.json', { cache: 'default', signal: controller.signal });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const raw = await response.json();
       const catalog = Core.normalizeCatalog(raw);
@@ -987,6 +1056,7 @@
       renderCollection();
       refreshRoulette(null);
       updateUserStats();
+      window.dispatchEvent(new CustomEvent('dimhookah:catalog-ready', { detail: { catalog } }));
     } catch (error) {
       state.loading = false;
       state.ready = false;
@@ -1049,6 +1119,14 @@
   }
 
   function initCollectionControls() {
+    if (el.clearUserStats) el.clearUserStats.addEventListener('click', clearActionStats);
+
+    window.addEventListener('dimhookah:history-ready', () => {
+      if (state.winner && el.rouletteResult && !el.rouletteResult.classList.contains('hidden')) {
+        renderResult(state.winner);
+      }
+    });
+
     if (el.collectionSearch) {
       el.collectionSearch.addEventListener('input', () => {
         state.collectionSearch = el.collectionSearch.value;

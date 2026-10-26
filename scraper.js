@@ -195,7 +195,7 @@ async function main(argv = process.argv.slice(2)) {
   console.log('=== DimHookah: каталог HTReviews ===');
   console.log(
     mode === 'merge'
-      ? `Режим: обновление брендов из ${options.out} + MUSTHAVE`
+      ? `Режим: обновление брендов из ${options.out}`
       : options.onlyBrands.length
         ? `Режим: только ${options.onlyBrands.join(', ')}`
         : `Режим: новый каталог, брендов: ${options.allBrands || options.limitBrands === 0 ? 'все' : options.limitBrands}`

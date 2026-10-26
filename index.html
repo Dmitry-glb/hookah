@@ -82,14 +82,6 @@
             <section class="tab-panel is-active" id="panel-home" data-panel="home" role="tabpanel"
                 aria-labelledby="tab-home">
                 <div class="home-stack">
-                    <div class="section-head">
-                        <div>
-                            <span class="eyebrow">Трекер</span>
-                            <h2>Главная</h2>
-                            <p class="section-sub">Покур, бюджет и история сессий. Всё считается локально.</p>
-                        </div>
-                    </div>
-
                     <div class="session-stack">
                         <!-- Покур: настройка -->
                         <section class="card" id="setup-form">
@@ -119,17 +111,6 @@
 
                             <div class="wizard-step step-visible" id="setup-step-2">
                                 <div class="step-divider"></div>
-                                <div class="form-group">
-                                    <button type="button" class="mode-click-bar" id="mode-toggle-btn"
-                                        onclick="toggleMixMode()">
-                                        <div class="mode-switch-info">
-                                            <span class="mode-title" id="mode-label">🍂 Режим: Соло (1 табак)</span>
-                                            <span class="mode-sub" id="mode-sub-label">Нажми для переключения в Микс</span>
-                                        </div>
-                                        <span class="mode-pill-indicator" id="mode-pill-badge">Соло ⇄</span>
-                                    </button>
-                                </div>
-
                                 <div class="form-group" style="margin-bottom: 8px;">
                                     <div class="label-row">
                                         <label>2. Табак, граммовка и пачка</label>
@@ -168,6 +149,8 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <button type="button" class="btn btn-secondary btn-dashed add-tobacco-btn"
+                                            onclick="addTobaccoToMix()">＋ Добавить табак</button>
                                     </div>
 
                                     <div id="mix-container" class="hidden">
@@ -177,7 +160,7 @@
                                         </div>
                                         <div id="mix-rows-list"></div>
                                         <button type="button" class="btn btn-secondary btn-dashed"
-                                            onclick="addMixRow(); revealSetupStep(3);">+ Добавить табак в микс</button>
+                                            onclick="addMixRow(); revealSetupStep(3);">＋ Добавить табак</button>
                                     </div>
                                 </div>
                             </div>
@@ -223,7 +206,7 @@
                                     <div class="live-cost-value" id="live-cost-total">0 ₽</div>
                                 </div>
 
-                                <button class="btn btn-primary-lg" id="start-btn" onclick="startWarmupSession()">🔥 Начать
+                                <button class="btn btn-primary-lg" id="start-btn" onclick="handleStartButton()">🔥 Начать
                                     прогрев</button>
                             </div>
                         </section>

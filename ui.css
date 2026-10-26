@@ -320,7 +320,7 @@ h1 {
 .home-stack {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     width: 100%;
     max-width: 900px;
     margin: 0 auto;
@@ -329,10 +329,66 @@ h1 {
 .home-stack .session-stack {
     max-width: none;
     margin: 0;
+    gap: 12px;
+}
+
+.add-tobacco-btn {
+    width: 100%;
+    margin-top: 8px;
+    height: 32px;
+    font-size: 0.72rem;
+}
+
+.history-header {
+    flex-wrap: nowrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.history-header h2 {
+    flex: 0 0 auto;
+}
+
+.backup-actions {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.backup-actions::-webkit-scrollbar {
+    display: none;
+}
+
+.backup-actions .pill-btn {
+    flex: 0 0 auto;
+}
+
+.filter-bar {
+    margin-bottom: 10px;
+}
+
+.history-item {
+    padding: 12px;
+    margin-bottom: 8px;
+}
+
+.history-actions {
+    margin-top: 8px;
+    padding-top: 8px;
+}
+
+.history-more-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 10px;
+    color: var(--ui-text-dim);
+    font-size: 0.72rem;
 }
 
 #panel-roulette > .card {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 #panel-roulette > .card:last-of-type {
@@ -416,7 +472,7 @@ h1 {
     align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
 .card-head h3,
@@ -1677,7 +1733,7 @@ option {
 }
 
 .user-stats-card {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .user-stat-grid {
@@ -1762,7 +1818,7 @@ option {
 
 #setup-form,
 #active-session {
-    padding: clamp(16px, 2.6vw, 24px);
+    padding: 15px;
 }
 
 #active-session {
@@ -1838,7 +1894,7 @@ option {
 }
 
 .form-group {
-    margin-bottom: 14px;
+    margin-bottom: 10px;
 }
 
 label {

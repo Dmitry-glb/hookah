@@ -918,6 +918,13 @@
     const actions = document.createElement('div');
     actions.className = 'collection-actions';
 
+    const fill = document.createElement('button');
+    fill.type = 'button';
+    fill.className = 'btn btn-small btn-primary';
+    fill.dataset.collectionAction = 'fill';
+    fill.dataset.slug = entry.slug;
+    fill.textContent = 'В чашу';
+
     const tried = document.createElement('button');
     tried.type = 'button';
     tried.className = 'btn btn-small btn-ghost';
@@ -939,7 +946,7 @@
     link.rel = 'noopener';
     link.textContent = 'HTReviews ↗';
 
-    actions.append(tried, remove, link);
+    actions.append(fill, tried, remove, link);
     body.append(brand, title);
     if (item.alt_name) body.append(alt);
     body.append(chips, meta, actions);
@@ -1147,6 +1154,18 @@
         if (!action) return;
         const slug = action.dataset.slug;
         if (!slug) return;
+
+        if (action.dataset.collectionAction === 'fill') {
+          const item = getCollectionItem({ slug });
+          if (!item) {
+            notify('Не удалось найти вкус в каталоге');
+            return;
+          }
+          if (typeof window.fillSessionFromCollection === 'function') {
+            window.fillSessionFromCollection({ brand: item.brand, flavor: item.name, slug: item.slug });
+          }
+          return;
+        }
 
         if (action.dataset.collectionAction === 'remove') {
           state.collection = Core.removeFromCollection(state.collection, slug);

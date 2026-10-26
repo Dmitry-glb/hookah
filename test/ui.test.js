@@ -160,6 +160,24 @@ test('e2e: две вкладки, каскадные фильтры, рулет�
     await page.addInitScript(() => {
       localStorage.setItem('hookah_bowls', JSON.stringify(['E2E Bowl']));
       localStorage.setItem('hookah_custom_bowls_only_v1', '1');
+      const now = Date.now();
+      const sessions = Array.from({ length: 7 }, (_, index) => ({
+        id: now - index,
+        date: `0${index + 1}.10.2026`,
+        bowl: 'E2E Bowl',
+        mix: [{
+          brand: 'MUSTHAVE',
+          flavor: index === 0 ? 'Earl Grey' : `Old Flavor ${7 - index}`,
+          weight: index === 0 ? 25 : 18
+        }],
+        placement: '2 + 1',
+        coalsUsed: 3,
+        actualWarmupDuration: 300,
+        smokeDuration: 3600,
+        rating: index === 0 ? 4.5 : 4,
+        sessionCost: 100
+      }));
+      localStorage.setItem('hookah_sessions', JSON.stringify(sessions));
     });
     await page.goto(`http://127.0.0.1:${port}/index.html`, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await waitCatalog(page);
@@ -187,6 +205,26 @@ test('e2e: две вкладки, каскадные фильтры, рулет�
     fs.mkdirSync(path.join(ROOT, 'debug'), { recursive: true });
     await page.screenshot({ path: path.join(ROOT, 'debug', 'e2e-home.png'), fullPage: true });
 
+    assert.equal(await page.locator('#history-list .history-item').count(), 5);
+    assert.match(await page.textContent('#history-list .history-more-row'), /Показать ещё 5/);
+    assert.equal(await page.locator('#solo-tobacco-brand').inputValue(), 'MUSTHAVE');
+    assert.equal(await page.locator('#solo-tobacco-flavor').inputValue(), 'Earl Grey');
+    assert.equal(await page.locator('#solo-tobacco-weight').inputValue(), '18');
+
+    await page.fill('#search-input', 'Old Flavor 1');
+    await page.waitForFunction(
+      () => document.querySelectorAll('#history-list .history-item').length === 1,
+      null,
+      { timeout: 5000 }
+    );
+    assert.match(await page.textContent('#history-list .history-item'), /Old Flavor 1/);
+    await page.fill('#search-input', '');
+    await page.waitForFunction(
+      () => document.querySelectorAll('#history-list .history-item').length === 5,
+      null,
+      { timeout: 5000 }
+    );
+
     // --- Прогрев можно начать до заполнения и менять данные по ходу ---
     const sessionBrands = await page.$$eval('#solo-tobacco-brand option', (options) => options.map((option) => option.textContent.trim()));
     const sessionFlavors = await page.$$eval('#solo-tobacco-flavor option', (options) => options.map((option) => option.textContent.trim()));
@@ -203,7 +241,15 @@ test('e2e: две вкладки, каскадные фильтры, рулет�
     await page.waitForTimeout(150);
     const activeMixText = (await page.textContent('#active-mix-label')) || '';
     assert.ok(activeMixText.trim().length > 0, 'активная сессия должна обновлять данные из формы');
+    assert.equal((await page.textContent('#start-btn')).trim(), '💾 Сохранить');
+    assert.equal(await page.isDisabled('#start-btn'), false);
     await page.screenshot({ path: path.join(ROOT, 'debug', 'e2e-active.png'), fullPage: true });
+    await page.click('#start-btn');
+    await page.waitForFunction(
+      () => (document.getElementById('start-btn')?.textContent || '').includes('Сессия идёт'),
+      null,
+      { timeout: 5000 }
+    );
 
     await page.click('button[onclick="startSmokingFromWarmup()"]');
     await page.waitForSelector('#smoking-controls:not(.hidden)', { timeout: 5000 });
@@ -220,6 +266,15 @@ test('e2e: две вкладки, каскадные фильтры, рулет�
     );
     const playbackState = await page.evaluate(() => 'mediaSession' in navigator ? navigator.mediaSession.playbackState : 'unsupported');
     if (playbackState !== 'unsupported') assert.equal(playbackState, 'none');
+
+    assert.equal(await page.locator('#history-list .history-item').count(), 5);
+    assert.match(await page.textContent('#history-list .history-more-row'), /Показать ещё 5/);
+    await page.click('#history-list .history-more-row button');
+    assert.equal(await page.locator('#history-list .history-item').count(), 8);
+    assert.equal(await page.locator('#mode-toggle-btn').count(), 0);
+    await page.click('.add-tobacco-btn');
+    await page.waitForSelector('#mix-container:not(.hidden)', { timeout: 5000 });
+    assert.equal(await page.locator('#mix-rows-list .tobacco-card-box').count(), 2);
 
     // --- Каскадные фильтры ---
     await page.click('#tab-roulette');
@@ -321,6 +376,17 @@ test('e2e: две вкладки, каскадные фильтры, рулет�
     assert.equal(numericText(await page.textContent('#user-collection')), 1);
     assert.equal(await page.locator('#collection-list .collection-item').count(), 1);
     await page.screenshot({ path: path.join(ROOT, 'debug', 'e2e-roulette-result.png'), fullPage: true });
+
+    await page.click('#collection-list [data-collection-action="fill"]');
+    await page.waitForFunction(
+      () => document.getElementById('panel-home')?.classList.contains('is-active'),
+      null,
+      { timeout: 5000 }
+    );
+    assert.equal(await page.locator('#solo-tobacco-brand').inputValue(), resultBrand);
+    assert.equal(await page.locator('#solo-tobacco-flavor').inputValue(), resultName);
+    await page.click('#tab-roulette');
+    await page.waitForSelector('#roulette-window', { state: 'visible' });
 
     // --- Быстрый выбор ---
     await page.evaluate(() => {

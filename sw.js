@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dimhookah-pwa-v15';
+const CACHE_NAME = 'dimhookah-pwa-v16';
 const SHELL_ASSETS = [
     './',
     './index.html',
@@ -8,7 +8,12 @@ const SHELL_ASSETS = [
     './app.js',
     './catalog-ui.js',
     './manifest.json',
-    './icon.png'
+    './manifest-light.json',
+    './icon.png',
+    './icon_dark-192.png',
+    './icon_dark-512.png',
+    './icon_light-192.png',
+    './icon_light-512.png'
 ];
 
 self.addEventListener('install', (event) => {

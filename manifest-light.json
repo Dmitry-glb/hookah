@@ -1,0 +1,57 @@
+{
+    "id": "./",
+    "name": "DimHookah — рулетка вкусов",
+    "short_name": "DimHookah",
+    "description": "Случайный подбор вкуса табака для кальяна, личная коллекция и трекер покурок",
+    "start_url": "./index.html",
+    "scope": "./",
+    "display": "standalone",
+    "display_override": ["standalone", "minimal-ui"],
+    "prefer_related_applications": false,
+    "background_color": "#f6f2ea",
+    "theme_color": "#f6f2ea",
+    "lang": "ru",
+    "dir": "ltr",
+    "categories": ["lifestyle", "food"],
+    "orientation": "any",
+    "shortcuts": [
+        {
+            "name": "Рулетка вкусов",
+            "short_name": "Рулетка",
+            "url": "./index.html#roulette",
+            "description": "Случайный вкус из каталога"
+        },
+        {
+            "name": "Новая сессия",
+            "short_name": "Сессия",
+            "url": "./index.html#home",
+            "description": "Прогрев и трекер покура"
+        }
+    ],
+    "icons": [
+        {
+            "src": "icon_light-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "icon_light-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "icon_light-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icon_light-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}

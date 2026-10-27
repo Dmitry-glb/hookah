@@ -199,7 +199,7 @@ test('e2e: две вкладки, каскадные фильтры, рулет�
     });
     if (swState) {
       assert.equal(swState.active, true);
-      assert.equal(swState.caches.some((name) => name.includes('dimhookah-pwa-v15')), true);
+      assert.equal(swState.caches.some((name) => name.includes('dimhookah-pwa-v16')), true);
     }
 
     fs.mkdirSync(path.join(ROOT, 'debug'), { recursive: true });
@@ -210,6 +210,16 @@ test('e2e: две вкладки, каскадные фильтры, рулет�
     assert.equal(await page.locator('#solo-tobacco-brand').inputValue(), 'MUSTHAVE');
     assert.equal(await page.locator('#solo-tobacco-flavor').inputValue(), 'Earl Grey');
     assert.equal(await page.locator('#solo-tobacco-weight').inputValue(), '18');
+
+    assert.match(await page.getAttribute('#app-logo', 'src'), /icon_dark-192\.png$/);
+    assert.equal(await page.getAttribute('#app-manifest', 'href'), 'manifest.json');
+    await page.evaluate(() => setThemeMode('light'));
+    assert.match(await page.getAttribute('#app-logo', 'src'), /icon_light-192\.png$/);
+    assert.equal(await page.getAttribute('#app-manifest', 'href'), 'manifest-light.json');
+    assert.equal(await page.getAttribute('#app-touch-icon', 'href'), 'icon_light-192.png');
+    assert.equal(await page.getAttribute('#theme-color-meta', 'content'), '#f6f2ea');
+    await page.evaluate(() => setThemeMode('dark'));
+    assert.match(await page.getAttribute('#app-logo', 'src'), /icon_dark-192\.png$/);
 
     await page.fill('#search-input', 'Old Flavor 1');
     await page.waitForFunction(

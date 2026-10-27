@@ -427,6 +427,34 @@ function applyThemeMode(mode) {
         if (prefersDark) root.setAttribute('data-theme', 'dark');
         else root.removeAttribute('data-theme');
     }
+    updateThemeAssets();
+}
+
+function isDarkTheme() {
+    return document.documentElement.getAttribute('data-theme') === 'dark';
+}
+
+function getThemeIconPath(size = 192) {
+    return `icon_${isDarkTheme() ? 'dark' : 'light'}-${size}.png`;
+}
+
+function updateThemeAssets() {
+    const dark = isDarkTheme();
+    const icon192 = getThemeIconPath(192);
+    const logo = document.getElementById('app-logo');
+    if (logo) logo.src = icon192;
+
+    const touchIcon = document.getElementById('app-touch-icon');
+    if (touchIcon) touchIcon.href = icon192;
+
+    const favicon = document.getElementById('app-favicon');
+    if (favicon) favicon.href = icon192;
+
+    const manifest = document.getElementById('app-manifest');
+    if (manifest) manifest.href = dark ? 'manifest.json' : 'manifest-light.json';
+
+    const themeColor = document.getElementById('theme-color-meta');
+    if (themeColor) themeColor.content = dark ? '#07080c' : '#f6f2ea';
 }
 
 // --- ЗВУК IOS 27 И УМНАЯ MEDIASESSION ---
@@ -599,7 +627,7 @@ function updateLockScreenMetadata(title, artist, force = false) {
             title: title || 'DimHookah',
             artist: artist || 'Контроль сессии',
             album: 'DimHookah Timer',
-            artwork: [{ src: 'icon.png', sizes: '192x192', type: 'image/png' }]
+            artwork: [{ src: getThemeIconPath(192), sizes: '192x192', type: 'image/png' }]
         });
     } catch (e) { }
 }
@@ -679,7 +707,7 @@ function sendPush(title, body) {
     if (!("Notification" in window) || Notification.permission !== "granted") return;
 
     const fallback = () => {
-        try { new Notification(title, { body, icon: 'icon.png' }); } catch (e) { }
+        try { new Notification(title, { body, icon: getThemeIconPath(192) }); } catch (e) { }
     };
 
     const show = (reg) => {
@@ -689,8 +717,8 @@ function sendPush(title, body) {
         }
         reg.showNotification(title, {
             body,
-            icon: 'icon.png',
-            badge: 'icon.png',
+            icon: getThemeIconPath(192),
+            badge: getThemeIconPath(192),
             tag: 'dimhookah-timer-alert',
             renotify: true,
             requireInteraction: true,

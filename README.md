@@ -202,8 +202,10 @@ npm run scrape -- --include-discontinued
 | `lib/htreviews.js` | API-клиент и нормализация HTReviews |
 | `scraper.js` | CLI обновления каталога |
 | `flavors.json` | Каталог вкусов |
-| `sw.js` | Service worker, кеш `dimhookah-pwa-v15` |
-| `manifest.json` | PWA-манифест |
+| `sw.js` | Service worker, кеш `dimhookah-pwa-v16` |
+| `manifest.json` | PWA-манифест тёмной темы |
+| `manifest-light.json` | PWA-манифест светлой темы |
+| `icon_dark*.png`, `icon_light*.png` | Иконки PWA для тёмной и светлой темы |
 | `test/` | Модульные, live- и e2e-тесты |
 | `docs/` | Скриншоты для README |
 | `backups/` | Проверенная резервная копия каталога |
@@ -242,8 +244,14 @@ E2E требует обычного окружения с возможность
 Каталог `flavors.json` обновляется по stale-while-revalidate: открывается сразу
 из кеша, свежие данные подтягиваются в фоне. Картинки и иконки кешируются
 cache-first. При изменении списка файлов поднимайте `CACHE_NAME`; текущая
-версия — `dimhookah-pwa-v15`. После активации нового service worker открытая
+версия — `dimhookah-pwa-v16`. После активации нового service worker открытая
 PWA перезагружается один раз автоматически.
+
+При смене темы приложение переключает `manifest.json` / `manifest-light.json`,
+`apple-touch-icon`, favicon и логотип на `icon_dark-192.png` или
+`icon_light-192.png`. Уже установленная PWA подхватывает новую иконку при
+следующем обновлении манифеста; iOS может закешировать иконку рабочего стола и
+потребовать повторного добавления на экран «Домой».
 
 ## Приватность
 

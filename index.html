@@ -14,12 +14,32 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="DimHookah">
     <meta name="format-detection" content="telephone=no">
-    <meta name="theme-color" content="#07080c">
+    <meta name="theme-color" id="theme-color-meta" content="#07080c">
 
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon.png">
+    <link id="app-manifest" rel="manifest" href="manifest.json">
+    <link id="app-touch-icon" rel="apple-touch-icon" href="icon_dark-192.png">
+    <link id="app-favicon" rel="icon" type="image/png" href="icon_dark-192.png">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="ui.css">
+    <script>
+        (function () {
+            try {
+                const mode = localStorage.getItem('hookah_theme_mode') || 'dark';
+                const dark = mode === 'dark' || (mode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                if (dark) document.documentElement.setAttribute('data-theme', 'dark');
+                else document.documentElement.removeAttribute('data-theme');
+                const suffix = dark ? 'dark' : 'light';
+                const manifest = document.getElementById('app-manifest');
+                const touchIcon = document.getElementById('app-touch-icon');
+                const favicon = document.getElementById('app-favicon');
+                const themeColor = document.getElementById('theme-color-meta');
+                if (manifest) manifest.href = dark ? 'manifest.json' : 'manifest-light.json';
+                if (touchIcon) touchIcon.href = `icon_${suffix}-192.png`;
+                if (favicon) favicon.href = `icon_${suffix}-192.png`;
+                if (themeColor) themeColor.content = dark ? '#07080c' : '#f6f2ea';
+            } catch (e) { }
+        })();
+    </script>
 </head>
 
 <body>
@@ -41,7 +61,7 @@
 
         <header class="app-header">
             <div class="brand-row">
-                <img src="icon.png" alt="DimHookah" class="app-logo" onerror="this.style.display='none'">
+                <img id="app-logo" src="icon_dark-192.png" alt="DimHookah" class="app-logo" onerror="this.style.display='none'">
                 <div class="brand-titles">
                     <h1>DimHookah</h1>
                     <p class="app-subtitle">Рулетка вкусов и трекер покурок</p>

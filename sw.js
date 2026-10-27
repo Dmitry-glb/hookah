@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dimhookah-pwa-v14';
+const CACHE_NAME = 'dimhookah-pwa-v15';
 const SHELL_ASSETS = [
     './',
     './index.html',
@@ -14,26 +14,35 @@ const SHELL_ASSETS = [
 self.addEventListener('install', (event) => {
     self.skipWaiting();
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) =>
-            Promise.all(SHELL_ASSETS.map((url) => cache.add(url).catch(() => null)))
-        )
+        caches.open(CACHE_NAME).then(async (cache) => {
+            const results = await Promise.all(
+                SHELL_ASSETS.map((url) => cache.add(url).then(() => true).catch(() => false))
+            );
+            if (results.some((ok) => !ok)) {
+                throw new Error('Не удалось закешировать оболочку PWA');
+            }
+        })
     );
 });
 
 self.addEventListener('activate', (event) => {
-    event.waitUntil(
-        caches.keys()
-            .then((keys) => Promise.all(
-                keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
-            ))
-            .then(() => self.clients.claim())
-            .then(() => {
-                if (self.registration.navigationPreload) {
-                    return self.registration.navigationPreload.enable();
-                }
-                return null;
-            })
-    );
+    event.waitUntil((async () => {
+        const keys = await caches.keys();
+        const hadOldCache = keys.some((key) => key.startsWith('dimhookah-pwa-') && key !== CACHE_NAME);
+        await Promise.all(
+            keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+        );
+        await self.clients.claim();
+        if (self.registration.navigationPreload) {
+            await self.registration.navigationPreload.enable();
+        }
+        // При обновлении со старой версии принудительно перезагружаем открытые
+        // окна PWA: старый app.js ещё не умеет слушать controllerchange.
+        if (hadOldCache) {
+            const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+            await Promise.all(windows.map((client) => client.navigate(client.url).catch(() => null)));
+        }
+    })());
 });
 
 self.addEventListener('message', (event) => {
@@ -100,6 +109,13 @@ self.addEventListener('fetch', (event) => {
 
     if (url.pathname.endsWith('/flavors.json')) {
         event.respondWith(staleWhileRevalidate(request, event));
+        return;
+    }
+
+    // Код и стили всегда сначала проверяем по сети, чтобы обновление PWA
+    // не застревало в старом cache-first кеше. Офлайн — fallback из кеша.
+    if (/\.(?:js|css|html|json)$/i.test(url.pathname)) {
+        event.respondWith(networkFirst(request));
         return;
     }
 

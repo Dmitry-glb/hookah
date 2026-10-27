@@ -202,7 +202,7 @@ npm run scrape -- --include-discontinued
 | `lib/htreviews.js` | API-клиент и нормализация HTReviews |
 | `scraper.js` | CLI обновления каталога |
 | `flavors.json` | Каталог вкусов |
-| `sw.js` | Service worker, кеш `dimhookah-pwa-v14` |
+| `sw.js` | Service worker, кеш `dimhookah-pwa-v15` |
 | `manifest.json` | PWA-манифест |
 | `test/` | Модульные, live- и e2e-тесты |
 | `docs/` | Скриншоты для README |
@@ -237,11 +237,13 @@ E2E требует обычного окружения с возможность
 
 ## PWA и кеш
 
-`sw.js` кеширует оболочку приложения cache-first, а каталог обновляет по
-стратегии stale-while-revalidate: приложение открывается из кеша сразу, свежий
-`flavors.json` подтягивается в фоне. Навигация идёт network-first с офлайн-
-фолбэком на `index.html`. При изменении списка файлов поднимайте `CACHE_NAME`;
-текущая версия — `dimhookah-pwa-v14`.
+`sw.js` обновляет HTML, JS и CSS по стратегии network-first с офлайн-фолбэком
+из кеша, поэтому новая версия PWA не застревает в старом cache-first кеше.
+Каталог `flavors.json` обновляется по stale-while-revalidate: открывается сразу
+из кеша, свежие данные подтягиваются в фоне. Картинки и иконки кешируются
+cache-first. При изменении списка файлов поднимайте `CACHE_NAME`; текущая
+версия — `dimhookah-pwa-v15`. После активации нового service worker открытая
+PWA перезагружается один раз автоматически.
 
 ## Приватность
 

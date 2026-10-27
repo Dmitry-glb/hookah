@@ -2870,7 +2870,25 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(() => { });
+    const hadController = Boolean(navigator.serviceWorker.controller);
+    let refreshingForUpdate = false;
+
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!hadController || refreshingForUpdate) return;
+        refreshingForUpdate = true;
+        window.location.reload();
+    });
+
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+        .then((registration) => {
+            registration.update().catch(() => { });
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    registration.update().catch(() => { });
+                }
+            });
+        })
+        .catch(() => { });
 }
 
 // --- ЛОГИКА ПОШАГОВОГО РАСКРЫТИЯ ПОЛЕЙ (IOS 27 PROGRESSIVE REVEAL) ---

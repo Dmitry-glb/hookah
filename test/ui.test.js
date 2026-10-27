@@ -199,7 +199,7 @@ test('e2e: две вкладки, каскадные фильтры, рулет�
     });
     if (swState) {
       assert.equal(swState.active, true);
-      assert.equal(swState.caches.some((name) => name.includes('dimhookah-pwa-v14')), true);
+      assert.equal(swState.caches.some((name) => name.includes('dimhookah-pwa-v15')), true);
     }
 
     fs.mkdirSync(path.join(ROOT, 'debug'), { recursive: true });

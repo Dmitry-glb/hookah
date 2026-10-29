@@ -111,17 +111,6 @@ body.modal-open {
 }
 
 /* --- ХОЛСТ ЖИВОГО АНИМИРОВАННОГО ФОНА НА JS --- */
-#liquid-bg-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 0;
-    pointer-events: none;
-    display: block;
-}
-
 .container {
     width: 100%;
     max-width: 500px;
@@ -318,7 +307,7 @@ select {
 select:focus,
 input:focus,
 textarea:focus {
-    border-color: var(--primary);
+    border-color: var(--ui-accent-text);
     box-shadow: 0 0 0 3px var(--primary-soft), var(--glass-specular);
 }
 
@@ -336,7 +325,7 @@ textarea:focus {
 }
 
 .unit-input-box:focus-within {
-    border-color: var(--primary);
+    border-color: var(--ui-accent-text);
     box-shadow: 0 0 0 3px var(--primary-soft), var(--glass-specular);
 }
 
@@ -385,7 +374,7 @@ textarea:focus {
 }
 
 .mode-click-bar.mix-active {
-    border-color: var(--primary);
+    border-color: var(--ui-accent-text);
     background: var(--primary-soft);
 }
 
@@ -408,7 +397,7 @@ textarea:focus {
 
 .mode-pill-indicator {
     background: var(--surface-input);
-    color: var(--primary);
+    color: var(--ui-accent-text);
     font-size: 0.75em;
     font-weight: 800;
     padding: 6px 11px;
@@ -452,7 +441,7 @@ textarea:focus {
 
 .custom-brand-input {
     margin-top: 8px;
-    border-color: var(--primary);
+    border-color: var(--ui-accent-text);
 }
 
 .pack-price-grid {
@@ -476,7 +465,7 @@ textarea:focus {
 }
 
 .pack-field:focus-within {
-    border-color: var(--primary);
+    border-color: var(--ui-accent-text);
 }
 
 .pack-field-label {
@@ -545,7 +534,7 @@ textarea:focus {
 .weight-badge {
     font-size: 0.95em;
     font-weight: 800;
-    color: var(--primary);
+    color: var(--ui-accent-text);
     background: var(--primary-soft);
     padding: 3px 10px;
     border-radius: var(--radius-pill);
@@ -635,7 +624,7 @@ textarea:focus {
 .live-cost-title {
     font-size: 0.82em;
     font-weight: 800;
-    color: var(--primary);
+    color: var(--ui-accent-text);
 }
 
 .live-cost-sub {
@@ -647,7 +636,7 @@ textarea:focus {
 .live-cost-value {
     font-size: 1.3em;
     font-weight: 800;
-    color: var(--primary);
+    color: var(--ui-accent-text);
     font-variant-numeric: tabular-nums;
 }
 
@@ -682,14 +671,14 @@ textarea:focus {
 
 .accent-pill {
     background: var(--primary-soft);
-    color: var(--primary);
+    color: var(--ui-accent-text);
     border-color: rgba(255, 85, 0, 0.30);
 }
 
 .text-action-btn {
     background: none;
     border: none;
-    color: var(--primary);
+    color: var(--ui-accent-text);
     font-size: 0.76em;
     font-weight: 700;
     cursor: pointer;
@@ -747,7 +736,7 @@ textarea:focus {
 
 .btn-dashed {
     border: 1.5px dashed var(--primary);
-    color: var(--primary);
+    color: var(--ui-accent-text);
     background: var(--primary-soft);
     height: 42px;
     font-size: 14px;
@@ -788,7 +777,7 @@ textarea:focus {
     padding: 5px 13px;
     border-radius: var(--radius-pill);
     background: var(--primary-soft);
-    color: var(--primary);
+    color: var(--ui-accent-text);
     font-weight: 700;
     font-size: 0.82em;
     margin-bottom: 6px;
@@ -876,7 +865,7 @@ textarea:focus {
 .forgotten-title {
     font-size: 0.85em;
     font-weight: 800;
-    color: var(--primary);
+    color: var(--ui-accent-text);
     margin-bottom: 4px;
 }
 
@@ -905,7 +894,7 @@ textarea:focus {
     background: var(--surface-input);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    color: var(--primary);
+    color: var(--ui-accent-text);
     border: 1px solid var(--border);
     box-shadow: var(--glass-specular);
     padding: 6px 12px;
@@ -951,7 +940,7 @@ textarea:focus {
 
 .period-option.active {
     background: var(--primary-soft);
-    color: var(--primary);
+    color: var(--ui-accent-text);
     font-weight: 700;
 }
 
@@ -1071,7 +1060,7 @@ textarea:focus {
 .coal-stock-status strong {
     font-size: 1.15em;
     font-weight: 800;
-    color: var(--primary);
+    color: var(--ui-accent-text);
     font-variant-numeric: tabular-nums;
 }
 
@@ -1209,7 +1198,7 @@ textarea:focus {
     display: inline-block;
     font-size: 0.74em;
     font-weight: 700;
-    color: var(--primary);
+    color: var(--ui-accent-text);
     background: var(--primary-soft);
     padding: 1px 6px;
     border-radius: 6px;
@@ -1274,7 +1263,7 @@ textarea:focus {
 }
 
 .action-chip.repeat {
-    color: var(--primary);
+    color: var(--ui-accent-text);
     background: var(--primary-soft);
     border-color: rgba(255, 85, 0, 0.25);
 }
@@ -1542,7 +1531,7 @@ textarea:focus {
     border-radius: 12px;
     border: 1px dashed var(--border-highlight);
     background: var(--primary-soft);
-    color: var(--primary);
+    color: var(--ui-accent-text);
     font-size: 0.78em;
     font-weight: 700;
     cursor: pointer;
@@ -1559,7 +1548,7 @@ textarea:focus {
 
 .flavor-picker-card { overflow: hidden; }
 .card-hint { margin-top: 4px; color: var(--text-secondary); font-size: .78em; line-height: 1.35; }
-.catalog-count { flex-shrink: 0; border: 1px solid var(--border); border-radius: var(--radius-pill); color: var(--primary); background: var(--primary-soft); padding: 6px 9px; font-size: .7em; font-weight: 800; }
+.catalog-count { flex-shrink: 0; border: 1px solid var(--border); border-radius: var(--radius-pill); color: var(--ui-accent-text); background: var(--primary-soft); padding: 6px 9px; font-size: .7em; font-weight: 800; }
 .picker-filters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 10px; }
 .picker-result a { display: inline-block; margin-top: 6px; color: var(--accent); font-size: .82rem; font-weight: 700; text-decoration: none; }
 .picker-field { margin: 0; text-transform: none; letter-spacing: 0; font-size: .75em; }

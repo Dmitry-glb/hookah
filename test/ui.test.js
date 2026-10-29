@@ -294,7 +294,7 @@ test('e2e: навигация PWA, каталог, каскадные фильт
     });
     if (swState) {
       assert.equal(swState.active, true);
-      assert.equal(swState.caches.some((name) => name.includes('dimhookah-pwa-v19-fixes')), true);
+      assert.equal(swState.caches.some((name) => name.includes('dimhookah-pwa-v20-polish')), true);
     }
 
     fs.mkdirSync(path.join(ROOT, 'debug'), { recursive: true });
@@ -306,15 +306,15 @@ test('e2e: навигация PWA, каталог, каскадные фильт
     assert.equal(await page.locator('#solo-tobacco-flavor').inputValue(), 'Earl Grey');
     assert.equal(await page.locator('#solo-tobacco-weight').inputValue(), '');
 
-    assert.match(await page.getAttribute('#app-logo', 'src'), /app-icon-192\.png$/);
+    assert.match(await page.getAttribute('#app-logo', 'src'), /app-icon-v20-192\.png$/);
     assert.equal(await page.getAttribute('#app-manifest', 'href'), 'manifest-light.json');
     await page.evaluate(() => setThemeMode('light'));
-    assert.match(await page.getAttribute('#app-logo', 'src'), /app-icon-192\.png$/);
+    assert.match(await page.getAttribute('#app-logo', 'src'), /app-icon-v20-192\.png$/);
     assert.equal(await page.getAttribute('#app-manifest', 'href'), 'manifest-light.json');
-    assert.equal(await page.getAttribute('#app-touch-icon', 'href'), 'assets/icons/app-icon-192.png');
+    assert.equal(await page.getAttribute('#app-touch-icon', 'href'), 'assets/icons/app-icon-v20-192.png');
     assert.equal(await page.getAttribute('#theme-color-meta', 'content'), '#f8f5ec');
     await page.evaluate(() => setThemeMode('dark'));
-    assert.match(await page.getAttribute('#app-logo', 'src'), /app-icon-192\.png$/);
+    assert.match(await page.getAttribute('#app-logo', 'src'), /app-icon-v20-192\.png$/);
 
     await page.fill('#search-input', 'Old Flavor 1');
     await page.waitForFunction(
@@ -640,6 +640,14 @@ test('e2e: навигация PWA, каталог, каскадные фильт
         for (const tab of ['home', 'catalog', 'roulette', 'collection']) {
           await page.click(`#tab-${tab}`);
           assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false, `${theme}/${tab}: overflow at ${width}px`);
+          if (tab === 'home') {
+            assert.deepEqual(await page.locator('.pack-field input').evaluateAll(inputs => inputs.filter(input => input.checkVisibility()).flatMap(input => {
+              const field = input.closest('.pack-field').getBoundingClientRect();
+              const rect = input.getBoundingClientRect();
+              return rect.left < field.left + 8 || rect.right > field.right - 8 ? [input.id || input.className] : [];
+            })), [], `pack fields must keep inner padding at ${width}px`);
+            assert.equal(await page.locator('.btn-buy-coal').evaluate(button => getComputedStyle(button).color), 'rgb(23, 23, 25)');
+          }
         }
       }
     }

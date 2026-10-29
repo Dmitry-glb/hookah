@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dimhookah-pwa-v19-fixes';
+const CACHE_NAME = 'dimhookah-pwa-v20-polish';
 const SHELL_ASSETS = [
     './',
     './index.html',
@@ -7,19 +7,14 @@ const SHELL_ASSETS = [
     './comics.css',
     './comics-photo.css',
     './assets/fonts/Underdog-Regular.ttf',
-    './assets/icons/app-icon-192.png',
-    './assets/icons/app-icon-512.png',
-    './assets/icons/app-icon-maskable-512.png',
+    './assets/icons/app-icon-v20-192.png',
+    './assets/icons/app-icon-v20-512.png',
+    './assets/icons/app-icon-v20-maskable-512.png',
     './lib/catalog-core.js',
     './app.js',
     './catalog-ui.js',
     './manifest.json',
-    './manifest-light.json',
-    './icon.png',
-    './icon_dark-192.png',
-    './icon_dark-512.png',
-    './icon_light-192.png',
-    './icon_light-512.png'
+    './manifest-light.json'
 ];
 
 self.addEventListener('install', (event) => {

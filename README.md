@@ -191,9 +191,7 @@ npm run scrape -- --include-discontinued
 есть в `flavors.json`, и добавляется `musthave`. Без `--include-discontinued`
 снятые с производства позиции не попадут в файл.
 
-Резервные копии каталога:
-[до добавления MUSTHAVE](backups/flavors-before-musthave-2026-10-23.json) и
-[старый вариант на 41 бренд](backups/flavors-41-brands-2026-10-23.json).
+Каталог обновляется парсером; прежние версии файлов доступны в истории Git.
 
 ## Структура проекта
 
@@ -210,13 +208,13 @@ npm run scrape -- --include-discontinued
 | `lib/htreviews.js` | API-клиент и нормализация HTReviews |
 | `scraper.js` | CLI обновления каталога |
 | `flavors.json` | Каталог вкусов |
-| `sw.js` | Service worker, кеш `dimhookah-pwa-v19-fixes` |
+| `sw.js` | Service worker, кеш `dimhookah-pwa-v20-polish` |
 | `manifest.json` | PWA-манифест тёмной темы |
 | `manifest-light.json` | PWA-манифест светлой темы |
-| `icon_dark*.png`, `icon_light*.png` | Иконки PWA для тёмной и светлой темы |
+| `assets/icons/` | Актуальные иконки PWA и maskable-версия |
+| `assets/fonts/` | Локальный Underdog и лицензия |
 | `test/` | Модульные, live- и e2e-тесты |
 | `docs/` | Скриншоты для README |
-| `backups/` | Проверенная резервная копия каталога |
 
 ## Тесты
 
@@ -252,12 +250,12 @@ E2E требует обычного окружения с возможность
 Каталог `flavors.json` обновляется по stale-while-revalidate: открывается сразу
 из кеша, свежие данные подтягиваются в фоне. Картинки и иконки кешируются
 cache-first. При изменении списка файлов поднимайте `CACHE_NAME`; текущая
-версия — `dimhookah-pwa-v19-fixes`. После активации нового service worker открытая
+версия — `dimhookah-pwa-v20-polish`. После активации нового service worker открытая
 PWA перезагружается один раз автоматически.
 
 При смене темы приложение переключает `manifest.json` / `manifest-light.json`,
-`apple-touch-icon`, favicon и логотип на `icon_dark-192.png` или
-`icon_light-192.png`. Уже установленная PWA подхватывает новую иконку при
+`apple-touch-icon`, favicon и логотип используют одну актуальную иконку
+`assets/icons/app-icon-v20-192.png` в обеих темах. Уже установленная PWA подхватывает новую иконку при
 следующем обновлении манифеста; iOS может закешировать иконку рабочего стола и
 потребовать повторного добавления на экран «Домой».
 

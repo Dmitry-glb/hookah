@@ -94,81 +94,6 @@ function setSelectValueIncludingLegacy(select, value) {
     select.value = clean;
 }
 
-// --- ПРОГРАММНАЯ JS-АНИМАЦИЯ ЖИВОГО ФОНА НА CANVAS (РАБОТАЕТ НА 100% ДАЖЕ В IOS SAFARI) ---
-function initLiquidBackgroundCanvas() {
-    // The comics theme uses a static paper texture instead of a frame loop.
-    if (document.querySelector('link[href="comics.css"]')) return;
-    const canvas = document.getElementById('liquid-bg-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-
-    const resize = () => {
-        width = window.innerWidth;
-        height = window.innerHeight;
-        canvas.width = width;
-        canvas.height = height;
-    };
-    resize();
-    window.addEventListener('resize', resize);
-
-    const orbs = [
-        { angle: 0.2, speedX: 0.015, speedY: 0.012, radRatio: 0.58, cx: 0.25, cy: 0.22, ampX: 0.30, ampY: 0.25 },
-        { angle: 2.1, speedX: 0.011, speedY: 0.016, radRatio: 0.62, cx: 0.78, cy: 0.35, ampX: 0.28, ampY: 0.28 },
-        { angle: 4.0, speedX: 0.014, speedY: 0.010, radRatio: 0.55, cx: 0.30, cy: 0.78, ampX: 0.32, ampY: 0.24 },
-        { angle: 5.2, speedX: 0.018, speedY: 0.014, radRatio: 0.48, cx: 0.72, cy: 0.75, ampX: 0.25, ampY: 0.26 }
-    ];
-
-    let tick = 0;
-
-    function renderFrame() {
-        tick += 1;
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-
-        ctx.fillStyle = isDark ? '#06060A' : '#E4E6F1';
-        ctx.fillRect(0, 0, width, height);
-
-        const palette = isDark
-            ? [
-                'rgba(255, 75, 0, 0.44)',
-                'rgba(124, 58, 237, 0.38)',
-                'rgba(245, 158, 11, 0.32)',
-                'rgba(219, 39, 119, 0.30)'
-            ]
-            : [
-                'rgba(255, 98, 26, 0.52)',
-                'rgba(139, 92, 246, 0.44)',
-                'rgba(245, 158, 11, 0.46)',
-                'rgba(236, 72, 153, 0.40)'
-            ];
-
-        const baseDim = Math.max(width, height);
-
-        for (let i = 0; i < orbs.length; i++) {
-            const o = orbs[i];
-            const x = (o.cx + Math.sin(tick * o.speedX + o.angle) * o.ampX) * width;
-            const y = (o.cy + Math.cos(tick * o.speedY + o.angle) * o.ampY) * height;
-            const r = baseDim * o.radRatio * (0.92 + 0.12 * Math.sin(tick * 0.02 + i));
-
-            const grad = ctx.createRadialGradient(x, y, 0, x, y, r);
-            grad.addColorStop(0, palette[i]);
-            grad.addColorStop(0.55, palette[i].replace(/[\d.]+\)$/, '0.14)'));
-            grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(x, y, r, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        requestAnimationFrame(renderFrame);
-    }
-
-    requestAnimationFrame(renderFrame);
-}
-
 // --- АВТОПОДСТАНОВКА ГРАММОВКИ С ПОСЛЕДНЕГО ПОКУРА ---
 function getLastUsedWeights(sessionsList = null) {
     let sessions = sessionsList;
@@ -430,7 +355,7 @@ function isDarkTheme() {
 }
 
 function getThemeIconPath(size = 192) {
-    return `assets/icons/app-icon-${size}.png`;
+    return `assets/icons/app-icon-v20-${size}.png`;
 }
 
 function updateThemeAssets() {
@@ -1440,7 +1365,7 @@ function addMixRow(brand = '', flavor = '', weight = '') {
             </select>
             <select class="flavor-select control-h" onchange="clearNewTobaccoWeight(this); revealSetupStep(3)"></select>
             <div class="unit-input-box control-h">
-                <input type="number" class="mix-weight-input" value="${defaultWeight}" placeholder="граммы" min="1" max="100" oninput="recalcLiveBowlCost()">
+                <input type="number" class="mix-weight-input" value="${defaultWeight}" placeholder="—" aria-label="Вес табака в граммах" min="1" max="100" oninput="recalcLiveBowlCost()">
                 <span>г</span>
             </div>
             <button type="button" class="remove-mix-btn" onclick="removeMixRow(this)">✕</button>
@@ -2889,7 +2814,6 @@ function initPwaViewport() {
 document.addEventListener('DOMContentLoaded', () => {
     initPwaViewport();
     initTheme();
-    initLiquidBackgroundCanvas();
     initCatalogs();
     restoreActiveSessionIfAny();
 

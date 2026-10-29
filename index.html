@@ -17,8 +17,8 @@
     <meta name="theme-color" id="theme-color-meta" content="#171719">
 
     <link id="app-manifest" rel="manifest" href="manifest.json">
-    <link id="app-touch-icon" rel="apple-touch-icon" href="assets/icons/app-icon-192.png">
-    <link id="app-favicon" rel="icon" type="image/png" href="assets/icons/app-icon-192.png">
+    <link id="app-touch-icon" rel="apple-touch-icon" href="assets/icons/app-icon-v20-192.png">
+    <link id="app-favicon" rel="icon" type="image/png" href="assets/icons/app-icon-v20-192.png">
     <link rel="preload" href="assets/fonts/Underdog-Regular.ttf" as="font" type="font/ttf" crossorigin>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="ui.css">
@@ -36,8 +36,8 @@
                 const favicon = document.getElementById('app-favicon');
                 const themeColor = document.getElementById('theme-color-meta');
                 if (manifest) manifest.href = dark ? 'manifest.json' : 'manifest-light.json';
-                if (touchIcon) touchIcon.href = 'assets/icons/app-icon-192.png';
-                if (favicon) favicon.href = 'assets/icons/app-icon-192.png';
+                if (touchIcon) touchIcon.href = 'assets/icons/app-icon-v20-192.png';
+                if (favicon) favicon.href = 'assets/icons/app-icon-v20-192.png';
                 if (themeColor) themeColor.content = dark ? '#171719' : '#f8f5ec';
             } catch (e) { }
         })();
@@ -46,7 +46,6 @@
 
 <body>
 
-    <canvas id="liquid-bg-canvas" aria-hidden="true"></canvas>
     <audio id="bg-audio" loop playsinline style="display:none;"></audio>
 
     <div id="toast-notification" class="toast-banner hidden" role="status" aria-live="polite"></div>
@@ -63,7 +62,7 @@
 
         <header class="app-header">
             <div class="brand-row">
-                <span class="brand-crown" aria-hidden="true">♛</span><img id="app-logo" src="assets/icons/app-icon-192.png" alt="DimHookah" class="app-logo" onerror="this.style.display='none'">
+                <span class="brand-crown" aria-hidden="true">♛</span><img id="app-logo" src="assets/icons/app-icon-v20-192.png" alt="DimHookah" class="app-logo" onerror="this.style.display='none'">
                 <div class="brand-titles">
                     <h1>DimHookah</h1>
                     <p class="app-subtitle">Больше, чем кальян</p>
@@ -156,7 +155,7 @@
                                                 <select id="solo-tobacco-flavor" class="flavor-select control-h"
                                                     onchange="clearNewTobaccoWeight(this); revealSetupStep(3)"></select>
                                                 <div class="unit-input-box control-h">
-                                                    <input type="number" id="solo-tobacco-weight" placeholder="граммы" min="1" max="100"
+                                                    <input type="number" id="solo-tobacco-weight" placeholder="—" aria-label="Вес табака в граммах" min="1" max="100"
                                                         oninput="recalcLiveBowlCost()">
                                                     <span>г</span>
                                                 </div>

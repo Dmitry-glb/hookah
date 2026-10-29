@@ -6,13 +6,19 @@
     "start_url": "./index.html",
     "scope": "./",
     "display": "standalone",
-    "display_override": ["standalone", "minimal-ui"],
+    "display_override": [
+        "standalone",
+        "minimal-ui"
+    ],
     "prefer_related_applications": false,
-    "background_color": "#f6f2ea",
-    "theme_color": "#f6f2ea",
+    "background_color": "#f8f5ec",
+    "theme_color": "#f8f5ec",
     "lang": "ru",
     "dir": "ltr",
-    "categories": ["lifestyle", "food"],
+    "categories": [
+        "lifestyle",
+        "food"
+    ],
     "orientation": "any",
     "shortcuts": [
         {
@@ -30,25 +36,19 @@
     ],
     "icons": [
         {
-            "src": "icon_light-192.png",
+            "src": "assets/icons/app-icon-192.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any"
         },
         {
-            "src": "icon_light-512.png",
+            "src": "assets/icons/app-icon-512.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any"
         },
         {
-            "src": "icon_light-192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "maskable"
-        },
-        {
-            "src": "icon_light-512.png",
+            "src": "assets/icons/app-icon-maskable-512.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"

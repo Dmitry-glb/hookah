@@ -96,6 +96,8 @@ function setSelectValueIncludingLegacy(select, value) {
 
 // --- ПРОГРАММНАЯ JS-АНИМАЦИЯ ЖИВОГО ФОНА НА CANVAS (РАБОТАЕТ НА 100% ДАЖЕ В IOS SAFARI) ---
 function initLiquidBackgroundCanvas() {
+    // The comics theme uses a static paper texture instead of a frame loop.
+    if (document.querySelector('link[href="comics.css"]')) return;
     const canvas = document.getElementById('liquid-bg-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -398,11 +400,11 @@ function showIosNotice(title, text) {
 
 // --- ТЕМА ОФОРМЛЕНИЯ ---
 function initTheme() {
-    const savedMode = localStorage.getItem('hookah_theme_mode') || 'dark';
+    const savedMode = localStorage.getItem('hookah_theme_mode') || 'light';
     applyThemeMode(savedMode);
 
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-        const currentMode = localStorage.getItem('hookah_theme_mode') || 'dark';
+        const currentMode = localStorage.getItem('hookah_theme_mode') || 'light';
         if (currentMode === 'auto') applyThemeMode('auto');
     });
 }
@@ -435,7 +437,7 @@ function isDarkTheme() {
 }
 
 function getThemeIconPath(size = 192) {
-    return `icon_${isDarkTheme() ? 'dark' : 'light'}-${size}.png`;
+    return `assets/icons/app-icon-${size}.png`;
 }
 
 function updateThemeAssets() {
@@ -454,7 +456,7 @@ function updateThemeAssets() {
     if (manifest) manifest.href = dark ? 'manifest.json' : 'manifest-light.json';
 
     const themeColor = document.getElementById('theme-color-meta');
-    if (themeColor) themeColor.content = dark ? '#07080c' : '#f6f2ea';
+    if (themeColor) themeColor.content = dark ? '#171719' : '#f8f5ec';
 }
 
 // --- ЗВУК IOS 27 И УМНАЯ MEDIASESSION ---

@@ -1,0 +1,16 @@
+/* Reusable photo treatment. The source URL/file is never modified.
+   This decorates real photos; CSS cannot turn arbitrary photos into drawings. */
+.comic-photo { --photo-color: #ffda35; position: relative; isolation: isolate; overflow: hidden; background: var(--photo-color); }
+.comic-photo[data-comic-tone="berry"] { --photo-color: #f87db5; }
+.comic-photo[data-comic-tone="mint"] { --photo-color: #b7e76a; }
+.comic-photo[data-comic-tone="drink"] { --photo-color: #7cd3ee; }
+.comic-photo[data-comic-tone="dessert"] { --photo-color: #bf9de8; }
+.comic-photo[data-comic-tone="spice"] { --photo-color: #f4ad65; }
+.comic-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: saturate(1.16) contrast(1.08); }
+.comic-photo::before { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none; border: 5px solid var(--photo-color); background: repeating-linear-gradient(135deg, transparent 0 11px, #17171990 11px 13px, transparent 13px 20px); mask-image: linear-gradient(135deg, #000 0, #000 6%, transparent 20%, transparent 80%, #000 97%); }
+.comic-photo::after { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none; background: radial-gradient(#171719 1px, transparent 1.3px) 0 0 / 5px 5px; mask-image: linear-gradient(25deg, #000, transparent 32%, transparent 72%, #000); opacity: .65; }
+.photo-sticker { position: absolute; z-index: 3; left: 7px; bottom: 8px; max-width: calc(100% - 14px); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 4px 7px; background: var(--photo-color); color: #171719; border: 2px solid #171719; box-shadow: 2px 2px 0 #171719; transform: rotate(-5deg); font-size: 9px; font-weight: 900; text-transform: uppercase; }
+.media-placeholder { position: absolute; inset: 0; background: var(--photo-color); color: #171719; }
+.media-placeholder span { color: #171719; }
+.comic-photo:not(.has-photo) .photo-sticker { display: none; }
+@media (prefers-reduced-data: reduce) { .comic-photo img { filter: none; } }

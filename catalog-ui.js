@@ -19,7 +19,7 @@
     spins: 'hookah_roulette_spins'
   };
 
-  const TABS = ['home', 'roulette'];
+  const TABS = ['home', 'catalog', 'roulette', 'collection'];
   const numberFormatter = new Intl.NumberFormat('ru-RU');
 
   const state = {
@@ -521,8 +521,17 @@
   function createMedia(item, className, options) {
     const settings = options || {};
     const wrapper = document.createElement('div');
-    wrapper.className = className;
+    wrapper.className = `${className} comic-photo`;
+    const category = (item && item.groups || []).join(' ');
+    const tones = [[/ягод/i, 'berry'], [/мят|трав|свеж/i, 'mint'], [/напит/i, 'drink'], [/десерт|слад/i, 'dessert'], [/прян|спец/i, 'spice']];
+    wrapper.dataset.comicTone = (tones.find(([pattern]) => pattern.test(category)) || [null, 'fruit'])[1];
     wrapper.append(createPlaceholder(item));
+    if (item && item.groups && item.groups.length) {
+      const sticker = document.createElement('span');
+      sticker.className = 'photo-sticker';
+      sticker.textContent = item.groups[0];
+      wrapper.append(sticker);
+    }
 
     if (!item || !item.image_url) return wrapper;
 
@@ -531,6 +540,7 @@
     image.alt = `${item.name}${item.brand ? ` — ${item.brand}` : ''}`;
     image.loading = settings.eager ? 'eager' : 'lazy';
     image.decoding = 'async';
+    image.addEventListener('load', () => wrapper.classList.add('has-photo'), { once: true });
     image.addEventListener(
       'error',
       () => {
@@ -955,6 +965,7 @@
   }
 
   function renderCollection() {
+    syncProductSaves();
     updateUserStats();
     if (!el.collectionList) return;
 
@@ -1063,12 +1074,16 @@
       renderCollection();
       refreshRoulette(null);
       updateUserStats();
+      initCatalogBrowser();
       window.dispatchEvent(new CustomEvent('dimhookah:catalog-ready', { detail: { catalog } }));
     } catch (error) {
       state.loading = false;
       state.ready = false;
       state.error = error;
       renderErrorState(error);
+      byId('home-products').textContent = 'Не удалось загрузить вкусы. Проверьте подключение и обновите страницу.';
+      byId('catalog-total').textContent = 'Нет подключения';
+      byId('catalog-products').textContent = 'Каталог недоступен. Проверьте подключение и обновите страницу.';
     } finally {
       clearTimeout(timeout);
     }
@@ -1188,6 +1203,111 @@
     }
   }
 
+  // Render only the current page of the catalog, never thousands of images at once.
+  let catalogLimit = 24;
+  function saveCatalogItem(item) {
+    const result = Core.addToCollection(state.collection, item);
+    if (result.added) {
+      state.collection = result.collection;
+      saveCollection();
+      renderCollection();
+      updateUserStats();
+      notify(`«${item.name}» добавлен в коллекцию`);
+    } else notify('Этот вкус уже в коллекции');
+    syncProductSaves();
+  }
+
+  function syncProductSaves() {
+    document.querySelectorAll('[data-save-product]').forEach((button) => {
+      const saved = isInCollection(button.dataset.saveProduct);
+      button.setAttribute('aria-pressed', String(saved));
+      button.textContent = saved ? '♥' : '♡';
+      button.setAttribute('aria-label', saved ? 'В коллекции' : 'Добавить в коллекцию');
+    });
+  }
+
+  function productCard(item) {
+    const article = document.createElement('article');
+    article.className = 'product-card';
+    const open = document.createElement('button');
+    open.type = 'button';
+    open.className = 'product-open';
+    open.setAttribute('aria-label', `${item.brand} ${item.name}, подробнее`);
+    open.append(createMedia(item, 'product-media'));
+    const copy = document.createElement('div');
+    copy.className = 'product-copy';
+    const brand = document.createElement('span');
+    brand.className = 'product-brand'; brand.textContent = item.brand;
+    const title = document.createElement('strong');
+    title.className = 'product-name'; title.textContent = item.name;
+    const rating = document.createElement('span');
+    rating.className = 'product-rating';
+    const star = document.createElement('b'); star.textContent = '★ ';
+    rating.append(star, item.rating > 0 ? String(item.rating) : 'Нет оценки');
+    copy.append(brand, title, rating); open.append(copy);
+    open.addEventListener('click', () => openProduct(item));
+    const save = document.createElement('button');
+    save.type = 'button'; save.className = 'product-save'; save.dataset.saveProduct = item.slug;
+    save.addEventListener('click', () => saveCatalogItem(item));
+    article.append(open, save);
+    return article;
+  }
+
+  function openProduct(item) {
+    let dialog = byId('product-detail');
+    if (!dialog) {
+      dialog = document.createElement('dialog');
+      dialog.id = 'product-detail'; dialog.className = 'product-detail';
+      dialog.setAttribute('aria-labelledby', 'detail-title');
+      dialog.addEventListener('click', (event) => { if (event.target === dialog && (event.clientX < dialog.getBoundingClientRect().left || event.clientX > dialog.getBoundingClientRect().right || event.clientY < dialog.getBoundingClientRect().top || event.clientY > dialog.getBoundingClientRect().bottom)) dialog.close(); });
+      document.body.append(dialog);
+    }
+    dialog.replaceChildren();
+    const close = document.createElement('button'); close.type = 'button'; close.className = 'detail-close'; close.textContent = 'Закрыть ×'; close.onclick = () => dialog.close();
+    const title = document.createElement('h2'); title.id = 'detail-title'; title.textContent = item.name;
+    const meta = document.createElement('p'); meta.textContent = [item.brand, item.line, item.strength, item.rating > 0 ? `★ ${item.rating}` : ''].filter(Boolean).join(' · ');
+    const tastes = document.createElement('p'); tastes.textContent = item.tastes.length ? item.tastes.join(' · ') : 'Ароматы не указаны в каталоге';
+    const save = document.createElement('button'); save.type = 'button'; save.className = 'btn btn-primary'; save.textContent = isInCollection(item.slug) ? 'В коллекции ✓' : 'Хочу покурить ♡'; save.disabled = isInCollection(item.slug);
+    save.onclick = () => { saveCatalogItem(item); save.textContent = 'В коллекции ✓'; save.disabled = true; };
+    const link = document.createElement('a'); link.href = item.source_url; link.target = '_blank'; link.rel = 'noopener'; link.textContent = 'Подробнее на HTReviews ↗';
+    dialog.append(close, createMedia(item, 'detail-media', { eager: true }), title, meta, tastes, save, link);
+    dialog.showModal();
+  }
+
+  function renderCatalogBrowser() {
+    const query = byId('catalog-search').value.trim().toLocaleLowerCase('ru');
+    const brand = byId('catalog-brand').value;
+    const group = byId('catalog-group').value;
+    const items = state.catalog.filter((item) => !item.discontinued && (!brand || item.brand === brand) && (!group || item.groups.includes(group)) && (!query || [item.brand, item.name, item.alt_name, ...item.tastes].join(' ').toLocaleLowerCase('ru').includes(query)));
+    items.sort(byId('catalog-sort').value === 'name' ? (a, b) => a.name.localeCompare(b.name, 'ru') : (a, b) => (b.rating || 0) - (a.rating || 0) || (b.ratings_count || 0) - (a.ratings_count || 0));
+    byId('catalog-total').textContent = countLabel(items.length);
+    const list = byId('catalog-products');
+    list.replaceChildren(...items.slice(0, catalogLimit).map(productCard));
+    if (!items.length) { const message = document.createElement('p'); message.className = 'empty-state'; message.textContent = state.error ? 'Каталог недоступен. Проверьте подключение и обновите страницу.' : 'Ничего не найдено. Попробуйте другой запрос или измените фильтры.'; list.append(message); }
+    byId('catalog-more').hidden = items.length <= catalogLimit;
+    syncProductSaves();
+  }
+
+  function initCatalogBrowser() {
+    const active = state.catalog.filter((item) => !item.discontinued);
+    for (const [id, values] of [['catalog-brand', active.map((item) => item.brand)], ['catalog-group', active.flatMap((item) => item.groups)]]) {
+      const select = byId(id);
+      for (const value of [...new Set(values)].sort((a, b) => a.localeCompare(b, 'ru'))) {
+        const option = document.createElement('option'); option.value = value; option.textContent = value; select.append(option);
+      }
+    }
+    for (const id of ['catalog-search', 'catalog-brand', 'catalog-group', 'catalog-sort']) byId(id).addEventListener(id === 'catalog-search' ? 'input' : 'change', () => { catalogLimit = 24; renderCatalogBrowser(); });
+    byId('catalog-more').addEventListener('click', () => { catalogLimit += 24; renderCatalogBrowser(); });
+    // Feature a range of brands, using the real catalog rating and image URLs.
+    const featured = []; const brands = new Set();
+    for (const item of [...active].filter((item) => item.image_url && item.rating > 0).sort((a, b) => (b.ratings_count || 0) - (a.ratings_count || 0))) {
+      if (!brands.has(item.brand)) { brands.add(item.brand); featured.push(item); }
+      if (featured.length === 4) break;
+    }
+    byId('home-products').replaceChildren(...featured.map(productCard));
+    renderCatalogBrowser();
+  }
+
   function initStorageSync() {
     window.addEventListener('storage', (event) => {
       if (event.key === KEYS.collection) {
@@ -1211,6 +1331,7 @@
     initialized = true;
 
     cacheElements();
+    byId('panel-collection').append(byId('collection-card'), byId('user-stats-card'));
     loadPreferences();
     initTabs();
     initRouletteControls();

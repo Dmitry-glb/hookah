@@ -133,7 +133,7 @@ function assertNoCounts(labels) {
   }
 }
 
-test('e2e: две вкладки, каскадные фильтры, рулетка, коллекция и трекер', { skip, timeout: 150000 }, async () => {
+test('e2e: навигация PWA, каталог, каскадные фильтры, рулетка, коллекция и трекер', { skip, timeout: 150000 }, async () => {
   const { chromium } = require('playwright');
   const server = createStaticServer();
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
@@ -183,7 +183,7 @@ test('e2e: две вкладки, каскадные фильтры, рулет�
     await waitCatalog(page);
 
     assert.equal(numericText(await page.textContent('#header-catalog-label')), catalog.length);
-    assert.equal(await page.locator('.nav-tab').count(), 2);
+    assert.equal(await page.locator('.nav-tab').count(), 4);
     assert.equal(await page.isVisible('#setup-form'), true);
     assert.equal(await page.isVisible('#analytics-card'), true);
     assert.equal(await page.locator('#history-list').count(), 1);
@@ -199,7 +199,7 @@ test('e2e: две вкладки, каскадные фильтры, рулет�
     });
     if (swState) {
       assert.equal(swState.active, true);
-      assert.equal(swState.caches.some((name) => name.includes('dimhookah-pwa-v16')), true);
+      assert.equal(swState.caches.some((name) => name.includes('dimhookah-pwa-v18-neucha')), true);
     }
 
     fs.mkdirSync(path.join(ROOT, 'debug'), { recursive: true });
@@ -211,15 +211,15 @@ test('e2e: две вкладки, каскадные фильтры, рулет�
     assert.equal(await page.locator('#solo-tobacco-flavor').inputValue(), 'Earl Grey');
     assert.equal(await page.locator('#solo-tobacco-weight').inputValue(), '18');
 
-    assert.match(await page.getAttribute('#app-logo', 'src'), /icon_dark-192\.png$/);
-    assert.equal(await page.getAttribute('#app-manifest', 'href'), 'manifest.json');
-    await page.evaluate(() => setThemeMode('light'));
-    assert.match(await page.getAttribute('#app-logo', 'src'), /icon_light-192\.png$/);
+    assert.match(await page.getAttribute('#app-logo', 'src'), /app-icon-192\.png$/);
     assert.equal(await page.getAttribute('#app-manifest', 'href'), 'manifest-light.json');
-    assert.equal(await page.getAttribute('#app-touch-icon', 'href'), 'icon_light-192.png');
-    assert.equal(await page.getAttribute('#theme-color-meta', 'content'), '#f6f2ea');
+    await page.evaluate(() => setThemeMode('light'));
+    assert.match(await page.getAttribute('#app-logo', 'src'), /app-icon-192\.png$/);
+    assert.equal(await page.getAttribute('#app-manifest', 'href'), 'manifest-light.json');
+    assert.equal(await page.getAttribute('#app-touch-icon', 'href'), 'assets/icons/app-icon-192.png');
+    assert.equal(await page.getAttribute('#theme-color-meta', 'content'), '#f8f5ec');
     await page.evaluate(() => setThemeMode('dark'));
-    assert.match(await page.getAttribute('#app-logo', 'src'), /icon_dark-192\.png$/);
+    assert.match(await page.getAttribute('#app-logo', 'src'), /app-icon-192\.png$/);
 
     await page.fill('#search-input', 'Old Flavor 1');
     await page.waitForFunction(
@@ -387,6 +387,7 @@ test('e2e: две вкладки, каскадные фильтры, рулет�
     assert.equal(await page.locator('#collection-list .collection-item').count(), 1);
     await page.screenshot({ path: path.join(ROOT, 'debug', 'e2e-roulette-result.png'), fullPage: true });
 
+    await page.click('#tab-collection');
     await page.click('#collection-list [data-collection-action="fill"]');
     await page.waitForFunction(
       () => document.getElementById('panel-home')?.classList.contains('is-active'),
@@ -427,6 +428,7 @@ test('e2e: две вкладки, каскадные фильтры, рулет�
     assert.equal(afterSecond, afterFirst, 'повторное добавление не должно создавать дубликат');
 
     // --- Коллекция и сохранение после перезагрузки ---
+    await page.click('#tab-collection');
     const collectionCount = await page.locator('#collection-list .collection-item').count();
     assert.ok(collectionCount >= 1);
     await page.click('#collection-list .collection-item [data-collection-action="tried"]');
@@ -436,6 +438,7 @@ test('e2e: две вкладки, каскадные фильтры, рулет�
     await page.reload({ waitUntil: 'domcontentloaded' });
     await waitCatalog(page);
     await page.click('#tab-roulette');
+    await page.click('#tab-collection');
     await page.waitForSelector('#collection-list .collection-item', { timeout: 5000 });
     assert.equal(await page.locator('#collection-list .collection-item').count(), collectionCount);
     assert.equal(await page.locator('#collection-list .collection-item.is-tried').count() > 0, true);
@@ -451,6 +454,7 @@ test('e2e: две вкладки, каскадные фильтры, рулет�
     await page.reload({ waitUntil: 'domcontentloaded' });
     await waitCatalog(page);
     await page.click('#tab-roulette');
+    await page.click('#tab-collection');
     await page.waitForSelector('#collection-empty:not(.hidden)', { timeout: 5000 });
     assert.equal(await page.locator('#collection-list .collection-item').count(), 0);
 
@@ -512,6 +516,38 @@ test('e2e: две вкладки, каскадные фильтры, рулет�
     );
     await page.screenshot({ path: path.join(ROOT, 'debug', 'e2e-mobile.png'), fullPage: true });
 
+    // Catalog search, pagination, original images, details and persistent saves.
+    await page.click('#tab-catalog');
+    assert.equal(await page.locator('#catalog-products .product-card').count(), 24);
+    await page.click('#catalog-more');
+    assert.equal(await page.locator('#catalog-products .product-card').count(), 48);
+    await page.fill('#catalog-search', 'Pinkman');
+    assert.ok(await page.locator('#catalog-products .product-card').count() > 0);
+    await page.selectOption('#catalog-brand', 'MUSTHAVE');
+    const expectedImage = catalog.find(item => item.brand === 'MUSTHAVE' && item.name === 'Pinkman').image_url;
+    assert.equal(await page.locator('#catalog-products .comic-photo img').first().getAttribute('src'), expectedImage);
+    await page.locator('#catalog-products .product-open').first().click();
+    await page.waitForSelector('#product-detail[open]');
+    await page.click('#product-detail .btn-primary');
+    await page.click('#product-detail .detail-close');
+    assert.equal(await page.locator('#catalog-products .product-save').first().getAttribute('aria-pressed'), 'true');
+    await page.fill('#catalog-search', 'this-flavor-does-not-exist-123');
+    assert.match(await page.textContent('#catalog-products'), /Ничего не найдено/);
+    await page.click('#tab-collection');
+    assert.equal(await page.locator('#collection-list .collection-item').count(), 1);
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await waitCatalog(page);
+    assert.equal(await page.locator('#collection-list .collection-item').count(), 1);
+    for (const width of [320, 390, 768, 1280]) {
+      await page.setViewportSize({ width, height: 844 });
+      for (const theme of ['light', 'dark']) {
+        await page.evaluate(theme => setThemeMode(theme), theme);
+        for (const tab of ['home', 'catalog', 'roulette', 'collection']) {
+          await page.click(`#tab-${tab}`);
+          assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false, `${theme}/${tab}: overflow at ${width}px`);
+        }
+      }
+    }
     assert.deepEqual(pageErrors, [], `ошибки страницы: ${pageErrors.join('; ')}`);
     assert.deepEqual(consoleErrors, [], `ошибки консоли: ${consoleErrors.join('; ')}`);
   } finally {

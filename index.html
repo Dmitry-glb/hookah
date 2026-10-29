@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>DimHookah — рулетка вкусов для кальяна</title>
     <meta name="description"
         content="DimHookah: случайный подбор вкуса табака для кальяна, личная коллекция и трекер покурок.">
@@ -14,29 +14,31 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="DimHookah">
     <meta name="format-detection" content="telephone=no">
-    <meta name="theme-color" id="theme-color-meta" content="#07080c">
+    <meta name="theme-color" id="theme-color-meta" content="#171719">
 
     <link id="app-manifest" rel="manifest" href="manifest.json">
-    <link id="app-touch-icon" rel="apple-touch-icon" href="icon_dark-192.png">
-    <link id="app-favicon" rel="icon" type="image/png" href="icon_dark-192.png">
+    <link id="app-touch-icon" rel="apple-touch-icon" href="assets/icons/app-icon-192.png">
+    <link id="app-favicon" rel="icon" type="image/png" href="assets/icons/app-icon-192.png">
+    <link rel="preload" href="assets/fonts/Neucha-Regular.ttf" as="font" type="font/ttf" crossorigin>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="ui.css">
+    <link rel="stylesheet" href="comics.css">
+    <link rel="stylesheet" href="comics-photo.css">
     <script>
         (function () {
             try {
-                const mode = localStorage.getItem('hookah_theme_mode') || 'dark';
+                const mode = localStorage.getItem('hookah_theme_mode') || 'light';
                 const dark = mode === 'dark' || (mode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
                 if (dark) document.documentElement.setAttribute('data-theme', 'dark');
                 else document.documentElement.removeAttribute('data-theme');
-                const suffix = dark ? 'dark' : 'light';
                 const manifest = document.getElementById('app-manifest');
                 const touchIcon = document.getElementById('app-touch-icon');
                 const favicon = document.getElementById('app-favicon');
                 const themeColor = document.getElementById('theme-color-meta');
                 if (manifest) manifest.href = dark ? 'manifest.json' : 'manifest-light.json';
-                if (touchIcon) touchIcon.href = `icon_${suffix}-192.png`;
-                if (favicon) favicon.href = `icon_${suffix}-192.png`;
-                if (themeColor) themeColor.content = dark ? '#07080c' : '#f6f2ea';
+                if (touchIcon) touchIcon.href = 'assets/icons/app-icon-192.png';
+                if (favicon) favicon.href = 'assets/icons/app-icon-192.png';
+                if (themeColor) themeColor.content = dark ? '#171719' : '#f8f5ec';
             } catch (e) { }
         })();
     </script>
@@ -61,10 +63,10 @@
 
         <header class="app-header">
             <div class="brand-row">
-                <img id="app-logo" src="icon_dark-192.png" alt="DimHookah" class="app-logo" onerror="this.style.display='none'">
+                <span class="brand-crown" aria-hidden="true">♛</span><img id="app-logo" src="assets/icons/app-icon-192.png" alt="DimHookah" class="app-logo" onerror="this.style.display='none'">
                 <div class="brand-titles">
                     <h1>DimHookah</h1>
-                    <p class="app-subtitle">Рулетка вкусов и трекер покурок</p>
+                    <p class="app-subtitle">Больше, чем кальян</p>
                 </div>
             </div>
             <div class="header-actions">
@@ -94,6 +96,9 @@
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M21 3v6h-6"/><circle cx="12" cy="12" r="2.6"/></svg>
                 <span>Рулетка</span>
             </button>
+
+            <button type="button" class="nav-tab" id="tab-catalog" role="tab" aria-selected="false" aria-controls="panel-catalog" data-tab="catalog"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Каталог</span></button>
+            <button type="button" class="nav-tab" id="tab-collection" role="tab" aria-selected="false" aria-controls="panel-collection" data-tab="collection"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 5c-3-3-6-1-8 1C8 1 2 4 3 9c0 4 9 11 9 11s9-7 9-11c0-2 0-3-1-4Z"/></svg><span>Коллекция</span></button>
         </nav>
 
         <main class="app-main">
@@ -101,6 +106,13 @@
             <!-- ГЛАВНАЯ: ПОКУР, СТАТИСТИКА И БЮДЖЕТ, ИСТОРИЯ -->
             <section class="tab-panel is-active" id="panel-home" data-panel="home" role="tabpanel"
                 aria-labelledby="tab-home">
+
+                <section class="comic-hero" aria-labelledby="hero-title">
+                    <div class="hero-copy"><span class="issue-label">ТВОЙ ВКУС. ТВОЯ ИСТОРИЯ.</span><h2 id="hero-title">Время<br>хороших<br><span>вкусов!</span></h2><p>Собери свою чашу.<br>Открой что-то новое.</p><a class="comic-cta" href="#setup-form">Начать сессию <span>↗</span></a></div>
+                    <div class="hero-art" aria-hidden="true"><span class="hero-burst">WOW!</span><svg viewBox="0 0 260 330" fill="none"><g stroke="#151515" stroke-width="5" stroke-linejoin="round"><path d="M137 61c-32-20 40-28 6-48m19 58c40-30-10-35 20-61" stroke="#fffdf5" stroke-width="10"/><path d="m110 74 69-5-9 32-46 3Z" fill="#171719"/><path d="m121 103 48-3-10 24-28 3Z" fill="#ffda35"/><path d="M143 126v103h15V124" fill="#fffdf5"/><path d="M100 133q48-21 98-2l-9 13q-38 17-81 2Z" fill="#fffdf5"/><path d="M142 210q-4 33-32 47c-28 15-24 44 7 48 23 4 47 4 68-2 25-9 16-31-4-44-20-13-24-30-24-49Z" fill="#b395f5"/><path d="M119 279q29 12 58-1M130 252l33 2"/><path d="M164 176c80-58 108 91 49 100-42 7-21-67-48-62" stroke="#151515" stroke-width="12"/><path d="m205 267-17 32" stroke="#fffdf5" stroke-width="9"/><path d="m68 113-18 29 22-5-12 29 37-41-23 4 10-19Z" fill="#fffdf5"/><path d="m198 58 13 20m-3-36 17 11M79 221l-19 10m23 3-12 17"/></g></svg><span class="art-caption">MAKE IT MIX!</span></div>
+                </section>
+                <div class="home-shortcuts"><button type="button" data-open-tab="catalog"><span>↗</span><strong>Найди свой вкус</strong><small>Весь каталог</small></button><button type="button" data-open-tab="roulette"><span>⚄</span><strong>Доверься случаю</strong><small>Рулетка вкусов</small></button></div>
+                <section class="home-picks"><div class="comic-section-title"><h2>В центре внимания</h2><button type="button" class="text-link" data-open-tab="catalog">Все вкусы ↗</button></div><div id="home-products" class="home-products"><p>Загружаем вкусы…</p></div></section>
                 <div class="home-stack">
                     <div class="session-stack">
                         <!-- Покур: настройка -->
@@ -434,8 +446,7 @@
                     <div>
                         <span class="eyebrow">Подбор вкуса</span>
                         <h2>Рулетка</h2>
-                        <p class="section-sub">Случайная позиция из отфильтрованного каталога. Результат фиксируется
-                            до начала прокрутки.</p>
+                        <p class="section-sub">Открой что-то новое. Следующий любимый вкус — в одном вращении.</p>
                     </div>
                     <span class="count-pill" id="roulette-available">Загрузка…</span>
                 </div>
@@ -559,6 +570,13 @@
                 </section>
             </section>
 
+
+            <section class="tab-panel" id="panel-catalog" data-panel="catalog" role="tabpanel" aria-labelledby="tab-catalog" hidden>
+                <div class="section-head"><div><span class="eyebrow">ВКУСНАЯ ВСЕЛЕННАЯ</span><h2>Найди свой вкус</h2><p class="section-sub">Реальные фото. Тысячи сочетаний. Твой следующий фаворит.</p></div><span class="count-pill" id="catalog-total">Загрузка…</span></div>
+                <div class="catalog-tools"><label class="catalog-search-label"><span aria-hidden="true">⌕</span><input type="search" id="catalog-search" placeholder="Вкус, бренд или аромат…" aria-label="Поиск по каталогу"></label><div class="catalog-filter-row"><select id="catalog-brand" aria-label="Бренд"><option value="">Все бренды</option></select><select id="catalog-group" aria-label="Направление"><option value="">Все направления</option></select><select id="catalog-sort" aria-label="Сортировка"><option value="rating">По рейтингу</option><option value="name">По названию</option></select></div></div>
+                <div class="catalog-grid" id="catalog-products" aria-live="polite"></div><div class="catalog-more"><button type="button" class="btn btn-primary" id="catalog-more" hidden>Показать ещё ↓</button></div>
+            </section>
+            <section class="tab-panel" id="panel-collection" data-panel="collection" role="tabpanel" aria-labelledby="tab-collection" hidden></section>
         </main>
 
         <footer class="app-footer">

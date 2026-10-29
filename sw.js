@@ -1,9 +1,15 @@
-const CACHE_NAME = 'dimhookah-pwa-v16';
+const CACHE_NAME = 'dimhookah-pwa-v18-neucha';
 const SHELL_ASSETS = [
     './',
     './index.html',
     './style.css',
     './ui.css',
+    './comics.css',
+    './comics-photo.css',
+    './assets/fonts/Neucha-Regular.ttf',
+    './assets/icons/app-icon-192.png',
+    './assets/icons/app-icon-512.png',
+    './assets/icons/app-icon-maskable-512.png',
     './lib/catalog-core.js',
     './app.js',
     './catalog-ui.js',

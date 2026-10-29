@@ -99,6 +99,101 @@ function numericText(value) {
   return Number(String(value || '').replace(/[^\d]/g, ''));
 }
 
+test('e2e: случайные предложения, пустая граммовка, время истории и зум только PWA', { skip, timeout: 60000 }, async () => {
+  const { chromium } = require('playwright');
+  const server = createStaticServer();
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  const browser = await chromium.launch({ headless: true, executablePath: CHROME || undefined });
+  try {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    const page = await context.newPage();
+    await page.addInitScript(() => {
+      if (localStorage.getItem('fixes-seeded')) return;
+      localStorage.setItem('fixes-seeded', '1');
+      localStorage.setItem('hookah_bowls', JSON.stringify(['Test bowl']));
+      localStorage.setItem('hookah_custom_bowls_only_v1', '1');
+      localStorage.setItem('hookah_sessions', JSON.stringify([{
+        id: 12345, date: '29.10.2026', bowl: 'Test bowl',
+        mix: [{ brand: 'MUSTHAVE', flavor: 'Earl Grey', weight: 25 }],
+        placement: '2 + 1', coalsUsed: 3, actualWarmupDuration: 307,
+        smokeDuration: 3611, rating: 4.5
+      }]));
+    });
+    const url = `http://127.0.0.1:${server.address().port}/`;
+    await page.goto(url);
+    await waitCatalog(page);
+    await page.evaluate(() => document.fonts.ready);
+    assert.equal(await page.evaluate(() => document.fonts.check('16px Underdog', 'Привет')), true);
+    assert.match(await page.evaluate(() => getComputedStyle(document.body).fontFamily), /Underdog/);
+    assert.doesNotMatch(await page.getAttribute('meta[name="viewport"]', 'content'), /user-scalable=no/);
+    assert.equal(await page.evaluate(() => !document.dispatchEvent(new WheelEvent('wheel', { ctrlKey: true, cancelable: true }))), false);
+    const previous = await page.locator('#home-products [data-save-product]').evaluateAll(buttons => buttons.map(button => button.dataset.saveProduct));
+    await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
+    const next = await page.locator('#home-products [data-save-product]').evaluateAll(buttons => buttons.map(button => button.dataset.saveProduct));
+    assert.equal(next.length, 4);
+    assert.equal(next.some(slug => previous.includes(slug)), false);
+    assert.equal(await page.inputValue('#solo-tobacco-weight'), '');
+    await page.fill('#solo-tobacco-weight', '18');
+    await page.selectOption('#solo-tobacco-brand', 'DARKSIDE');
+    assert.equal(await page.inputValue('#solo-tobacco-weight'), '');
+    await page.fill('#solo-tobacco-weight', '12');
+    await page.selectOption('#solo-tobacco-flavor', { index: 1 });
+    assert.equal(await page.inputValue('#solo-tobacco-weight'), '');
+    await page.click('button[onclick="addTobaccoToMix()"]');
+    assert.deepEqual(await page.locator('.mix-weight-input').evaluateAll(inputs => inputs.map(input => input.value)), ['', '']);
+    assert.equal(await page.locator('#coal-placement, #edit-placement, #manual-placement-select').count(), 0);
+    assert.doesNotMatch(await page.textContent('#history-list'), /2 \+ 1/);
+    await page.click('button[onclick="openEditModal(12345)"]');
+    await page.waitForSelector('#edit-modal:not(.hidden)');
+    assert.equal(await page.inputValue('#edit-warmup-seconds'), '7');
+    assert.equal(await page.inputValue('#edit-smoke-seconds'), '11');
+    await page.fill('#edit-warmup-minutes', '7');
+    await page.fill('#edit-warmup-seconds', '60');
+    await page.click('button[onclick="saveEditedSession()"]');
+    assert.equal(await page.isVisible('#edit-modal'), true, 'invalid seconds must not save');
+    await page.fill('#edit-warmup-seconds', '30');
+    await page.fill('#edit-smoke-minutes', '95');
+    await page.fill('#edit-smoke-seconds', '15');
+    await page.screenshot({ path: path.join(ROOT, 'debug', 'comics-edit-durations.png') });
+    await page.click('button[onclick="saveEditedSession()"]');
+    await page.waitForFunction(() => document.getElementById('edit-modal').classList.contains('hidden'));
+    await page.reload();
+    await waitCatalog(page);
+    assert.match(await page.textContent('#history-list'), /7 мин 30 сек/);
+    assert.match(await page.textContent('#history-list'), /95 мин 15 сек/);
+    const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('hookah_sessions'))[0]);
+    assert.equal(saved.actualWarmupDuration, 450);
+    assert.equal(saved.smokeDuration, 5715);
+    assert.equal(saved.placement, '2 + 1', 'legacy data is retained without displaying placement');
+    await page.evaluate(() => localStorage.setItem('hookah_active_session', JSON.stringify({
+      stage: 'warmup', targetTimestamp: Date.now() + 300000, stepStartTime: Date.now(),
+      activeCoalsUsed: 3, mix: [{ brand: 'MUSTHAVE', flavor: 'Earl Grey', weight: 22 }]
+    })));
+    await page.reload();
+    await waitCatalog(page);
+    assert.equal(await page.inputValue('#solo-tobacco-weight'), '22', 'active session restores its actual weight');
+    await page.selectOption('#solo-tobacco-brand', 'DARKSIDE');
+    assert.equal(await page.inputValue('#solo-tobacco-weight'), '22', 'active weight is not cleared');
+
+    const pwa = await browser.newPage();
+    await pwa.addInitScript(() => Object.defineProperty(navigator, 'standalone', { get: () => true }));
+    await pwa.goto(url);
+    await waitCatalog(pwa);
+    assert.match(await pwa.getAttribute('meta[name="viewport"]', 'content'), /maximum-scale=1.0, user-scalable=no/);
+    assert.equal(await pwa.evaluate(() => document.documentElement.classList.contains('is-pwa')), true);
+    assert.equal(await pwa.evaluate(() => !document.dispatchEvent(new WheelEvent('wheel', { ctrlKey: true, cancelable: true }))), true);
+    assert.equal(await pwa.evaluate(() => {
+      const event = new Event('touchmove', { cancelable: true });
+      Object.defineProperty(event, 'touches', { value: [{}, {}] });
+      return !document.dispatchEvent(event);
+    }), true);
+    assert.equal(await pwa.locator('#solo-tobacco-weight').evaluate(input => getComputedStyle(input).fontSize), '16px');
+  } finally {
+    await browser.close();
+    await new Promise(resolve => server.close(resolve));
+  }
+});
+
 async function waitCatalog(page) {
   await page.waitForFunction(
     () => {
@@ -199,7 +294,7 @@ test('e2e: навигация PWA, каталог, каскадные фильт
     });
     if (swState) {
       assert.equal(swState.active, true);
-      assert.equal(swState.caches.some((name) => name.includes('dimhookah-pwa-v18-neucha')), true);
+      assert.equal(swState.caches.some((name) => name.includes('dimhookah-pwa-v19-fixes')), true);
     }
 
     fs.mkdirSync(path.join(ROOT, 'debug'), { recursive: true });
@@ -209,7 +304,7 @@ test('e2e: навигация PWA, каталог, каскадные фильт
     assert.match(await page.textContent('#history-list .history-more-row'), /Показать ещё 5/);
     assert.equal(await page.locator('#solo-tobacco-brand').inputValue(), 'MUSTHAVE');
     assert.equal(await page.locator('#solo-tobacco-flavor').inputValue(), 'Earl Grey');
-    assert.equal(await page.locator('#solo-tobacco-weight').inputValue(), '18');
+    assert.equal(await page.locator('#solo-tobacco-weight').inputValue(), '');
 
     assert.match(await page.getAttribute('#app-logo', 'src'), /app-icon-192\.png$/);
     assert.equal(await page.getAttribute('#app-manifest', 'href'), 'manifest-light.json');

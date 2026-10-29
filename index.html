@@ -19,7 +19,7 @@
     <link id="app-manifest" rel="manifest" href="manifest.json">
     <link id="app-touch-icon" rel="apple-touch-icon" href="assets/icons/app-icon-192.png">
     <link id="app-favicon" rel="icon" type="image/png" href="assets/icons/app-icon-192.png">
-    <link rel="preload" href="assets/fonts/Neucha-Regular.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="preload" href="assets/fonts/Underdog-Regular.ttf" as="font" type="font/ttf" crossorigin>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="ui.css">
     <link rel="stylesheet" href="comics.css">
@@ -112,7 +112,7 @@
                     <div class="hero-art" aria-hidden="true"><span class="hero-burst">WOW!</span><svg viewBox="0 0 260 330" fill="none"><g stroke="#151515" stroke-width="5" stroke-linejoin="round"><path d="M137 61c-32-20 40-28 6-48m19 58c40-30-10-35 20-61" stroke="#fffdf5" stroke-width="10"/><path d="m110 74 69-5-9 32-46 3Z" fill="#171719"/><path d="m121 103 48-3-10 24-28 3Z" fill="#ffda35"/><path d="M143 126v103h15V124" fill="#fffdf5"/><path d="M100 133q48-21 98-2l-9 13q-38 17-81 2Z" fill="#fffdf5"/><path d="M142 210q-4 33-32 47c-28 15-24 44 7 48 23 4 47 4 68-2 25-9 16-31-4-44-20-13-24-30-24-49Z" fill="#b395f5"/><path d="M119 279q29 12 58-1M130 252l33 2"/><path d="M164 176c80-58 108 91 49 100-42 7-21-67-48-62" stroke="#151515" stroke-width="12"/><path d="m205 267-17 32" stroke="#fffdf5" stroke-width="9"/><path d="m68 113-18 29 22-5-12 29 37-41-23 4 10-19Z" fill="#fffdf5"/><path d="m198 58 13 20m-3-36 17 11M79 221l-19 10m23 3-12 17"/></g></svg><span class="art-caption">MAKE IT MIX!</span></div>
                 </section>
                 <div class="home-shortcuts"><button type="button" data-open-tab="catalog"><span>↗</span><strong>Найди свой вкус</strong><small>Весь каталог</small></button><button type="button" data-open-tab="roulette"><span>⚄</span><strong>Доверься случаю</strong><small>Рулетка вкусов</small></button></div>
-                <section class="home-picks"><div class="comic-section-title"><h2>В центре внимания</h2><button type="button" class="text-link" data-open-tab="catalog">Все вкусы ↗</button></div><div id="home-products" class="home-products"><p>Загружаем вкусы…</p></div></section>
+                <section class="home-picks"><div class="comic-section-title"><h2>Попробуй что-то новое</h2><button type="button" class="text-link" data-open-tab="catalog">Все вкусы ↗</button></div><div id="home-products" class="home-products"><p>Загружаем вкусы…</p></div></section>
                 <div class="home-stack">
                     <div class="session-stack">
                         <!-- Покур: настройка -->
@@ -154,9 +154,9 @@
                                                 <select id="solo-tobacco-brand" class="brand-select control-h"
                                                     onchange="onBrandSelectChange(this)"></select>
                                                 <select id="solo-tobacco-flavor" class="flavor-select control-h"
-                                                    onchange="revealSetupStep(3)"></select>
+                                                    onchange="clearNewTobaccoWeight(this); revealSetupStep(3)"></select>
                                                 <div class="unit-input-box control-h">
-                                                    <input type="number" id="solo-tobacco-weight" value="18" min="1" max="100"
+                                                    <input type="number" id="solo-tobacco-weight" placeholder="граммы" min="1" max="100"
                                                         oninput="recalcLiveBowlCost()">
                                                     <span>г</span>
                                                 </div>
@@ -290,16 +290,6 @@
                                     <span class="star" data-value="3" role="presentation">★</span>
                                     <span class="star" data-value="4" role="presentation">★</span>
                                     <span class="star" data-value="5" role="presentation">★</span>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Расстановка углей</label>
-                                    <select id="coal-placement" class="control-h">
-                                        <option value="2 + 1">2 + 1</option>
-                                        <option value="3 в колодке">3 в колодке</option>
-                                        <option value="пирамида">пирамида</option>
-                                        <option value="чебурашка">чебурашка</option>
-                                    </select>
                                 </div>
 
                                 <div class="form-group">
@@ -604,6 +594,15 @@
         <div class="modal-content">
             <h3 class="modal-title">✏️ Редактировать запись</h3>
             <input type="hidden" id="edit-session-id">
+            <div class="manual-grid-2 edit-duration-grid">
+                <div class="form-group"><label for="edit-warmup-minutes">Прогрев, мин : сек</label><div class="duration-pair">
+                    <input type="number" id="edit-warmup-minutes" class="control-h" min="0" max="10080" step="1" aria-label="Минуты прогрева" required><span>:</span><input type="number" id="edit-warmup-seconds" class="control-h" min="0" max="59" step="1" aria-label="Секунды прогрева" required>
+                </div></div>
+                <div class="form-group"><label for="edit-smoke-minutes">Покур, мин : сек</label><div class="duration-pair">
+                    <input type="number" id="edit-smoke-minutes" class="control-h" min="0" max="10080" step="1" aria-label="Минуты покура" required><span>:</span><input type="number" id="edit-smoke-seconds" class="control-h" min="0" max="59" step="1" aria-label="Секунды покура" required>
+                </div></div>
+            </div>
+
 
             <div class="form-group">
                 <label>Чаша</label>
@@ -619,18 +618,12 @@
             </div>
 
             <div class="form-group">
-                <label>Угли и расстановка</label>
+                <label>Количество углей</label>
                 <div class="manual-grid-2">
                     <div class="unit-input-box control-h">
                         <input type="number" id="edit-coals-used" value="3" min="1" max="15">
                         <span>угл.</span>
                     </div>
-                    <select id="edit-placement" class="control-h">
-                        <option value="2 + 1">2 + 1</option>
-                        <option value="3 в колодке">3 в колодке</option>
-                        <option value="пирамида">пирамида</option>
-                        <option value="чебурашка">чебурашка</option>
-                    </select>
                 </div>
             </div>
 
@@ -657,7 +650,7 @@
 
             <div class="modal-actions-row">
                 <button class="btn btn-secondary" onclick="closeEditModal()">Отмена</button>
-                <button class="btn" onclick="saveEditedSession()">Сохранить</button>
+                <button class="btn btn-primary" onclick="saveEditedSession()">Сохранить</button>
             </div>
         </div>
     </div>
@@ -725,18 +718,12 @@
             </div>
 
             <div class="form-group">
-                <label>Угли и расстановка</label>
+                <label>Количество углей</label>
                 <div class="manual-grid-2">
                     <div class="unit-input-box control-h">
                         <input type="number" id="manual-coals-input" value="3" min="1" max="12">
                         <span>угл.</span>
                     </div>
-                    <select id="manual-placement-select" class="control-h">
-                        <option value="2 + 1">2 + 1</option>
-                        <option value="3 в колодке">3 в колодке</option>
-                        <option value="пирамида">пирамида</option>
-                        <option value="чебурашка">чебурашка</option>
-                    </select>
                 </div>
             </div>
 

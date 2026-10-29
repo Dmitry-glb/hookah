@@ -206,10 +206,6 @@ function getLastUsedWeights(sessionsList = null) {
 
 function applyLastUsedWeightToForm(sessionsList = null) {
     const { soloWeight } = getLastUsedWeights(sessionsList);
-    const soloWeightEl = document.getElementById('solo-tobacco-weight');
-    if (soloWeightEl) {
-        soloWeightEl.value = soloWeight;
-    }
     const manualWeightEl = document.getElementById('manual-weight-input');
     if (manualWeightEl) {
         manualWeightEl.value = soloWeight;
@@ -242,9 +238,6 @@ function applySessionDefaultsFromLast(sessionsList) {
         }
     }
 
-    if (last.placement && document.getElementById('coal-placement')) {
-        document.getElementById('coal-placement').value = last.placement;
-    }
     if (last.coalsUsed && document.getElementById('start-coals-input')) {
         document.getElementById('start-coals-input').value = last.coalsUsed;
     }
@@ -262,13 +255,13 @@ function applySessionDefaultsFromLast(sessionsList) {
             setSelectValueIncludingLegacy(document.getElementById('solo-tobacco-brand'), brand);
             syncSoloFlavorOptions(first.flavor || '');
             const weight = document.getElementById('solo-tobacco-weight');
-            if (weight) weight.value = 18;
+            if (weight) weight.value = '';
             fillPackInputsForBrand('solo', brand);
         } else {
             toggleMixMode(true);
             const list = document.getElementById('mix-rows-list');
             list.innerHTML = '';
-            mix.forEach(item => addMixRow(stripRussianBrackets(item.brand), item.flavor, 10));
+            mix.forEach(item => addMixRow(stripRussianBrackets(item.brand), item.flavor, ''));
         }
     }
 
@@ -1238,7 +1231,16 @@ function resetDefaultBrands() {
     showBannerToast('Базовые бренды восстановлены');
 }
 
+function clearNewTobaccoWeight(control) {
+    if (getActiveStage() || !control.closest('#setup-form')) return;
+    const row = control.closest('.tobacco-card-box');
+    const weight = row && row.querySelector('#solo-tobacco-weight, .mix-weight-input');
+    if (weight) weight.value = '';
+    recalcLiveBowlCost();
+}
+
 function onBrandSelectChange(selectEl) {
+    clearNewTobaccoWeight(selectEl);
     const card = selectEl.closest('.tobacco-card-box');
     const mixRow = selectEl.closest('.tobacco-grid-mix');
     if (selectEl.id === 'solo-tobacco-brand') {
@@ -1397,7 +1399,7 @@ function toggleMixMode(forceState = null) {
     if (isMixMode) {
         const list = document.getElementById('mix-rows-list');
         if (list && list.children.length === 0) {
-            addMixRow(sortedBrandList()[0] || '', '', 10);
+            addMixRow(sortedBrandList()[0] || '', '', '');
         }
     }
     recalcLiveBowlCost();
@@ -1407,14 +1409,14 @@ function addTobaccoToMix() {
     if (!isMixMode) {
         const brand = document.getElementById('solo-tobacco-brand')?.value || sortedBrandList()[0] || '';
         const flavor = document.getElementById('solo-tobacco-flavor')?.value || '';
-        const weight = parseFloat(document.getElementById('solo-tobacco-weight')?.value) || 10;
+        const weight = document.getElementById('solo-tobacco-weight')?.value || '';
         isMixMode = true;
         setMixModeVisual();
         const list = document.getElementById('mix-rows-list');
         if (list) {
             list.innerHTML = '';
             addMixRow(brand, flavor, weight);
-            addMixRow(sortedBrandList()[1] || sortedBrandList()[0] || '', '', 10);
+            addMixRow(sortedBrandList()[1] || sortedBrandList()[0] || '', '', '');
         }
     } else {
         addMixRow();
@@ -1427,7 +1429,7 @@ function addMixRow(brand = '', flavor = '', weight = '') {
     const list = document.getElementById('mix-rows-list');
     const selectedBrand = stripRussianBrackets(brand) || savedBrands[0] || DEFAULT_BRANDS[0];
     const pack = brandPackDefaults[selectedBrand] || { price: '', weight: '' };
-    const defaultWeight = weight !== '' ? weight : 10;
+    const defaultWeight = weight;
 
     const card = document.createElement('div');
     card.className = 'tobacco-card-box';
@@ -1436,9 +1438,9 @@ function addMixRow(brand = '', flavor = '', weight = '') {
             <select class="brand-select control-h" onchange="onBrandSelectChange(this)">
                 ${getBrandOptionsHtml(selectedBrand)}
             </select>
-            <select class="flavor-select control-h" onchange="revealSetupStep(3)"></select>
+            <select class="flavor-select control-h" onchange="clearNewTobaccoWeight(this); revealSetupStep(3)"></select>
             <div class="unit-input-box control-h">
-                <input type="number" class="mix-weight-input" value="${defaultWeight}" placeholder="0" min="1" max="100" oninput="recalcLiveBowlCost()">
+                <input type="number" class="mix-weight-input" value="${defaultWeight}" placeholder="граммы" min="1" max="100" oninput="recalcLiveBowlCost()">
                 <span>г</span>
             </div>
             <button type="button" class="remove-mix-btn" onclick="removeMixRow(this)">✕</button>
@@ -1556,7 +1558,6 @@ function saveActiveSessionState(stage) {
         activeCoalsUsed,
         alarmAlreadyPlayed,
         bowl: document.getElementById('bowl-select')?.value || '',
-        placement: document.getElementById('coal-placement')?.value || '2 + 1',
         mix: getDraftMixFromForm()
     };
     localStorage.setItem('hookah_active_session', JSON.stringify(state));
@@ -1587,9 +1588,6 @@ function restoreActiveSessionIfAny() {
                 populateSelects();
             }
             document.getElementById('bowl-select').value = state.bowl;
-        }
-        if (state.placement && document.getElementById('coal-placement')) {
-            document.getElementById('coal-placement').value = state.placement;
         }
 
         if (Array.isArray(state.mix) && state.mix.length > 0) {
@@ -2108,7 +2106,6 @@ function saveCompletedSession() {
 
     const mix = getDraftMixFromForm();
     const bowl = document.getElementById('bowl-select')?.value || (savedState && savedState.bowl) || 'Не указана';
-    const placement = document.getElementById('coal-placement')?.value || '2 + 1';
     const coalsUsed = activeCoalsUsed || 3;
 
     const totalW = mix.reduce((acc, item) => acc + (parseFloat(item.weight) || 0), 0);
@@ -2125,7 +2122,6 @@ function saveCompletedSession() {
         date: new Date().toLocaleDateString('ru-RU'),
         bowl,
         mix,
-        placement,
         coalsUsed,
         coalCost,
         sessionCost,
@@ -2338,7 +2334,7 @@ function renderData(sessions) {
         const mixHtml = formatMixText(mixArr);
         const totalWeight = mixArr.reduce((acc, i) => acc + (parseFloat(i.weight) || 0), 0);
         const costBadge = s.sessionCost ? `<span class="cost-tag">💰 ${s.sessionCost} ₽</span>` : '';
-        const coalsText = s.coalsUsed ? ` • 🔥 ${s.coalsUsed} шт.` : '';
+        const coalsText = s.coalsUsed ? `${s.coalsUsed} шт.` : 'Не указано';
 
         const item = document.createElement('div');
         item.className = 'history-item';
@@ -2350,7 +2346,7 @@ function renderData(sessions) {
             <div class="history-mix-title">${mixHtml} ${costBadge}</div>
             <div class="history-meta">
                 🏺 <b>Чаша:</b> ${s.bowl} ${totalWeight > 0 ? `(${totalWeight} г)` : ''}<br>
-                炭 <b>Угли:</b> ${s.placement || 'Не указана'}${coalsText}<br>
+                🔥 <b>Угли:</b> ${coalsText}<br>
                 ⏱ <b>Прогрев:</b> ${formatDurationText(s.actualWarmupDuration)} &nbsp;•&nbsp; 💨 <b>Покур:</b> ${formatDurationText(s.smokeDuration)}
             </div>
             ${s.comment ? `<div class="history-comment">«${s.comment}»</div>` : ''}
@@ -2407,6 +2403,7 @@ function fillSessionFromCollection(data) {
     populateSelects();
     setSelectValueIncludingLegacy(document.getElementById('solo-tobacco-brand'), brand);
     syncSoloFlavorOptions(flavor);
+    clearNewTobaccoWeight(document.getElementById('solo-tobacco-brand'));
     fillPackInputsForBrand('solo', brand);
     recalcLiveBowlCost();
 
@@ -2435,9 +2432,6 @@ function repeatSession(sessionId) {
             populateSelects();
         }
         document.getElementById('bowl-select').value = target.bowl;
-        if (target.placement && document.getElementById('coal-placement')) {
-            document.getElementById('coal-placement').value = target.placement;
-        }
         if (target.coalsUsed) document.getElementById('start-coals-input').value = target.coalsUsed;
 
         const mixArr = getNormalizedMix(target);
@@ -2499,20 +2493,15 @@ function openEditModal(sessionId) {
         document.getElementById('edit-session-id').value = target.id;
         document.getElementById('edit-bowl').innerHTML = getBowlOptionsHtml(target.bowl);
 
-        const editPlacementEl = document.getElementById('edit-placement');
-        if (editPlacementEl) {
-            const pVal = target.placement || '2 + 1';
-            if (!Array.from(editPlacementEl.options).some(o => o.value === pVal)) {
-                editPlacementEl.value = '2 + 1';
-            } else {
-                editPlacementEl.value = pVal;
-            }
-        }
-
         document.getElementById('edit-coals-used').value = target.coalsUsed || 3;
         const editRating = Math.round((Number(target.rating) || 5) * 2) / 2;
         document.getElementById('edit-rating').value = String(editRating);
         document.getElementById('edit-comment').value = target.comment || '';
+        for (const [prefix, duration] of [['warmup', target.actualWarmupDuration], ['smoke', target.smokeDuration]]) {
+            const seconds = Math.max(0, Math.round(Number(duration) || 0));
+            document.getElementById(`edit-${prefix}-minutes`).value = Math.floor(seconds / 60);
+            document.getElementById(`edit-${prefix}-seconds`).value = seconds % 60;
+        }
 
         const container = document.getElementById('edit-mix-rows');
         container.innerHTML = '';
@@ -2553,9 +2542,15 @@ function closeEditModal() {
 }
 
 function saveEditedSession() {
+    const timeInputs = [...document.querySelectorAll('#edit-modal .duration-pair input')];
+    for (const input of timeInputs) {
+        if (!input.reportValidity()) return;
+    }
+    const readDuration = prefix => Number(document.getElementById(`edit-${prefix}-minutes`).value) * 60 + Number(document.getElementById(`edit-${prefix}-seconds`).value);
+    const editedWarmupDuration = readDuration('warmup');
+    const editedSmokeDuration = readDuration('smoke');
     const id = parseInt(document.getElementById('edit-session-id').value);
     const bowl = document.getElementById('edit-bowl').value;
-    const placement = document.getElementById('edit-placement').value;
     const coalsUsed = parseInt(document.getElementById('edit-coals-used').value) || 3;
     const rating = parseFloat(document.getElementById('edit-rating').value) || 5;
     const comment = document.getElementById('edit-comment').value.trim();
@@ -2578,7 +2573,8 @@ function saveEditedSession() {
         const idx = sessions.findIndex(s => s.id === id);
         if (idx !== -1) {
             sessions[idx].bowl = bowl;
-            sessions[idx].placement = placement;
+            sessions[idx].actualWarmupDuration = editedWarmupDuration;
+            sessions[idx].smokeDuration = editedSmokeDuration;
             sessions[idx].coalsUsed = coalsUsed;
             sessions[idx].coalCost = coalCost;
             sessions[idx].sessionCost = sessionCost;
@@ -2639,7 +2635,6 @@ function saveManualSession() {
     const weight = parseFloat(document.getElementById('manual-weight-input').value) || getLastUsedWeights().soloWeight;
     const durMins = parseInt(document.getElementById('manual-duration-input').value) || 60;
     const coalsUsed = parseInt(document.getElementById('manual-coals-input')?.value) || 3;
-    const placement = document.getElementById('manual-placement-select')?.value || '2 + 1';
     const rating = parseFloat(document.getElementById('manual-rating-select').value) || 5;
     const comment = document.getElementById('manual-comment-input').value.trim();
 
@@ -2666,7 +2661,6 @@ function saveManualSession() {
         id: Date.now(),
         date: formattedDate,
         bowl,
-        placement,
         coalsUsed,
         coalCost,
         mix: [{
@@ -2718,7 +2712,7 @@ async function exportToAppleNotes() {
         const costStr = s.sessionCost ? ` | 💰 ${s.sessionCost} ₽` : '';
         text += `${idx + 1}. 📅 ${s.date} — ★ ${s.rating}/5${costStr}\n`;
         text += `   🍂 Табак: ${mixStr}\n`;
-        text += `   🏺 Чаша: ${s.bowl} | 🔥 Угли: ${s.placement || '—'} (${s.coalsUsed || 3} шт)\n`;
+        text += `   🏺 Чаша: ${s.bowl} | 🔥 Угли: ${s.coalsUsed || 3} шт\n`;
         text += `   ⏱ Прогрев: ${formatDurationText(s.actualWarmupDuration)} | Покур: ${formatDurationText(s.smokeDuration)}\n`;
         if (s.comment) text += `   💬 Заметка: "${s.comment}"\n`;
         text += `\n`;
@@ -2861,8 +2855,39 @@ function syncActiveTimerOnWake() {
     }
 }
 
+// Keep browser zoom available; lock touch zoom only in the installed app.
+function initPwaViewport() {
+    const standalone = window.matchMedia('(display-mode: standalone)');
+    const fullscreen = window.matchMedia('(display-mode: fullscreen)');
+    const viewport = document.querySelector('meta[name="viewport"]');
+    const baseViewport = 'width=device-width, initial-scale=1.0, viewport-fit=cover';
+    const isInstalled = () => standalone.matches || fullscreen.matches || navigator.standalone === true;
+    const sync = () => {
+        const installed = isInstalled();
+        document.documentElement.classList.toggle('is-pwa', installed);
+        if (viewport) viewport.content = baseViewport + (installed ? ', maximum-scale=1.0, user-scalable=no' : '');
+    };
+    sync();
+    standalone.addEventListener('change', sync);
+    fullscreen.addEventListener('change', sync);
+    window.addEventListener('pageshow', sync);
+    for (const name of ['gesturestart', 'gesturechange']) {
+        document.addEventListener(name, event => { if (isInstalled()) event.preventDefault(); }, { passive: false });
+    }
+    document.addEventListener('touchmove', event => {
+        if (isInstalled() && event.touches.length > 1) event.preventDefault();
+    }, { passive: false });
+    document.addEventListener('wheel', event => {
+        if (isInstalled() && (event.ctrlKey || event.metaKey)) event.preventDefault();
+    }, { passive: false });
+    document.addEventListener('keydown', event => {
+        if (isInstalled() && (event.ctrlKey || event.metaKey) && ['+', '-', '=', '0'].includes(event.key)) event.preventDefault();
+    });
+}
+
 // --- ИНИЦИАЛИЗАЦИЯ ---
 document.addEventListener('DOMContentLoaded', () => {
+    initPwaViewport();
     initTheme();
     initLiquidBackgroundCanvas();
     initCatalogs();

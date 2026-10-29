@@ -1298,14 +1298,29 @@
     }
     for (const id of ['catalog-search', 'catalog-brand', 'catalog-group', 'catalog-sort']) byId(id).addEventListener(id === 'catalog-search' ? 'input' : 'change', () => { catalogLimit = 24; renderCatalogBrowser(); });
     byId('catalog-more').addEventListener('click', () => { catalogLimit += 24; renderCatalogBrowser(); });
-    // Feature a range of brands, using the real catalog rating and image URLs.
-    const featured = []; const brands = new Set();
-    for (const item of [...active].filter((item) => item.image_url && item.rating > 0).sort((a, b) => (b.ratings_count || 0) - (a.ratings_count || 0))) {
-      if (!brands.has(item.brand)) { brands.add(item.brand); featured.push(item); }
-      if (featured.length === 4) break;
-    }
-    byId('home-products').replaceChildren(...featured.map(productCard));
+    renderRandomSuggestions();
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') renderRandomSuggestions();
+    });
+    window.addEventListener('pageshow', event => {
+      if (event.persisted) renderRandomSuggestions();
+    });
     renderCatalogBrowser();
+  }
+
+  function renderRandomSuggestions() {
+    if (!state.ready) return;
+    const previous = new Set([...byId('home-products').querySelectorAll('[data-save-product]')].map(button => button.dataset.saveProduct));
+    const candidates = state.catalog.filter(item => !item.discontinued && item.image_url);
+    const fresh = candidates.filter(item => !previous.has(item.slug));
+    const pool = fresh.length >= 4 ? fresh : candidates;
+    // Fisher–Yates: every eligible flavor has an equal chance, independent of rating.
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(randomUnit() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    byId('home-products').replaceChildren(...pool.slice(0, 4).map(productCard));
+    syncProductSaves();
   }
 
   function initStorageSync() {

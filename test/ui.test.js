@@ -205,6 +205,76 @@ async function waitCatalog(page) {
   );
 }
 
+test('e2e: URL actions start preheat once and open roulette', { skip, timeout: 60000 }, async () => {
+  const { chromium } = require('playwright');
+  const server = createStaticServer();
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  const browser = await chromium.launch({ headless: true, executablePath: CHROME || undefined });
+  try {
+    const context = await browser.newContext({ serviceWorkers: 'block' });
+    const page = await context.newPage();
+    const errors = [];
+    page.on('pageerror', error => errors.push(error.message));
+    const base = `http://127.0.0.1:${server.address().port}/`;
+    const active = () => page.evaluate(() => JSON.parse(localStorage.getItem('hookah_active_session')));
+    await page.goto(`${base}?source=shortcuts&action=preheat#collection`);
+    await page.waitForFunction(() => getActiveStage() === 'warmup');
+    assert.equal(await page.inputValue('#warmup-min'), '7');
+    const first = await active();
+    assert.equal(first.targetTimestamp - first.stepStartTime, 7 * 60000);
+    assert.equal(new URL(page.url()).search, '?source=shortcuts');
+    assert.equal(new URL(page.url()).hash, '#home');
+    assert.equal(await page.isVisible('#panel-home'), true);
+    const stock = await page.evaluate(() => localStorage.getItem('hookah_coal_inventory'));
+    await page.reload();
+    await page.waitForFunction(() => getActiveStage() === 'warmup');
+    assert.equal((await active()).targetTimestamp, first.targetTimestamp);
+    await page.goto(`${base}?action=preheat`);
+    await page.waitForFunction(() => getActiveStage() === 'warmup');
+    assert.equal((await active()).targetTimestamp, first.targetTimestamp);
+    assert.equal(await page.evaluate(() => localStorage.getItem('hookah_coal_inventory')), stock);
+    await page.goto(`${base}?action=roulette#catalog`);
+    await page.waitForSelector('#panel-roulette', { state: 'visible' });
+    assert.equal(new URL(page.url()).search, '');
+    assert.equal(new URL(page.url()).hash, '#roulette');
+    assert.equal((await active()).targetTimestamp, first.targetTimestamp);
+    await page.click('#tab-catalog');
+    assert.equal(new URL(page.url()).hash, '#catalog');
+    await page.reload();
+    await page.waitForSelector('#panel-catalog', { state: 'visible' });
+
+    // Preserve both smoking and rating sessions when asked to preheat.
+    for (const stage of ['smoking', 'rating']) {
+      await page.evaluate(stage => {
+        const state = JSON.parse(localStorage.getItem('hookah_active_session'));
+        state.stage = stage;
+        localStorage.setItem('hookah_active_session', JSON.stringify(state));
+      }, stage);
+      await page.goto(`${base}?action=preheat`);
+      await page.waitForFunction(stage => getActiveStage() === stage, stage);
+      assert.equal((await active()).targetTimestamp, first.targetTimestamp);
+    }
+
+    // URL preheat uses the same duration supplied by history as a normal launch.
+    await page.evaluate(() => {
+      localStorage.removeItem('hookah_active_session');
+      localStorage.setItem('hookah_sessions', JSON.stringify([{
+        id: 1, bowl: 'Test bowl', actualWarmupDuration: 540,
+        smokeDuration: 3600, mix: [], rating: 4
+      }]));
+    });
+    await page.goto(`${base}?action=preheat`);
+    await page.waitForFunction(() => getActiveStage() === 'warmup');
+    const customized = await active();
+    assert.equal(await page.inputValue('#warmup-min'), '9');
+    assert.equal(customized.targetTimestamp - customized.stepStartTime, 9 * 60000);
+    assert.deepEqual(errors, []);
+  } finally {
+    await browser.close();
+    await new Promise(resolve => server.close(resolve));
+  }
+});
+
 async function optionLabels(page, selector) {
   return page.$$eval(`${selector} option`, (options) =>
     options.slice(1).map((option) => option.textContent.trim())

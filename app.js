@@ -668,6 +668,8 @@ function sendPush(title, body) {
 // --- STORAGE: INDEXEDDB + LOCALSTORAGE ---
 const dbName = "HookahDB";
 let db;
+let resolveInitialHistory;
+const initialHistoryReady = new Promise(resolve => { resolveInitialHistory = resolve; });
 
 const request = indexedDB.open(dbName, 2);
 request.onupgradeneeded = function (event) {
@@ -681,12 +683,14 @@ request.onsuccess = function (event) {
     loadAllData((sessions) => {
         applyLastUsedWeightToForm(sessions);
         renderData(sessions);
+        resolveInitialHistory();
     });
 };
 request.onerror = function () {
     loadAllData((sessions) => {
         applyLastUsedWeightToForm(sessions);
         renderData(sessions);
+        resolveInitialHistory();
     });
 };
 
@@ -1717,14 +1721,14 @@ function scheduleIdleAudioCleanup() {
 }
 
 // --- ЛОГИКА ТАЙМЕРА ПРОГРЕВА И ПОКУРА ---
-function startWarmupSession() {
+function startWarmupSession({ allowEmptyBowl = false } = {}) {
     if (isWarmupOrSmokingActive() || getActiveStage() === 'rating') {
         showBannerToast('Сессия уже идёт — заполните данные и завершите её');
         return;
     }
 
     const selectedBowl = document.getElementById('bowl-select')?.value;
-    if (!selectedBowl) {
+    if (!selectedBowl && !allowEmptyBowl) {
         document.getElementById('quick-bowl-box')?.classList.remove('hidden');
         document.getElementById('new-bowl-input')?.focus();
         showIosNotice("Добавь свою чашу 🏺", "Список чаш пуст! Введи название своей чаши в поле выше и нажми «ОК».");
@@ -2811,11 +2815,30 @@ function initPwaViewport() {
 }
 
 // --- ИНИЦИАЛИЗАЦИЯ ---
+// One-shot URL actions reuse the existing navigation and session timer.
+async function handleLaunchAction() {
+    const url = new URL(window.location.href);
+    const action = url.searchParams.get('action');
+    if (!url.searchParams.has('action')) return;
+
+    url.searchParams.delete('action');
+    if (action === 'preheat') url.hash = 'home';
+    if (action === 'roulette') url.hash = 'roulette';
+    window.history.replaceState(window.history.state, '', url);
+
+    if (action === 'preheat') {
+        // History may supply the current warmup duration and bowl. Restore first.
+        await initialHistoryReady;
+        startWarmupSession({ allowEmptyBowl: true });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initPwaViewport();
     initTheme();
     initCatalogs();
     restoreActiveSessionIfAny();
+    handleLaunchAction();
 
     window.addEventListener('dimhookah:catalog-ready', event => {
         const catalog = event && event.detail && Array.isArray(event.detail.catalog)

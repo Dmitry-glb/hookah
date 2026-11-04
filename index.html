@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="ui.css">
     <link rel="stylesheet" href="comics.css">
     <link rel="stylesheet" href="comics-photo.css">
+    <link rel="stylesheet" href="experience.css">
     <script>
         (function () {
             try {
@@ -68,7 +69,7 @@
                     <p class="app-subtitle">Больше, чем кальян</p>
                 </div>
             </div>
-            <div class="header-actions">
+            <div class="header-actions"><button type="button" class="settings-shortcut" data-open-tab="settings" aria-label="Настройки">⚙</button>
                 <span class="catalog-status" id="header-catalog-status" title="Локальный каталог HTReviews">
                     <span class="catalog-dot" aria-hidden="true"></span>
                     <span id="header-catalog-label">Загрузка…</span>
@@ -97,7 +98,8 @@
             </button>
 
             <button type="button" class="nav-tab" id="tab-catalog" role="tab" aria-selected="false" aria-controls="panel-catalog" data-tab="catalog"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Каталог</span></button>
-            <button type="button" class="nav-tab" id="tab-collection" role="tab" aria-selected="false" aria-controls="panel-collection" data-tab="collection"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 5c-3-3-6-1-8 1C8 1 2 4 3 9c0 4 9 11 9 11s9-7 9-11c0-2 0-3-1-4Z"/></svg><span>Коллекция</span></button>
+            <button type="button" class="nav-tab" id="tab-collection" hidden role="tab" aria-selected="false" aria-controls="panel-collection" data-tab="collection"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 5c-3-3-6-1-8 1C8 1 2 4 3 9c0 4 9 11 9 11s9-7 9-11c0-2 0-3-1-4Z"/></svg><span>Коллекция</span></button>
+<button type="button" class="nav-tab" id="tab-history" role="tab" aria-selected="false" aria-controls="panel-history" data-tab="history"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l4 2"/></svg><span>История</span></button><button type="button" class="nav-tab desktop-only" id="tab-stats" role="tab" aria-selected="false" aria-controls="panel-stats" data-tab="stats"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10m8 10V4m8 16v-7"/></svg><span>Статистика</span></button>
         </nav>
 
         <main class="app-main">
@@ -107,11 +109,13 @@
                 aria-labelledby="tab-home">
 
                 <section class="comic-hero" aria-labelledby="hero-title">
-                    <div class="hero-copy"><span class="issue-label">ТВОЙ ВКУС. ТВОЯ ИСТОРИЯ.</span><h2 id="hero-title">Время<br>хороших<br><span>вкусов!</span></h2><p>Собери свою чашу.<br>Открой что-то новое.</p><a class="comic-cta" href="#setup-form">Начать сессию <span>↗</span></a></div>
+                    <div class="hero-copy"><span class="issue-label">ТВОЙ ВКУС. ТВОЯ ИСТОРИЯ.</span><h2 id="hero-title">Время<br>хороших<br><span>вкусов!</span></h2><p>Собери свою чашу.<br>Открой что-то новое.</p><span class="hero-caption">Меньше настроек.<br>Больше хороших моментов.</span></div>
                     <div class="hero-art" aria-hidden="true"><span class="hero-burst">WOW!</span><svg viewBox="0 0 260 330" fill="none"><g stroke="#151515" stroke-width="5" stroke-linejoin="round"><path d="M137 61c-32-20 40-28 6-48m19 58c40-30-10-35 20-61" stroke="#fffdf5" stroke-width="10"/><path d="m110 74 69-5-9 32-46 3Z" fill="#171719"/><path d="m121 103 48-3-10 24-28 3Z" fill="#ffda35"/><path d="M143 126v103h15V124" fill="#fffdf5"/><path d="M100 133q48-21 98-2l-9 13q-38 17-81 2Z" fill="#fffdf5"/><path d="M142 210q-4 33-32 47c-28 15-24 44 7 48 23 4 47 4 68-2 25-9 16-31-4-44-20-13-24-30-24-49Z" fill="#b395f5"/><path d="M119 279q29 12 58-1M130 252l33 2"/><path d="M164 176c80-58 108 91 49 100-42 7-21-67-48-62" stroke="#151515" stroke-width="12"/><path d="m205 267-17 32" stroke="#fffdf5" stroke-width="9"/><path d="m68 113-18 29 22-5-12 29 37-41-23 4 10-19Z" fill="#fffdf5"/><path d="m198 58 13 20m-3-36 17 11M79 221l-19 10m23 3-12 17"/></g></svg><span class="art-caption">MAKE IT MIX!</span></div>
                 </section>
-                <div class="home-shortcuts"><button type="button" data-open-tab="catalog"><span>↗</span><strong>Найди свой вкус</strong><small>Весь каталог</small></button><button type="button" data-open-tab="roulette"><span>⚄</span><strong>Доверься случаю</strong><small>Рулетка вкусов</small></button></div>
-                <section class="home-picks"><div class="comic-section-title"><h2>Попробуй что-то новое</h2><button type="button" class="text-link" data-open-tab="catalog">Все вкусы ↗</button></div><div id="home-products" class="home-products"><p>Загружаем вкусы…</p></div></section>
+                <div class="home-actions"><button type="button" id="quick-preheat" class="quick-preheat" onclick="startQuickPreheat()"><span class="quick-flame" aria-hidden="true">♨</span><span><strong>Начать прогрев</strong><small>Одно нажатие — и всё готово</small></span><b>07:00</b><span aria-hidden="true">▶</span></button>
+                <div class="home-shortcuts"><button type="button" data-open-tab="roulette"><span>⤨</span><strong>Рулетка</strong><small>Найти свой вкус</small></button><button type="button" onclick="openManualAddModal()"><span>✎</span><strong>Записать покур</strong><small>Быстро и просто</small></button></div>
+                <button type="button" class="resume-session hidden" id="resume-session" data-open-tab="timer">Прогрев идёт — открыть таймер ↗</button></div>
+                <section class="recent-section"><div class="comic-section-title"><h2>Последние покуры</h2><button type="button" class="text-link" data-open-tab="history">Вся история ↗</button></div><div id="recent-sessions" class="recent-sessions"><p class="quiet-empty">Твоя история начнётся с первой записи.</p></div></section>
                 <div class="home-stack">
                     <div class="session-stack">
                         <!-- Покур: настройка -->
@@ -562,10 +566,24 @@
 
             <section class="tab-panel" id="panel-catalog" data-panel="catalog" role="tabpanel" aria-labelledby="tab-catalog" hidden>
                 <div class="section-head"><div><span class="eyebrow">ВКУСНАЯ ВСЕЛЕННАЯ</span><h2>Найди свой вкус</h2><p class="section-sub">Реальные фото. Тысячи сочетаний. Твой следующий фаворит.</p></div><span class="count-pill" id="catalog-total">Загрузка…</span></div>
-                <div class="catalog-tools"><label class="catalog-search-label"><span aria-hidden="true">⌕</span><input type="search" id="catalog-search" placeholder="Вкус, бренд или аромат…" aria-label="Поиск по каталогу"></label><div class="catalog-filter-row"><select id="catalog-brand" aria-label="Бренд"><option value="">Все бренды</option></select><select id="catalog-group" aria-label="Направление"><option value="">Все направления</option></select><select id="catalog-sort" aria-label="Сортировка"><option value="rating">По рейтингу</option><option value="name">По названию</option></select></div></div>
+                <div class="catalog-shortcuts"><button type="button" class="filter-chip is-active" data-open-tab="catalog">Все табаки</button><button type="button" class="filter-chip" data-open-tab="collection">♡ Моя коллекция</button></div><div class="catalog-tools"><label class="catalog-search-label"><span aria-hidden="true">⌕</span><input type="search" id="catalog-search" placeholder="Вкус, бренд или аромат…" aria-label="Поиск по каталогу"></label><div class="catalog-filter-row"><select id="catalog-brand" aria-label="Бренд"><option value="">Все бренды</option></select><select id="catalog-group" aria-label="Направление"><option value="">Все направления</option></select><select id="catalog-sort" aria-label="Сортировка"><option value="rating">По рейтингу</option><option value="name">По названию</option></select></div></div>
                 <div class="catalog-grid" id="catalog-products" aria-live="polite"></div><div class="catalog-more"><button type="button" class="btn btn-primary" id="catalog-more" hidden>Показать ещё ↓</button></div>
             </section>
             <section class="tab-panel" id="panel-collection" data-panel="collection" role="tabpanel" aria-labelledby="tab-collection" hidden></section>
+
+            <section class="tab-panel" id="panel-timer" data-panel="timer" aria-label="Активная сессия" hidden><button type="button" class="back-link" data-open-tab="home">← На главную</button><div class="timer-illustration" aria-hidden="true">♨<span>Время хороших вкусов</span></div></section>
+            <section class="tab-panel" id="panel-session" data-panel="session" aria-label="Настройка сессии" hidden><div class="section-head"><div><span class="eyebrow">Всё по твоему вкусу</span><h2>Моя сессия</h2></div><button type="button" class="text-link" data-open-tab="timer">К таймеру ↗</button></div></section>
+            <section class="tab-panel" id="panel-history" data-panel="history" role="tabpanel" aria-labelledby="tab-history" hidden><div class="section-head"><div><span class="eyebrow">Твоя кальянная история</span><h2>История</h2></div><button type="button" class="btn btn-primary" onclick="openManualAddModal()">✎ Записать покур</button></div></section>
+            <section class="tab-panel" id="panel-stats" data-panel="stats" role="tabpanel" aria-labelledby="tab-stats" hidden></section>
+            <section class="tab-panel" id="panel-settings" data-panel="settings" aria-label="Настройки приложения" hidden>
+                <div class="section-head"><div><span class="eyebrow">На твоих условиях</span><h2>Настройки</h2></div></div>
+                <div class="settings-grid"><section class="card"><h3>Оформление</h3><p class="setting-note">Выбери тему в переключателе сверху. Интерфейс хранит выбор на этом устройстве.</p><button class="btn btn-secondary" type="button" data-open-tab="stats">Статистика и запас углей ↗</button><button class="btn btn-secondary" type="button" data-open-tab="collection">Моя коллекция ↗</button></section>
+                <section class="card cloud-settings"><h3>Cloudflare и Siri</h3><p class="setting-note">Таймер, история и фоновые уведомления на твоём сервере. Без подключения всё работает локально.</p>
+                <label class="field">Адрес Worker<input type="url" id="cloud-url" class="control-h" placeholder="https://….workers.dev" autocomplete="off"></label><label class="field">Ключ доступа<input type="password" id="cloud-token" class="control-h" autocomplete="new-password" placeholder="Ключ из настройки сервера"></label>
+                <label class="check"><input type="checkbox" id="cloud-history"> Синхронизировать историю покуров</label><div class="setting-actions"><button type="button" class="btn btn-primary" id="cloud-connect">Подключить</button><button type="button" class="btn btn-secondary" id="cloud-disconnect">Отключить</button></div><p id="cloud-status" class="setting-note" role="status">Локальный режим</p><button type="button" class="btn btn-secondary hidden" id="cloud-adopt">Открыть серверный таймер</button>
+                <button type="button" class="btn btn-secondary" id="cloud-push">Включить фоновые уведомления</button><p class="setting-note">На iPhone уведомления доступны для приложения, добавленного на экран «Домой». Доставка зависит от разрешений и связи.</p><details><summary>Журнал таймера</summary><ol id="cloud-events" class="cloud-events"><li>Появится после подключения.</li></ol></details></section></div>
+            </section>
+
         </main>
 
         <footer class="app-footer">
@@ -759,8 +777,11 @@
     </noscript>
 
     <script src="lib/catalog-core.js"></script>
+    <script src="lib/preheat-config.js"></script>
     <script src="app.js"></script>
+    <script src="experience.js"></script>
     <script src="catalog-ui.js"></script>
+    <script src="cloud-sync.js"></script>
 </body>
 
 </html>

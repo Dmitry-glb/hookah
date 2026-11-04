@@ -8,3 +8,6 @@ require('./catalog-core.test.js');
 require('./catalog.test.js');
 require('./live.test.js');
 require('./ui.test.js');
+require('./session-service.test.js');
+require('./experience.test.js');
+require('./preheat.test.js');

@@ -54,6 +54,7 @@ let targetTimestamp = null;
 let stepStartTime = null;
 let actualWarmupDuration = 0;
 let smokeDuration = 0;
+let timerPausedAt = null;
 let currentRating = 0;
 let activeCoalsUsed = 3;
 let alarmAlreadyPlayed = false;
@@ -624,6 +625,7 @@ function showBannerToast(msg) {
 
 function sendPush(title, body) {
     showBannerToast(`${title}: ${body}`);
+    if (window.DimHookahCloud?.usesPush()) return;
     if (!("Notification" in window) || Notification.permission !== "granted") return;
 
     const fallback = () => {
@@ -695,6 +697,9 @@ request.onerror = function () {
 };
 
 function saveSessionsToStorage(sessions, callback) {
+    let previous = [];
+    try { previous = JSON.parse(localStorage.getItem('hookah_sessions') || '[]'); } catch {}
+    window.dispatchEvent(new CustomEvent('dimhookah:history-write', { detail: { sessions, previous } }));
     localStorage.setItem('hookah_sessions', JSON.stringify(sessions));
     if (db) {
         try {
@@ -807,7 +812,7 @@ function getBowlOptionsHtml(selectedVal = '') {
         return `<option value="" selected>Нет чаш — нажми «+ Добавить»</option>`;
     }
     const target = savedBowls.includes(selectedVal) ? selectedVal : savedBowls[0];
-    return savedBowls.map(b => `<option value="${b}" ${b === target ? 'selected' : ''}>${b}</option>`).join('');
+    return savedBowls.map(b => `<option value="${escapeHtml(b)}" ${b === target ? 'selected' : ''}>${escapeHtml(b)}</option>`).join('');
 }
 
 function sortedBrandList() {
@@ -1456,8 +1461,8 @@ function formatMixText(mixArray) {
     if (!Array.isArray(mixArray) || mixArray.length === 0) return 'Табак не указан';
     return mixArray.map(item => {
         const cleanB = stripRussianBrackets(item.brand);
-        const namePart = item.flavor ? `${cleanB} (${item.flavor})` : cleanB;
-        const weightPart = item.weight ? ` <span class="mix-tag">${item.weight}г</span>` : '';
+        const namePart = item.flavor ? `${escapeHtml(cleanB)} (${escapeHtml(item.flavor)})` : escapeHtml(cleanB);
+        const weightPart = item.weight ? ` <span class="mix-tag">${escapeHtml(item.weight)}г</span>` : '';
         return `${namePart}${weightPart}`;
     }).join(' + ');
 }
@@ -1478,7 +1483,9 @@ function setWarmupPreset(min) {
 
 // --- СОХРАНЕНИЕ И ВОССТАНОВЛЕНИЕ АКТИВНОЙ СЕССИИ ---
 function saveActiveSessionState(stage) {
+    const previous = localStorage.getItem('hookah_active_session');
     const state = {
+        pausedAt: timerPausedAt,
         stage,
         targetTimestamp,
         stepStartTime,
@@ -1490,10 +1497,13 @@ function saveActiveSessionState(stage) {
         mix: getDraftMixFromForm()
     };
     localStorage.setItem('hookah_active_session', JSON.stringify(state));
+    window.dispatchEvent(new CustomEvent('dimhookah:timer-change', { detail: { state, previous } }));
 }
 
 function clearActiveSessionState() {
+    timerPausedAt = null;
     localStorage.removeItem('hookah_active_session');
+    window.dispatchEvent(new CustomEvent('dimhookah:timer-change', { detail: { state: null } }));
 }
 
 function restoreActiveSessionIfAny() {
@@ -1504,6 +1514,7 @@ function restoreActiveSessionIfAny() {
         const state = JSON.parse(raw);
         if (!state || !state.stage) return;
 
+        timerPausedAt = state.pausedAt || null;
         targetTimestamp = state.targetTimestamp;
         stepStartTime = state.stepStartTime;
         actualWarmupDuration = state.actualWarmupDuration || 0;
@@ -1576,6 +1587,7 @@ function restoreActiveSessionIfAny() {
                 forgottenBox.classList.remove('hidden');
             }
         }
+        if (timerPausedAt) { stopTimerTicker(); stopKeepAliveAudio(); clearSessionAlertTimers(); }
     } catch (e) {
         console.warn('Ошибка восстановления сессии:', e);
     }
@@ -1675,6 +1687,7 @@ function clearSessionAlertTimers() {
 }
 
 function scheduleWarmupAlert() {
+    if (timerPausedAt) return;
     if (warmupAlertTimeout) clearTimeout(warmupAlertTimeout);
     if (!targetTimestamp) return;
     const delay = targetTimestamp - Date.now();
@@ -1689,6 +1702,7 @@ function scheduleWarmupAlert() {
 }
 
 function scheduleSmokingAlerts() {
+    if (timerPausedAt) return;
     if (smoke60Timeout) clearTimeout(smoke60Timeout);
     if (smoke90Timeout) clearTimeout(smoke90Timeout);
     if (!stepStartTime) return;
@@ -1770,6 +1784,7 @@ function startWarmupSession({ allowEmptyBowl = false } = {}) {
             ? mixText
             : 'Данные сессии можно заполнить во время прогрева';
 
+    timerPausedAt = null;
     stepStartTime = Date.now();
     targetTimestamp = stepStartTime + (totalSeconds * 1000);
     alarmAlreadyPlayed = false;
@@ -1787,7 +1802,7 @@ function startWarmupSession({ allowEmptyBowl = false } = {}) {
 }
 
 function updateWarmupTimer() {
-    const now = Date.now();
+    const now = timerPausedAt || Date.now();
     const diffSec = Math.ceil((targetTimestamp - now) / 1000);
     const totalElapsedWarmup = Math.max(0, Math.floor((now - stepStartTime) / 1000));
 
@@ -1830,7 +1845,7 @@ function updateWarmupTimer() {
 
 function addWarmupMinute() {
     initAudio();
-    const now = Date.now();
+    const now = timerPausedAt || Date.now();
     if (targetTimestamp < now) {
         targetTimestamp = now + 60000;
     } else {
@@ -1847,6 +1862,7 @@ function addWarmupMinute() {
 }
 
 function startSmokingFromWarmup() {
+    if (timerPausedAt) toggleSessionPause();
     initAudio();
     actualWarmupDuration = Math.max(1, Math.floor((Date.now() - stepStartTime) / 1000));
 
@@ -1874,7 +1890,7 @@ function startSmokingFromWarmup() {
 }
 
 function updateSmokingTimer() {
-    const elapsedSmoke = Math.floor((Date.now() - stepStartTime) / 1000);
+    const elapsedSmoke = Math.max(0, Math.floor(((timerPausedAt || Date.now()) - stepStartTime) / 1000));
     const formatted = formatTimerSec(elapsedSmoke);
     document.getElementById('timer').innerText = formatted;
     updateLockScreenMetadata(`💨 Покур: ${formatted}`, getCurrentMixSummaryText());
@@ -1897,7 +1913,8 @@ function updateSmokingTimer() {
 }
 
 function finishSmokingSession() {
-    smokeDuration = Math.floor((Date.now() - stepStartTime) / 1000);
+    smokeDuration = Math.max(0, Math.floor(((timerPausedAt || Date.now()) - stepStartTime) / 1000));
+    timerPausedAt = null;
     stopTimerTicker();
     stopKeepAliveAudio();
     clearSessionAlertTimers();
@@ -2225,7 +2242,7 @@ function renderData(sessions) {
         sessions: lastHistorySessions,
         updatedAt: Date.now()
     };
-    window.dispatchEvent(new CustomEvent('dimhookah:history-ready'));
+    window.dispatchEvent(new CustomEvent('dimhookah:history-ready', { detail: { sessions: lastHistorySessions } }));
 
     syncCatalogFromHistory(sessions);
     if (!sessionDefaultsApplied) {
@@ -2262,27 +2279,27 @@ function renderData(sessions) {
         const mixArr = getNormalizedMix(s);
         const mixHtml = formatMixText(mixArr);
         const totalWeight = mixArr.reduce((acc, i) => acc + (parseFloat(i.weight) || 0), 0);
-        const costBadge = s.sessionCost ? `<span class="cost-tag">💰 ${s.sessionCost} ₽</span>` : '';
-        const coalsText = s.coalsUsed ? `${s.coalsUsed} шт.` : 'Не указано';
+        const costBadge = s.sessionCost ? `<span class="cost-tag">💰 ${escapeHtml(s.sessionCost)} ₽</span>` : '';
+        const coalsText = s.coalsUsed ? `${escapeHtml(s.coalsUsed)} шт.` : 'Не указано';
 
         const item = document.createElement('div');
         item.className = 'history-item';
         item.innerHTML = `
             <div class="history-top-bar">
-                <span class="history-date">${s.date || '—'}</span>
-                <span class="history-rating-pill">★ ${s.rating}</span>
+                <span class="history-date">${escapeHtml(s.date || '—')}</span>
+                <span class="history-rating-pill">★ ${escapeHtml(s.rating)}</span>
             </div>
             <div class="history-mix-title">${mixHtml} ${costBadge}</div>
             <div class="history-meta">
-                🏺 <b>Чаша:</b> ${s.bowl} ${totalWeight > 0 ? `(${totalWeight} г)` : ''}<br>
+                🏺 <b>Чаша:</b> ${escapeHtml(s.bowl)} ${totalWeight > 0 ? `(${totalWeight} г)` : ''}<br>
                 🔥 <b>Угли:</b> ${coalsText}<br>
                 ⏱ <b>Прогрев:</b> ${formatDurationText(s.actualWarmupDuration)} &nbsp;•&nbsp; 💨 <b>Покур:</b> ${formatDurationText(s.smokeDuration)}
             </div>
-            ${s.comment ? `<div class="history-comment">«${s.comment}»</div>` : ''}
+            ${s.comment ? `<div class="history-comment">«${escapeHtml(s.comment)}»</div>` : ''}
             <div class="history-actions">
-                <button class="action-chip repeat" onclick="repeatSession(${s.id})">🔄 Повторить</button>
-                <button class="action-chip" onclick="openEditModal(${s.id})">✏️ Изменить</button>
-                <button class="action-chip delete" onclick="deleteSession(${s.id})">🗑️</button>
+                <button class="action-chip repeat" onclick="repeatSession(${Number(s.id) || 0})">🔄 Повторить</button>
+                <button class="action-chip" onclick="openEditModal(${Number(s.id) || 0})">✏️ Изменить</button>
+                <button class="action-chip delete" onclick="deleteSession(${Number(s.id) || 0})">🗑️</button>
             </div>
         `;
         historyList.appendChild(item);
@@ -2343,7 +2360,7 @@ function fillSessionFromCollection(data) {
     }
 
     if (window.DimHookahUI && typeof window.DimHookahUI.showTab === 'function') {
-        window.DimHookahUI.showTab('home');
+        window.DimHookahUI.showTab('session');
     }
     setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 80);
     showBannerToast(`«${flavor || brand}» перенесён в забивку`);
@@ -2540,7 +2557,10 @@ function openManualAddModal() {
 
     const { soloWeight } = getLastUsedWeights();
     const manualWeightInput = document.getElementById('manual-weight-input');
-    if (manualWeightInput) manualWeightInput.value = soloWeight;
+    if (manualWeightInput) manualWeightInput.value = '';
+    document.getElementById('manual-rating-select').value = '';
+    document.getElementById('manual-duration-input').value = '';
+    document.getElementById('manual-coals-input').value = '';
 
     syncManualFlavorOptions('');
     document.getElementById('manual-comment-input').value = '';
@@ -2561,10 +2581,11 @@ function saveManualSession() {
     const brandSelectVal = document.getElementById('manual-brand-select').value;
     const brand = stripRussianBrackets(brandSelectVal || sortedBrandList()[0] || 'Без бренда');
     const flavor = document.getElementById('manual-flavor-input').value || '';
-    const weight = parseFloat(document.getElementById('manual-weight-input').value) || getLastUsedWeights().soloWeight;
-    const durMins = parseInt(document.getElementById('manual-duration-input').value) || 60;
-    const coalsUsed = parseInt(document.getElementById('manual-coals-input')?.value) || 3;
-    const rating = parseFloat(document.getElementById('manual-rating-select').value) || 5;
+    const weight = parseFloat(document.getElementById('manual-weight-input').value) || 0;
+    const durMins = parseInt(document.getElementById('manual-duration-input').value) || 0;
+    const coalsUsed = parseInt(document.getElementById('manual-coals-input')?.value) || 0;
+    const rating = parseFloat(document.getElementById('manual-rating-select').value);
+    if (!Number.isFinite(rating) || rating < 0.5 || rating > 5) { showIosNotice('Оценка покура', 'Выбери оценку от 0.5 до 5.'); return; }
     const comment = document.getElementById('manual-comment-input').value.trim();
 
     if (!dateVal) {
@@ -2601,7 +2622,7 @@ function saveManualSession() {
             cost: itemCost
         }],
         sessionCost: itemCost + coalCost,
-        actualWarmupDuration: 300,
+        actualWarmupDuration: 0,
         smokeDuration: durMins * 60,
         rating,
         comment: comment || ''
@@ -2776,12 +2797,55 @@ function formatDurationHM(totalSeconds) {
 }
 
 function syncActiveTimerOnWake() {
+    if (timerPausedAt) return;
     const isWarmup = !document.getElementById('warmup-controls').classList.contains('hidden');
     const isSmoking = !document.getElementById('smoking-controls').classList.contains('hidden');
     if (!document.getElementById('active-session').classList.contains('hidden')) {
         if (isWarmup && targetTimestamp) updateWarmupTimer();
         else if (isSmoking && stepStartTime) updateSmokingTimer();
     }
+}
+
+let preheatSyncInFlight = null;
+let lastPreheatSyncAt = 0;
+
+function syncRemotePreheat() {
+    const baseUrl = window.DimHookahPreheatConfig?.apiBaseUrl;
+    if (!baseUrl || document.visibilityState === 'hidden') return Promise.resolve();
+    if (preheatSyncInFlight) return preheatSyncInFlight;
+    if (Date.now() - lastPreheatSyncAt < 5000) return Promise.resolve();
+    lastPreheatSyncAt = Date.now();
+    preheatSyncInFlight = (async () => {
+        try {
+            const response = await fetch(`${baseUrl.replace(/\/$/, '')}/preheat/status`, {
+                cache: 'no-store', credentials: 'omit', signal: AbortSignal.timeout(5000)
+            });
+            if (!response.ok) return;
+            const remote = await response.json();
+            await initialHistoryReady;
+            if (!remote.active || !Number.isSafeInteger(remote.startedAt) || remote.startedAt <= 0 ||
+                !Number.isSafeInteger(remote.duration) || remote.duration <= 0 || remote.duration > 86400 ||
+                !Number.isFinite(remote.remainingSeconds) || remote.remainingSeconds <= 0) return;
+            const end = remote.startedAt + remote.duration * 1000;
+            // Never replace a local session, including smoking, rating or overtime.
+            if (getActiveStage() || end <= Date.now() ||
+                remote.startedAt <= Number(localStorage.getItem('hookah_remote_preheat_seen'))) return;
+            const state = {
+                stage: 'warmup', stepStartTime: remote.startedAt, targetTimestamp: end,
+                actualWarmupDuration: 0, smokeDuration: 0,
+                activeCoalsUsed: parseInt(byId('start-coals-input').value) || 3,
+                alarmAlreadyPlayed: false, bowl: byId('bowl-select').value,
+                mix: getDraftMixFromForm()
+            };
+            localStorage.setItem('hookah_active_session', JSON.stringify(state));
+            localStorage.setItem('hookah_remote_preheat_seen', String(remote.startedAt));
+            restoreActiveSessionIfAny();
+            window.DimHookahUI?.showTab('timer');
+        } catch {
+            // Offline, timeout or unavailable backend: local timer remains independent.
+        }
+    })().finally(() => { preheatSyncInFlight = null; });
+    return preheatSyncInFlight;
 }
 
 // Keep browser zoom available; lock touch zoom only in the installed app.
@@ -2819,6 +2883,7 @@ function initPwaViewport() {
 async function handleLaunchAction() {
     const url = new URL(window.location.href);
     const action = url.searchParams.get('action');
+    window.DimHookahLaunchTarget = action === 'roulette' ? 'roulette' : null;
     if (!url.searchParams.has('action')) return;
 
     url.searchParams.delete('action');
@@ -2837,8 +2902,11 @@ document.addEventListener('DOMContentLoaded', () => {
     initPwaViewport();
     initTheme();
     initCatalogs();
+    const defaultDuration = window.DimHookahPreheatConfig?.defaultDurationSeconds;
+    if (defaultDuration) byId('warmup-min').value = defaultDuration / 60;
     restoreActiveSessionIfAny();
     handleLaunchAction();
+    syncRemotePreheat();
 
     window.addEventListener('dimhookah:catalog-ready', event => {
         const catalog = event && event.detail && Array.isArray(event.detail.catalog)
@@ -2853,6 +2921,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
             syncActiveTimerOnWake();
+            syncRemotePreheat();
         }
     });
 
@@ -2869,6 +2938,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('focus', syncActiveTimerOnWake);
     window.addEventListener('pageshow', syncActiveTimerOnWake);
+    window.addEventListener('focus', syncRemotePreheat);
+    window.addEventListener('pageshow', syncRemotePreheat);
 });
 
 if ('serviceWorker' in navigator) {

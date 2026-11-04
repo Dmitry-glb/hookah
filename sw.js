@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dimhookah-pwa-v20-polish';
+const CACHE_NAME = 'dimhookah-pwa-v22-experience';
 const SHELL_ASSETS = [
     './',
     './index.html',
@@ -6,11 +6,15 @@ const SHELL_ASSETS = [
     './ui.css',
     './comics.css',
     './comics-photo.css',
+    './experience.css',
+    './experience.js',
+    './cloud-sync.js',
     './assets/fonts/Underdog-Regular.ttf',
     './assets/icons/app-icon-v20-192.png',
     './assets/icons/app-icon-v20-512.png',
     './assets/icons/app-icon-v20-maskable-512.png',
     './lib/catalog-core.js',
+    './lib/preheat-config.js',
     './app.js',
     './catalog-ui.js',
     './manifest.json',
@@ -128,14 +132,26 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(cacheFirst(request, event));
 });
 
+self.addEventListener('push', event => {
+    let data = {};
+    try { data = event.data?.json() || {}; } catch { }
+    event.waitUntil(self.registration.showNotification(data.title || 'DimHookah', {
+        body: data.body || 'Открой приложение, чтобы проверить сессию.',
+        tag: data.tag || 'dimhookah-timer-alert',
+        icon: './assets/icons/app-icon-v20-192.png',
+        badge: './assets/icons/app-icon-v20-192.png',
+        data: { url: './index.html#timer' }
+    }));
+});
+
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
     event.waitUntil(
         self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
             for (const client of clientList) {
-                if ('focus' in client) return client.focus();
+                if ('focus' in client) return client.navigate(new URL('./index.html#timer', self.registration.scope).href).then(() => client.focus());
             }
-            if (self.clients.openWindow) return self.clients.openWindow('./');
+            if (self.clients.openWindow) return self.clients.openWindow('./index.html#timer');
             return null;
         })
     );

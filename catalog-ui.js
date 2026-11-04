@@ -19,7 +19,7 @@
     spins: 'hookah_roulette_spins'
   };
 
-  const TABS = ['home', 'catalog', 'roulette', 'collection'];
+  const TABS = ['home', 'catalog', 'roulette', 'collection', 'history', 'stats', 'session', 'timer', 'settings'];
   const numberFormatter = new Intl.NumberFormat('ru-RU');
 
   const state = {
@@ -175,7 +175,7 @@
 
   function loadPreferences() {
     state.collection = Core.normalizeCollection(readJson(KEYS.collection, []));
-    state.fast = readStorage(KEYS.fast) === '1';
+    state.fast = readStorage(KEYS.fast) !== '0';
     state.spinCount = Math.max(0, Number(readStorage(KEYS.spins)) || 0);
     if (el.rouletteFast) el.rouletteFast.checked = state.fast;
   }
@@ -304,7 +304,7 @@
     }
 
     for (const button of el.navTabs) {
-      const active = button.dataset.tab === target;
+      const active = button.dataset.tab === target || (['timer', 'session', 'settings'].includes(target) && button.dataset.tab === 'home');
       button.classList.toggle('is-active', active);
       button.setAttribute('aria-selected', active ? 'true' : 'false');
       button.tabIndex = active ? 0 : -1;
@@ -323,6 +323,7 @@
       renderCollection();
     }
 
+    window.dispatchEvent(new CustomEvent('dimhookah:tab', { detail: { tab: target } }));
     if (settings.scroll !== false) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -1081,7 +1082,7 @@
       state.ready = false;
       state.error = error;
       renderErrorState(error);
-      byId('home-products').textContent = 'Не удалось загрузить вкусы. Проверьте подключение и обновите страницу.';
+
       byId('catalog-total').textContent = 'Нет подключения';
       byId('catalog-products').textContent = 'Каталог недоступен. Проверьте подключение и обновите страницу.';
     } finally {
@@ -1298,29 +1299,8 @@
     }
     for (const id of ['catalog-search', 'catalog-brand', 'catalog-group', 'catalog-sort']) byId(id).addEventListener(id === 'catalog-search' ? 'input' : 'change', () => { catalogLimit = 24; renderCatalogBrowser(); });
     byId('catalog-more').addEventListener('click', () => { catalogLimit += 24; renderCatalogBrowser(); });
-    renderRandomSuggestions();
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') renderRandomSuggestions();
-    });
-    window.addEventListener('pageshow', event => {
-      if (event.persisted) renderRandomSuggestions();
-    });
-    renderCatalogBrowser();
-  }
 
-  function renderRandomSuggestions() {
-    if (!state.ready) return;
-    const previous = new Set([...byId('home-products').querySelectorAll('[data-save-product]')].map(button => button.dataset.saveProduct));
-    const candidates = state.catalog.filter(item => !item.discontinued && item.image_url);
-    const fresh = candidates.filter(item => !previous.has(item.slug));
-    const pool = fresh.length >= 4 ? fresh : candidates;
-    // Fisher–Yates: every eligible flavor has an equal chance, independent of rating.
-    for (let i = pool.length - 1; i > 0; i--) {
-      const j = Math.floor(randomUnit() * (i + 1));
-      [pool[i], pool[j]] = [pool[j], pool[i]];
-    }
-    byId('home-products').replaceChildren(...pool.slice(0, 4).map(productCard));
-    syncProductSaves();
+    renderCatalogBrowser();
   }
 
   function initStorageSync() {
@@ -1357,6 +1337,7 @@
     updateUserStats();
     updateHeaderStatus();
     loadCatalog();
+    window.DimHookahExperience?.openActive();
   }
 
   if (document.readyState === 'loading') {
@@ -1367,6 +1348,7 @@
 
   // Небольшой публичный API для e2e/отладки.
   window.DimHookahUI = {
+    isInitialized: () => Boolean(el.panels),
     showTab,
     getState: () => state,
     getFilteredItems,

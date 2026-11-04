@@ -1,0 +1,15 @@
+{
+    "name": "dimhookah-preheat",
+    "main": "index.mjs",
+    "compatibility_date": "2026-10-30",
+    "workers_dev": true,
+    "vars": { "ALLOWED_ORIGIN": "https://dmitry-glb.github.io,http://127.0.0.1:4173,http://localhost:4173" },
+    "durable_objects": {
+        "bindings": [
+            { "name": "PREHEAT_COORDINATOR", "class_name": "PreheatCoordinator" }
+        ]
+    },
+    "migrations": [
+        { "tag": "v1", "new_sqlite_classes": ["PreheatCoordinator"] }
+    ]
+}

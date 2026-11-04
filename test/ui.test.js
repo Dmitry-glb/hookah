@@ -99,7 +99,7 @@ function numericText(value) {
   return Number(String(value || '').replace(/[^\d]/g, ''));
 }
 
-test('e2e: случайные предложения, пустая граммовка, время истории и зум только PWA', { skip, timeout: 60000 }, async () => {
+test('e2e: спокойные формы, пустая граммовка, время истории и зум только PWA', { skip, timeout: 60000 }, async () => {
   const { chromium } = require('playwright');
   const server = createStaticServer();
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
@@ -124,14 +124,10 @@ test('e2e: случайные предложения, пустая граммо�
     await waitCatalog(page);
     await page.evaluate(() => document.fonts.ready);
     assert.equal(await page.evaluate(() => document.fonts.check('16px Underdog', 'Привет')), true);
-    assert.match(await page.evaluate(() => getComputedStyle(document.body).fontFamily), /Underdog/);
+    assert.match(await page.locator('.hero-copy h2').evaluate(node => getComputedStyle(node).fontFamily), /Underdog/);
     assert.doesNotMatch(await page.getAttribute('meta[name="viewport"]', 'content'), /user-scalable=no/);
     assert.equal(await page.evaluate(() => !document.dispatchEvent(new WheelEvent('wheel', { ctrlKey: true, cancelable: true }))), false);
-    const previous = await page.locator('#home-products [data-save-product]').evaluateAll(buttons => buttons.map(button => button.dataset.saveProduct));
-    await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
-    const next = await page.locator('#home-products [data-save-product]').evaluateAll(buttons => buttons.map(button => button.dataset.saveProduct));
-    assert.equal(next.length, 4);
-    assert.equal(next.some(slug => previous.includes(slug)), false);
+    await page.evaluate(() => DimHookahUI.showTab('session'));
     assert.equal(await page.inputValue('#solo-tobacco-weight'), '');
     await page.fill('#solo-tobacco-weight', '18');
     await page.selectOption('#solo-tobacco-brand', 'DARKSIDE');
@@ -143,6 +139,7 @@ test('e2e: случайные предложения, пустая граммо�
     assert.deepEqual(await page.locator('.mix-weight-input').evaluateAll(inputs => inputs.map(input => input.value)), ['', '']);
     assert.equal(await page.locator('#coal-placement, #edit-placement, #manual-placement-select').count(), 0);
     assert.doesNotMatch(await page.textContent('#history-list'), /2 \+ 1/);
+    await page.evaluate(() => DimHookahUI.showTab('history'));
     await page.click('button[onclick="openEditModal(12345)"]');
     await page.waitForSelector('#edit-modal:not(.hidden)');
     assert.equal(await page.inputValue('#edit-warmup-seconds'), '7');
@@ -172,6 +169,7 @@ test('e2e: случайные предложения, пустая граммо�
     await page.reload();
     await waitCatalog(page);
     assert.equal(await page.inputValue('#solo-tobacco-weight'), '22', 'active session restores its actual weight');
+    await page.evaluate(() => DimHookahUI.showTab('session'));
     await page.selectOption('#solo-tobacco-brand', 'DARKSIDE');
     assert.equal(await page.inputValue('#solo-tobacco-weight'), '22', 'active weight is not cleared');
 
@@ -205,6 +203,77 @@ async function waitCatalog(page) {
   );
 }
 
+test('e2e: Siri preheat sync restores absolute time without polling or overwriting local sessions', { skip, timeout: 60000 }, async () => {
+  const { chromium } = require('playwright');
+  const server = createStaticServer();
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  const browser = await chromium.launch({ headless: true, executablePath: CHROME || undefined });
+  try {
+    const context = await browser.newContext({ serviceWorkers: 'block' });
+    const page = await context.newPage();
+    const errors = [];
+    page.on('pageerror', error => errors.push(error.message));
+    let calls = 0;
+    let offline = false;
+    let remote = { active: true, startedAt: Date.now() - 120000, duration: 420, remainingSeconds: 300 };
+    await page.route('**/lib/preheat-config.js', route => route.fulfill({
+      contentType: 'application/javascript',
+      body: 'window.DimHookahPreheatConfig = { defaultDurationSeconds: 420, apiBaseUrl: "https://preheat.test" };'
+    }));
+    await page.route('https://preheat.test/preheat/status', route => {
+      calls++;
+      assert.equal(route.request().headers().authorization, undefined);
+      return offline ? route.abort() : route.fulfill({ json: remote });
+    });
+    const url = `http://127.0.0.1:${server.address().port}/`;
+    await page.goto(url);
+    await page.waitForFunction(() => getActiveStage() === 'warmup');
+    const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('hookah_active_session')));
+    assert.equal(saved.stepStartTime, remote.startedAt);
+    assert.equal(saved.targetTimestamp, remote.startedAt + 420000);
+    assert.match(await page.textContent('#timer'), /^0[45]:/);
+    assert.equal(await page.isVisible('#panel-timer'), true);
+    await page.waitForTimeout(2200);
+    assert.equal(calls, 1, 'timer ticks do not fetch status');
+    await page.reload();
+    await page.evaluate(() => syncRemotePreheat());
+    assert.equal(await page.evaluate(() => targetTimestamp), saved.targetTimestamp);
+
+    // A completed/dismissed remote session must not be imported a second time.
+    await page.evaluate(() => localStorage.removeItem('hookah_active_session'));
+    await page.reload();
+    await page.evaluate(() => syncRemotePreheat());
+    assert.equal(await page.evaluate(() => getActiveStage()), null);
+
+    // Ordinary UI start still works; a later Siri status cannot replace it.
+    await page.evaluate(() => {
+      savedBowls = ['Local bowl'];
+      populateSelects();
+      startWarmupSession();
+    });
+    const localEnd = await page.evaluate(() => targetTimestamp);
+    remote = { ...remote, startedAt: Date.now() - 30000, remainingSeconds: 390 };
+    await page.reload();
+    await page.evaluate(() => syncRemotePreheat());
+    assert.equal(await page.evaluate(() => targetTimestamp), localEnd);
+    offline = true;
+    await page.reload();
+    await page.evaluate(() => syncRemotePreheat());
+    assert.equal(await page.evaluate(() => targetTimestamp), localEnd);
+
+    await page.evaluate(() => localStorage.removeItem('hookah_active_session'));
+    offline = false;
+    remote = { ...remote, active: false, remainingSeconds: 0 };
+    await page.reload();
+    await page.evaluate(() => syncRemotePreheat());
+    assert.equal(await page.evaluate(() => getActiveStage()), null);
+    assert.deepEqual(errors, []);
+  } finally {
+    await browser.close();
+    await new Promise(resolve => server.close(resolve));
+  }
+});
+
 test('e2e: URL actions start preheat once and open roulette', { skip, timeout: 60000 }, async () => {
   const { chromium } = require('playwright');
   const server = createStaticServer();
@@ -223,8 +292,8 @@ test('e2e: URL actions start preheat once and open roulette', { skip, timeout: 6
     const first = await active();
     assert.equal(first.targetTimestamp - first.stepStartTime, 7 * 60000);
     assert.equal(new URL(page.url()).search, '?source=shortcuts');
-    assert.equal(new URL(page.url()).hash, '#home');
-    assert.equal(await page.isVisible('#panel-home'), true);
+    assert.equal(new URL(page.url()).hash, '#timer');
+    assert.equal(await page.isVisible('#panel-timer'), true);
     const stock = await page.evaluate(() => localStorage.getItem('hookah_coal_inventory'));
     await page.reload();
     await page.waitForFunction(() => getActiveStage() === 'warmup');
@@ -241,7 +310,7 @@ test('e2e: URL actions start preheat once and open roulette', { skip, timeout: 6
     await page.click('#tab-catalog');
     assert.equal(new URL(page.url()).hash, '#catalog');
     await page.reload();
-    await page.waitForSelector('#panel-catalog', { state: 'visible' });
+    await page.waitForSelector('#panel-timer', { state: 'visible' });
 
     // Preserve both smoking and rating sessions when asked to preheat.
     for (const stage of ['smoking', 'rating']) {
@@ -348,9 +417,10 @@ test('e2e: навигация PWA, каталог, каскадные фильт
     await waitCatalog(page);
 
     assert.equal(numericText(await page.textContent('#header-catalog-label')), catalog.length);
-    assert.equal(await page.locator('.nav-tab').count(), 4);
+    assert.equal(await page.locator('#main-nav .nav-tab:not([hidden])').count(), 5);
+    assert.equal(await page.isVisible('#quick-preheat'), true);
+    await page.evaluate(() => DimHookahUI.showTab('session'));
     assert.equal(await page.isVisible('#setup-form'), true);
-    assert.equal(await page.isVisible('#analytics-card'), true);
     assert.equal(await page.locator('#history-list').count(), 1);
 
     const swState = await page.evaluate(async () => {
@@ -364,7 +434,7 @@ test('e2e: навигация PWA, каталог, каскадные фильт
     });
     if (swState) {
       assert.equal(swState.active, true);
-      assert.equal(swState.caches.some((name) => name.includes('dimhookah-pwa-v20-polish')), true);
+      assert.equal(swState.caches.some((name) => name.includes('dimhookah-pwa-v22-experience')), true);
     }
 
     fs.mkdirSync(path.join(ROOT, 'debug'), { recursive: true });
@@ -386,6 +456,7 @@ test('e2e: навигация PWA, каталог, каскадные фильт
     await page.evaluate(() => setThemeMode('dark'));
     assert.match(await page.getAttribute('#app-logo', 'src'), /app-icon-v20-192\.png$/);
 
+    await page.evaluate(() => DimHookahUI.showTab('history'));
     await page.fill('#search-input', 'Old Flavor 1');
     await page.waitForFunction(
       () => document.querySelectorAll('#history-list .history-item').length === 1,
@@ -400,6 +471,7 @@ test('e2e: навигация PWA, каталог, каскадные фильт
       { timeout: 5000 }
     );
 
+    await page.evaluate(() => DimHookahUI.showTab('session'));
     // --- Прогрев можно начать до заполнения и менять данные по ходу ---
     const sessionBrands = await page.$$eval('#solo-tobacco-brand option', (options) => options.map((option) => option.textContent.trim()));
     const sessionFlavors = await page.$$eval('#solo-tobacco-flavor option', (options) => options.map((option) => option.textContent.trim()));
@@ -411,6 +483,7 @@ test('e2e: навигация PWA, каталог, каскадные фильт
     assert.ok(flavorValues.length > 1, 'в селекте вкуса должен быть список вкусов бренда');
     await page.click('#start-btn');
     await page.waitForSelector('#active-session:not(.hidden)', { timeout: 5000 });
+    await page.evaluate(() => DimHookahUI.showTab('session'));
     assert.equal(await page.isVisible('#setup-form'), true);
     await page.selectOption('#solo-tobacco-flavor', flavorValues[1]);
     await page.waitForTimeout(150);
@@ -426,6 +499,7 @@ test('e2e: навигация PWA, каталог, каскадные фильт
       { timeout: 5000 }
     );
 
+    await page.evaluate(() => DimHookahUI.showTab('timer'));
     await page.click('button[onclick="startSmokingFromWarmup()"]');
     await page.waitForSelector('#smoking-controls:not(.hidden)', { timeout: 5000 });
     await page.click('button[onclick="finishSmokingSession()"]');
@@ -444,16 +518,19 @@ test('e2e: навигация PWA, каталог, каскадные фильт
 
     assert.equal(await page.locator('#history-list .history-item').count(), 5);
     assert.match(await page.textContent('#history-list .history-more-row'), /Показать ещё 5/);
+    await page.evaluate(() => DimHookahUI.showTab('history'));
     await page.click('#history-list .history-more-row button');
     assert.equal(await page.locator('#history-list .history-item').count(), 8);
     assert.equal(await page.locator('#mode-toggle-btn').count(), 0);
+    await page.evaluate(() => DimHookahUI.showTab('session'));
     await page.click('.add-tobacco-btn');
     await page.waitForSelector('#mix-container:not(.hidden)', { timeout: 5000 });
     assert.equal(await page.locator('#mix-rows-list .tobacco-card-box').count(), 2);
 
     // --- Каскадные фильтры ---
     await page.click('#tab-roulette');
-    await page.waitForSelector('#roulette-window', { state: 'visible' });
+    await page.waitForSelector('.roulette-card', { state: 'visible' });
+    await page.locator('.roulette-options').evaluate(node => node.open = true);
 
     const brandCase = findBrandWithoutCategory();
     assert.ok(brandCase, 'не найден бренд без одного из направлений');
@@ -552,17 +629,18 @@ test('e2e: навигация PWA, каталог, каскадные фильт
     assert.equal(await page.locator('#collection-list .collection-item').count(), 1);
     await page.screenshot({ path: path.join(ROOT, 'debug', 'e2e-roulette-result.png'), fullPage: true });
 
-    await page.click('#tab-collection');
+    await page.evaluate(() => DimHookahUI.showTab('collection'));
     await page.click('#collection-list [data-collection-action="fill"]');
     await page.waitForFunction(
-      () => document.getElementById('panel-home')?.classList.contains('is-active'),
+      () => document.getElementById('panel-session')?.classList.contains('is-active'),
       null,
       { timeout: 5000 }
     );
     assert.equal(await page.locator('#solo-tobacco-brand').inputValue(), resultBrand);
     assert.equal(await page.locator('#solo-tobacco-flavor').inputValue(), resultName);
     await page.click('#tab-roulette');
-    await page.waitForSelector('#roulette-window', { state: 'visible' });
+    await page.waitForSelector('.roulette-card', { state: 'visible' });
+    await page.locator('.roulette-options').evaluate(node => node.open = true);
 
     // --- Быстрый выбор ---
     await page.evaluate(() => {
@@ -593,7 +671,7 @@ test('e2e: навигация PWA, каталог, каскадные фильт
     assert.equal(afterSecond, afterFirst, 'повторное добавление не должно создавать дубликат');
 
     // --- Коллекция и сохранение после перезагрузки ---
-    await page.click('#tab-collection');
+    await page.evaluate(() => DimHookahUI.showTab('collection'));
     const collectionCount = await page.locator('#collection-list .collection-item').count();
     assert.ok(collectionCount >= 1);
     await page.click('#collection-list .collection-item [data-collection-action="tried"]');
@@ -603,7 +681,7 @@ test('e2e: навигация PWA, каталог, каскадные фильт
     await page.reload({ waitUntil: 'domcontentloaded' });
     await waitCatalog(page);
     await page.click('#tab-roulette');
-    await page.click('#tab-collection');
+    await page.evaluate(() => DimHookahUI.showTab('collection'));
     await page.waitForSelector('#collection-list .collection-item', { timeout: 5000 });
     assert.equal(await page.locator('#collection-list .collection-item').count(), collectionCount);
     assert.equal(await page.locator('#collection-list .collection-item.is-tried').count() > 0, true);
@@ -619,7 +697,7 @@ test('e2e: навигация PWA, каталог, каскадные фильт
     await page.reload({ waitUntil: 'domcontentloaded' });
     await waitCatalog(page);
     await page.click('#tab-roulette');
-    await page.click('#tab-collection');
+    await page.evaluate(() => DimHookahUI.showTab('collection'));
     await page.waitForSelector('#collection-empty:not(.hidden)', { timeout: 5000 });
     assert.equal(await page.locator('#collection-list .collection-item').count(), 0);
 
@@ -634,7 +712,7 @@ test('e2e: навигация PWA, каталог, каскадные фильт
     assert.equal(numericText(await page.textContent('#user-spins')), 0);
     assert.equal(numericText(await page.textContent('#user-collection')), 0);
 
-    await page.click('#tab-home');
+    await page.evaluate(() => DimHookahUI.showTab('session'));
     await page.waitForSelector('#setup-form', { state: 'visible' });
     assert.equal(await page.isVisible('#start-btn'), true);
     assert.equal(await page.isVisible('#setup-step-3'), true);
@@ -647,7 +725,8 @@ test('e2e: навигация PWA, каталог, каскадные фильт
     await page.waitForTimeout(700);
     await page.screenshot({ path: path.join(ROOT, 'debug', 'e2e-session.png'), fullPage: true });
 
-    await page.click('button[onclick="openManualAddModal()"]');
+    await page.evaluate(() => DimHookahUI.showTab('home'));
+    await page.click('#panel-home button[onclick="openManualAddModal()"]');
     await page.waitForFunction(
       () => !document.getElementById('manual-add-modal')?.classList.contains('hidden'),
       null,
@@ -698,7 +777,7 @@ test('e2e: навигация PWA, каталог, каскадные фильт
     assert.equal(await page.locator('#catalog-products .product-save').first().getAttribute('aria-pressed'), 'true');
     await page.fill('#catalog-search', 'this-flavor-does-not-exist-123');
     assert.match(await page.textContent('#catalog-products'), /Ничего не найдено/);
-    await page.click('#tab-collection');
+    await page.evaluate(() => DimHookahUI.showTab('collection'));
     assert.equal(await page.locator('#collection-list .collection-item').count(), 1);
     await page.reload({ waitUntil: 'domcontentloaded' });
     await waitCatalog(page);
@@ -708,7 +787,7 @@ test('e2e: навигация PWA, каталог, каскадные фильт
       for (const theme of ['light', 'dark']) {
         await page.evaluate(theme => setThemeMode(theme), theme);
         for (const tab of ['home', 'catalog', 'roulette', 'collection']) {
-          await page.click(`#tab-${tab}`);
+          await page.evaluate(tab => DimHookahUI.showTab(tab), tab);
           assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false, `${theme}/${tab}: overflow at ${width}px`);
           if (tab === 'home') {
             assert.deepEqual(await page.locator('.pack-field input').evaluateAll(inputs => inputs.filter(input => input.checkVisibility()).flatMap(input => {

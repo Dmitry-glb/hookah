@@ -5,10 +5,14 @@
   "main": "app.js",
   "type": "commonjs",
   "scripts": {
-    "test": "node test/all.test.js && node --check app.js && node --check scraper.js && node --check lib/htreviews.js && node --check lib/catalog-core.js && node --check catalog-ui.js",
+    "test": "node test/all.test.js && node --check app.js && node --check scraper.js && node --check lib/htreviews.js && node --check lib/catalog-core.js && node --check catalog-ui.js && node --check experience.js && node --check cloud-sync.js && node --check worker/session-service.mjs",
     "test:live": "node test/live-run.js",
     "test:e2e": "node test/e2e-run.js",
-    "scrape": "node scraper.js"
+    "scrape": "node scraper.js",
+    "worker:dev": "wrangler dev --config worker/wrangler.jsonc --local",
+    "worker:check": "wrangler deploy --config worker/wrangler.jsonc --dry-run --outdir ../debug/worker-build",
+    "worker:deploy": "wrangler deploy --config worker/wrangler.jsonc",
+    "worker:setup": "node worker/setup.mjs"
   },
   "repository": {
     "type": "git",
@@ -29,10 +33,12 @@
   },
   "homepage": "https://github.com/Dmitry-glb/hookah#readme",
   "dependencies": {
+    "@block65/webcrypto-web-push": "^2.0.0",
     "axios": "^1.20.0",
     "cheerio": "^1.2.0"
   },
   "devDependencies": {
-    "playwright": "^1.64.1"
+    "playwright": "^1.64.1",
+    "wrangler": "^4.156.0"
   }
 }

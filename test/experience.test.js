@@ -5,7 +5,7 @@ test('e2e: quick 7-minute timer, durable pause, short recording, cloud outbox an
     const root = path.resolve(__dirname, '..');
     const server = http.createServer((req, res) => {
         const file = path.resolve(root, '.' + (new URL(req.url, 'http://local').pathname === '/' ? '/index.html' : new URL(req.url, 'http://local').pathname));
-        const type = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.ttf': 'font/ttf' };
+        const type = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.ttf': 'font/ttf', '.svg': 'image/svg+xml' };
         fs.readFile(file, (error, data) => { res.writeHead(error ? 404 : 200, { 'Content-Type': type[path.extname(file)] || 'application/octet-stream' }); res.end(error ? '' : data); });
     });
     await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
@@ -105,6 +105,20 @@ test('e2e: quick 7-minute timer, durable pause, short recording, cloud outbox an
         await reelPage.waitForFunction(() => window.DimHookahUI?.getState().ready);
         assert.equal(await reelPage.locator('.comic-hero, .roulette-intro').count(), 0);
         assert.equal(await reelPage.locator('#quick-preheat b').textContent(), '07:00');
+        assert.equal(await reelPage.locator('#warmup-slider').getAttribute('min'), '4');
+        assert.equal(await reelPage.locator('#warmup-slider').getAttribute('max'), '10');
+        await reelPage.waitForFunction(() => document.querySelector('.quick-flame img').naturalWidth > 0);
+        await reelPage.evaluate(() => setWarmupPreset(1));
+        assert.equal(await reelPage.locator('#quick-preheat b').textContent(), '04:00');
+        assert.equal(await reelPage.locator('#warmup-minus').isDisabled(), true);
+        await reelPage.evaluate(() => setWarmupPreset(59));
+        assert.equal(await reelPage.locator('#quick-preheat b').textContent(), '10:00');
+        assert.equal(await reelPage.locator('#warmup-plus').isDisabled(), true);
+        // Existing out-of-range preferences migrate without touching saved sessions.
+        await reelPage.evaluate(() => localStorage.setItem('hookah_warmup_minutes_v1', '15'));
+        await reelPage.reload();
+        await reelPage.waitForFunction(() => window.DimHookahUI?.getState().ready);
+        assert.equal(await reelPage.locator('#quick-preheat b').textContent(), '10:00');
         await reelPage.click('[data-warmup-choice="5"]');
         assert.equal(await reelPage.locator('#quick-preheat b').textContent(), '05:00');
         await reelPage.locator('#warmup-slider').evaluate(input => { input.value = '10'; input.dispatchEvent(new Event('input', { bubbles: true })); });

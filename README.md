@@ -233,7 +233,7 @@ npm run scrape -- --include-discontinued
 | `lib/htreviews.js` | API-клиент и нормализация HTReviews |
 | `scraper.js` | CLI обновления каталога |
 | `flavors.json` | Каталог вкусов |
-| `sw.js` | Service worker, кеш `dimhookah-pwa-v24-icon` |
+| `sw.js` | Service worker, кеш `dimhookah-pwa-v25-print` |
 | `manifest.json` | PWA-манифест тёмной темы |
 | `manifest-light.json` | PWA-манифест светлой темы |
 | `assets/icons/` | Актуальные иконки PWA и maskable-версия |
@@ -275,7 +275,7 @@ E2E требует обычного окружения с возможность
 Каталог `flavors.json` обновляется по stale-while-revalidate: открывается сразу
 из кеша, свежие данные подтягиваются в фоне. Картинки и иконки кешируются
 cache-first. При изменении списка файлов поднимайте `CACHE_NAME`; текущая
-версия — `dimhookah-pwa-v24-icon`. После активации нового service worker открытая
+версия — `dimhookah-pwa-v25-print`. После активации нового service worker открытая
 PWA перезагружается один раз автоматически.
 
 При смене темы приложение переключает `manifest.json` / `manifest-light.json`,

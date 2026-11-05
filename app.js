@@ -1477,11 +1477,11 @@ function formatMixPlainText(mixArray) {
 
 function getPreferredWarmupMinutes() {
     const value = Number(localStorage.getItem('hookah_warmup_minutes_v1'));
-    return Number.isInteger(value) && value >= 1 && value <= 59 ? value : 7;
+    return Number.isInteger(value) && value >= 1 && value <= 59 ? Math.max(4, Math.min(10, value)) : 7;
 }
 
 function setWarmupPreset(min) {
-    const value = Math.max(1, Math.min(59, Math.round(Number(min) || 7)));
+    const value = Math.max(4, Math.min(10, Math.round(Number(min) || 7)));
     localStorage.setItem('hookah_warmup_minutes_v1', String(value));
     document.getElementById('warmup-min').value = value;
     window.dispatchEvent(new CustomEvent('dimhookah:warmup-preference', { detail: { minutes: value } }));
@@ -1760,11 +1760,11 @@ function startWarmupSession({ allowEmptyBowl = false } = {}) {
         Notification.requestPermission();
     }
 
-    const mins = parseInt(document.getElementById('warmup-min').value) || 0;
+    const mins = Number(document.getElementById('warmup-min').value);
     const totalSeconds = mins * 60;
 
-    if (totalSeconds <= 0) {
-        showIosNotice("Время прогрева", "Укажи количество минут для прогрева чаши!");
+    if (!Number.isInteger(mins) || mins < 4 || mins > 10) {
+        showIosNotice("Время прогрева", "Выбери от 4 до 10 минут");
         return;
     }
     setWarmupPreset(mins);

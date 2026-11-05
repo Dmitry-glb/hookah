@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dimhookah-pwa-v24-icon';
+const CACHE_NAME = 'dimhookah-pwa-v25-print';
 const SHELL_ASSETS = [
     './',
     './index.html',
@@ -7,6 +7,7 @@ const SHELL_ASSETS = [
     './comics.css',
     './comics-photo.css',
     './experience.css',
+    './assets/warmup-ink.svg',
     './experience.js',
     './cloud-sync.js',
     './assets/fonts/Underdog-Regular.ttf',

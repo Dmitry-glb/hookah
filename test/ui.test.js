@@ -435,7 +435,7 @@ test('e2e: навигация PWA, каталог, каскадные фильт
     });
     if (swState) {
       assert.equal(swState.active, true);
-      assert.equal(swState.caches.some((name) => name.includes('dimhookah-pwa-v24-icon')), true);
+      assert.equal(swState.caches.some((name) => name.includes('dimhookah-pwa-v25-print')), true);
     }
 
     fs.mkdirSync(path.join(ROOT, 'debug'), { recursive: true });

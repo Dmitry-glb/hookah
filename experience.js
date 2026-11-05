@@ -49,7 +49,7 @@
     fastOption.lastElementChild.textContent = 'Мгновенный результат';
     filterDetails.append(fastOption);
     const consoleHead = document.createElement('div'); consoleHead.className = 'reel-console-head';
-    consoleHead.innerHTML = '<span><i aria-hidden="true"></i> Лови свой вкус</span><span class="reel-console-mark" aria-hidden="true">✦</span>';
+    consoleHead.innerHTML = '<span><i aria-hidden="true"></i> Случайный выбор</span><span class="reel-console-mark" aria-hidden="true">✦</span>';
     document.querySelector('.roulette-stage').prepend(consoleHead);
     const observeResult = new MutationObserver(() => {
         const result = byId('roulette-result');
@@ -85,7 +85,7 @@
         byId('quick-preheat').classList.toggle('session-running', Boolean(stage));
         byId('quick-preheat').querySelector('strong').textContent = stage ? 'Вернуться к сессии' : 'Начать прогрев';
         byId('quick-preheat').querySelector('b').textContent = stage ? byId('timer').textContent : formatTimerSec(getPreferredWarmupMinutes() * 60);
-        byId('quick-preheat').querySelector('small').textContent = stage ? timerPausedAt ? 'На паузе — продолжи, когда удобно' : 'Таймер и данные сессии сохранены' : 'Твоя чаша. Твой темп.';
+        byId('quick-preheat').querySelector('small').textContent = stage ? timerPausedAt ? 'На паузе — продолжи, когда удобно' : 'Таймер и данные сессии сохранены' : 'Таймер прогрева';
         byId('resume-session').textContent = stage === 'smoking' ? 'Покур идёт — открыть таймер ↗' : stage === 'rating' ? 'Оцени покур и сохрани запись ↗' : 'Прогрев идёт — открыть таймер ↗';
         const pause = byId('pause-session');
         pause.classList.toggle('hidden', !['warmup', 'smoking'].includes(stage));
@@ -115,7 +115,9 @@
         byId('warmup-slider').value = value;
         byId('warmup-picker-value').value = `${value} мин`;
         byId('warmup-slider').setAttribute('aria-valuetext', `${value} мин`);
-        byId('warmup-slider').style.setProperty('--warmup-fill', `${(value - 1) / 58 * 100}%`);
+        byId('warmup-slider').style.setProperty('--warmup-fill', `${(value - 4) / 6 * 100}%`);
+        byId('warmup-minus').disabled = value === 4;
+        byId('warmup-plus').disabled = value === 10;
         document.querySelectorAll('[data-warmup-choice]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.warmupChoice) === value)));
         updateTimerView();
     }

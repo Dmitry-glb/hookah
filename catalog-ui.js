@@ -175,7 +175,8 @@
 
   function loadPreferences() {
     state.collection = Core.normalizeCollection(readJson(KEYS.collection, []));
-    state.fast = readStorage(KEYS.fast) !== '0';
+    if (readStorage('hookah_reel_motion_v2') !== '1') { writeStorage(KEYS.fast, '0'); writeStorage('hookah_reel_motion_v2', '1'); }
+    state.fast = readStorage(KEYS.fast) === '1';
     state.spinCount = Math.max(0, Number(readStorage(KEYS.spins)) || 0);
     if (el.rouletteFast) el.rouletteFast.checked = state.fast;
   }
@@ -321,6 +322,7 @@
     if (target === 'roulette' && state.ready) {
       if (!el.rouletteTrack.children.length) renderIdleReel();
       renderCollection();
+      if (!state.running) positionReel(0);
     }
 
     window.dispatchEvent(new CustomEvent('dimhookah:tab', { detail: { tab: target } }));
@@ -614,6 +616,7 @@
     for (let index = 0; index < REEL_CARDS; index += 1) {
       const item = index === WINNER_INDEX ? winner : Core.pickRandomItem(items, randomUnit) || winner;
       const card = renderReelCard(item);
+      if (Math.abs(index - WINNER_INDEX) <= 2) { const image = card.querySelector('img'); if (image) image.loading = 'eager'; }
       card.dataset.index = String(index);
       if (index === WINNER_INDEX) card.dataset.winner = 'true';
       fragment.append(card);
@@ -671,6 +674,8 @@
     el.rouletteTrack.replaceChildren(fragment);
     el.rouletteTrack.style.transition = 'none';
     el.rouletteTrack.style.transform = 'translate3d(0, 0, 0)';
+    state.winnerIndex = Math.min(2, count - 1);
+    requestAnimationFrame(() => { if (state.activeTab === 'roulette' && !state.running) positionReel(0); });
   }
 
   function refreshRoulette(priority) {
@@ -822,7 +827,7 @@
     setControlsDisabled(true);
     buildReel(items, winner);
 
-    if (state.fast) {
+    if (state.fast || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       positionReel(0);
       finishSpin();
       return;
@@ -1134,9 +1139,7 @@
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
         if (state.running || state.activeTab !== 'roulette') return;
-        if (state.winner && el.rouletteResult && !el.rouletteResult.classList.contains('hidden')) {
-          positionReel(0);
-        }
+        positionReel(0);
       }, 160);
     });
   }

@@ -89,12 +89,65 @@ test('e2e: quick 7-minute timer, durable pause, short recording, cloud outbox an
         assert.equal(data.get('history')[0].session.id, sessions[0].id);
         await page.evaluate(() => DimHookahUI.showTab('settings'));
         await page.click('#cloud-disconnect');
+        await page.waitForFunction(() => localStorage.getItem('hookah_cloud_v1') === null);
         assert.equal(await page.evaluate(() => localStorage.getItem('hookah_cloud_v1')), null);
         assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('hookah_active_session')).stage), 'warmup');
         assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('hookah_sessions')).length), 1);
         await page.evaluate(() => renderData([{ id: 12, date: '05.11.2026', bowl: '<img src=x onerror="window.untrustedRan=true">', comment: '<img src=x onerror="window.untrustedRan=true">', rating: 4, mix: [{ brand: 'Test', flavor: '<img src=x onerror="window.untrustedRan=true">', weight: 0 }] }]));
         assert.equal(await page.locator('#history-list img').count(), 0);
         assert.equal(await page.evaluate(() => Boolean(window.untrustedRan)), false);
+        assert.deepEqual(errors, []);
+
+        // New PWA controls persist selection, and the restored reel actually moves.
+        const reelPage = await browser.newPage({ viewport: { width: 390, height: 844 }, reducedMotion: 'no-preference' });
+        reelPage.on('pageerror', error => errors.push(error.message));
+        await reelPage.goto(origin);
+        await reelPage.waitForFunction(() => window.DimHookahUI?.getState().ready);
+        assert.equal(await reelPage.locator('.comic-hero, .roulette-intro').count(), 0);
+        assert.equal(await reelPage.locator('#quick-preheat b').textContent(), '07:00');
+        await reelPage.click('[data-warmup-choice="5"]');
+        assert.equal(await reelPage.locator('#quick-preheat b').textContent(), '05:00');
+        await reelPage.locator('#warmup-slider').evaluate(input => { input.value = '10'; input.dispatchEvent(new Event('input', { bubbles: true })); });
+        assert.equal(await reelPage.locator('#warmup-picker-value').textContent(), '10 мин');
+        await reelPage.click('[data-warmup-choice="5"]');
+        await reelPage.reload();
+        await reelPage.waitForFunction(() => window.DimHookahUI?.getState().ready);
+        assert.equal(await reelPage.locator('#quick-preheat b').textContent(), '05:00');
+        await reelPage.click('#quick-preheat');
+        const fiveMinuteState = await reelPage.evaluate(() => JSON.parse(localStorage.getItem('hookah_active_session')));
+        assert.equal(fiveMinuteState.targetTimestamp - fiveMinuteState.stepStartTime, 300000);
+        await reelPage.click('.timer-toolbar button:last-child');
+        await reelPage.click('#confirm-ok-btn');
+        await reelPage.reload();
+        await reelPage.waitForFunction(() => window.DimHookahUI?.getState().ready);
+        assert.equal(await reelPage.locator('#quick-preheat b').textContent(), '05:00');
+        await reelPage.click('#tab-roulette');
+        assert.equal(await reelPage.locator('#roulette-window').isVisible(), true);
+        assert.equal(await reelPage.locator('#roulette-fast').isChecked(), false);
+        const startedAt = Date.now();
+        await reelPage.click('#roulette-spin');
+        await reelPage.waitForTimeout(200);
+        const firstTransform = await reelPage.locator('#roulette-track').evaluate(node => getComputedStyle(node).transform);
+        await reelPage.waitForTimeout(250);
+        const secondTransform = await reelPage.locator('#roulette-track').evaluate(node => getComputedStyle(node).transform);
+        assert.notEqual(firstTransform, secondTransform, 'reel cards must visibly travel, not just delay the result');
+        await reelPage.waitForSelector('#roulette-result.is-visible', { timeout: 9000 });
+        assert.ok(Date.now() - startedAt >= 4500);
+        const centerError = await reelPage.evaluate(() => {
+            const card = document.querySelector('.reel-card.is-winner').getBoundingClientRect();
+            const frame = document.getElementById('roulette-window').getBoundingClientRect();
+            return Math.abs(card.left + card.width / 2 - frame.left - frame.width / 2);
+        });
+        assert.ok(centerError < 3, `winner must align with the pointer, error ${centerError}px`);
+        for (const width of [320, 390, 768, 1280]) {
+            await reelPage.setViewportSize({ width, height: 844 });
+            for (const tab of ['home', 'roulette', 'catalog', 'history']) {
+                await reelPage.evaluate(tab => DimHookahUI.showTab(tab), tab);
+                assert.equal(await reelPage.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false);
+                const heading = reelPage.locator(`#panel-${tab} > .section-head`);
+                if (await heading.count()) assert.ok((await heading.boundingBox()).height < 60, `${tab}: heading wastes vertical space`);
+            }
+        }
         assert.deepEqual(errors, []);
     } finally { await browser.close(); await new Promise(resolve => server.close(resolve)); }
 });

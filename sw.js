@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dimhookah-pwa-v22-experience';
+const CACHE_NAME = 'dimhookah-pwa-v24-icon';
 const SHELL_ASSETS = [
     './',
     './index.html',
@@ -10,9 +10,9 @@ const SHELL_ASSETS = [
     './experience.js',
     './cloud-sync.js',
     './assets/fonts/Underdog-Regular.ttf',
-    './assets/icons/app-icon-v20-192.png',
-    './assets/icons/app-icon-v20-512.png',
-    './assets/icons/app-icon-v20-maskable-512.png',
+    './assets/icons/app-icon-v24-192.png',
+    './assets/icons/app-icon-v24-512.png',
+    './assets/icons/app-icon-v24-maskable-512.png',
     './lib/catalog-core.js',
     './lib/preheat-config.js',
     './app.js',
@@ -138,8 +138,8 @@ self.addEventListener('push', event => {
     event.waitUntil(self.registration.showNotification(data.title || 'DimHookah', {
         body: data.body || 'Открой приложение, чтобы проверить сессию.',
         tag: data.tag || 'dimhookah-timer-alert',
-        icon: './assets/icons/app-icon-v20-192.png',
-        badge: './assets/icons/app-icon-v20-192.png',
+        icon: './assets/icons/app-icon-v24-192.png',
+        badge: './assets/icons/app-icon-v24-192.png',
         data: { url: './index.html#timer' }
     }));
 });

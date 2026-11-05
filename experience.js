@@ -48,9 +48,9 @@
     const fastOption = byId('roulette-fast').closest('label');
     fastOption.lastElementChild.textContent = 'Мгновенный результат';
     filterDetails.append(fastOption);
-    const intro = document.createElement('div'); intro.className = 'roulette-intro';
-    intro.innerHTML = '<span class="roulette-dice" aria-hidden="true">⚄</span><h3>Твой следующий<br>любимый вкус?</h3><p>Нажми — и доверься случаю.</p>';
-    document.querySelector('.roulette-stage').before(intro);
+    const consoleHead = document.createElement('div'); consoleHead.className = 'reel-console-head';
+    consoleHead.innerHTML = '<span><i aria-hidden="true"></i> Лови свой вкус</span><span class="reel-console-mark" aria-hidden="true">✦</span>';
+    document.querySelector('.roulette-stage').prepend(consoleHead);
     const observeResult = new MutationObserver(() => {
         const result = byId('roulette-result');
         document.querySelector('.roulette-card').classList.toggle('has-result', !result.classList.contains('hidden'));
@@ -84,8 +84,8 @@
         byId('resume-session').classList.toggle('hidden', !stage);
         byId('quick-preheat').classList.toggle('session-running', Boolean(stage));
         byId('quick-preheat').querySelector('strong').textContent = stage ? 'Вернуться к сессии' : 'Начать прогрев';
-        byId('quick-preheat').querySelector('b').textContent = stage ? byId('timer').textContent : '07:00';
-        byId('quick-preheat').querySelector('small').textContent = stage ? timerPausedAt ? 'На паузе — продолжи, когда удобно' : 'Таймер и данные сессии сохранены' : 'Одно нажатие — и всё готово';
+        byId('quick-preheat').querySelector('b').textContent = stage ? byId('timer').textContent : formatTimerSec(getPreferredWarmupMinutes() * 60);
+        byId('quick-preheat').querySelector('small').textContent = stage ? timerPausedAt ? 'На паузе — продолжи, когда удобно' : 'Таймер и данные сессии сохранены' : 'Твоя чаша. Твой темп.';
         byId('resume-session').textContent = stage === 'smoking' ? 'Покур идёт — открыть таймер ↗' : stage === 'rating' ? 'Оцени покур и сохрани запись ↗' : 'Прогрев идёт — открыть таймер ↗';
         const pause = byId('pause-session');
         pause.classList.toggle('hidden', !['warmup', 'smoking'].includes(stage));
@@ -110,7 +110,29 @@
     });
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { window.DimHookahLaunchTarget = null; openActive(); } });
     window.addEventListener('pageshow', openActive);
+    function syncWarmupPicker() {
+        const value = getPreferredWarmupMinutes();
+        byId('warmup-slider').value = value;
+        byId('warmup-picker-value').value = `${value} мин`;
+        byId('warmup-slider').setAttribute('aria-valuetext', `${value} мин`);
+        byId('warmup-slider').style.setProperty('--warmup-fill', `${(value - 1) / 58 * 100}%`);
+        document.querySelectorAll('[data-warmup-choice]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.warmupChoice) === value)));
+        updateTimerView();
+    }
+    byId('warmup-slider').addEventListener('input', event => setWarmupPreset(event.target.value));
+    byId('warmup-minus').onclick = () => setWarmupPreset(getPreferredWarmupMinutes() - 1);
+    byId('warmup-plus').onclick = () => setWarmupPreset(getPreferredWarmupMinutes() + 1);
+    byId('warmup-slider').addEventListener('wheel', event => {
+        if (document.activeElement !== event.currentTarget || !event.deltaY) return;
+        event.preventDefault();
+        setWarmupPreset(getPreferredWarmupMinutes() + (event.deltaY > 0 ? -1 : 1));
+    }, { passive: false });
+    document.querySelectorAll('[data-warmup-choice]').forEach(button => { button.onclick = () => setWarmupPreset(button.dataset.warmupChoice); });
+    byId('warmup-min').addEventListener('change', event => setWarmupPreset(event.target.value));
+    window.addEventListener('dimhookah:warmup-preference', syncWarmupPicker);
+    window.addEventListener('storage', event => { if (event.key === 'hookah_warmup_minutes_v1') syncWarmupPicker(); });
     document.addEventListener('DOMContentLoaded', () => {
+        syncWarmupPicker();
         loadAllData(renderRecent);
         openActive();
         setInterval(updateTimerView, 1000);
@@ -120,7 +142,7 @@
 
 function startQuickPreheat() {
     if (getActiveStage()) { window.DimHookahUI?.showTab('timer'); return; }
-    document.getElementById('warmup-min').value = 7;
+    document.getElementById('warmup-min').value = getPreferredWarmupMinutes();
     startWarmupSession({ allowEmptyBowl: true });
     window.DimHookahUI?.showTab('timer');
 }

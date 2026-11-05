@@ -1,6 +1,6 @@
 # DimHookah
 
-**New Experience:** быстрый прогрев на 7 минут, отдельный таймер с паузой,
+**New Experience:** прогрев с запоминанием времени (7 минут по умолчанию), отдельный таймер с паузой,
 короткая запись покура, спокойные каталог и история, широкая веб-версия.
 Cloudflare Worker уже развёрнут. [Подключение, Siri и фоновые уведомления](docs/new-experience.md).
 
@@ -233,7 +233,7 @@ npm run scrape -- --include-discontinued
 | `lib/htreviews.js` | API-клиент и нормализация HTReviews |
 | `scraper.js` | CLI обновления каталога |
 | `flavors.json` | Каталог вкусов |
-| `sw.js` | Service worker, кеш `dimhookah-pwa-v22-experience` |
+| `sw.js` | Service worker, кеш `dimhookah-pwa-v24-icon` |
 | `manifest.json` | PWA-манифест тёмной темы |
 | `manifest-light.json` | PWA-манифест светлой темы |
 | `assets/icons/` | Актуальные иконки PWA и maskable-версия |
@@ -275,12 +275,12 @@ E2E требует обычного окружения с возможность
 Каталог `flavors.json` обновляется по stale-while-revalidate: открывается сразу
 из кеша, свежие данные подтягиваются в фоне. Картинки и иконки кешируются
 cache-first. При изменении списка файлов поднимайте `CACHE_NAME`; текущая
-версия — `dimhookah-pwa-v22-experience`. После активации нового service worker открытая
+версия — `dimhookah-pwa-v24-icon`. После активации нового service worker открытая
 PWA перезагружается один раз автоматически.
 
 При смене темы приложение переключает `manifest.json` / `manifest-light.json`,
 `apple-touch-icon`, favicon и логотип используют одну актуальную иконку
-`assets/icons/app-icon-v20-192.png` в обеих темах. Уже установленная PWA подхватывает новую иконку при
+`assets/icons/app-icon-v24-192.png` в обеих темах. Уже установленная PWA подхватывает новую иконку при
 следующем обновлении манифеста; iOS может закешировать иконку рабочего стола и
 потребовать повторного добавления на экран «Домой».
 

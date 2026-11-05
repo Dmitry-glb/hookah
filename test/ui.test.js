@@ -124,7 +124,7 @@ test('e2e: спокойные формы, пустая граммовка, вр�
     await waitCatalog(page);
     await page.evaluate(() => document.fonts.ready);
     assert.equal(await page.evaluate(() => document.fonts.check('16px Underdog', 'Привет')), true);
-    assert.match(await page.locator('.hero-copy h2').evaluate(node => getComputedStyle(node).fontFamily), /Underdog/);
+    assert.match(await page.locator('.brand-titles h1').evaluate(node => getComputedStyle(node).fontFamily), /Underdog/);
     assert.doesNotMatch(await page.getAttribute('meta[name="viewport"]', 'content'), /user-scalable=no/);
     assert.equal(await page.evaluate(() => !document.dispatchEvent(new WheelEvent('wheel', { ctrlKey: true, cancelable: true }))), false);
     await page.evaluate(() => DimHookahUI.showTab('session'));
@@ -324,9 +324,10 @@ test('e2e: URL actions start preheat once and open roulette', { skip, timeout: 6
       assert.equal((await active()).targetTimestamp, first.targetTimestamp);
     }
 
-    // URL preheat uses the same duration supplied by history as a normal launch.
+    // The selected duration takes precedence over elapsed time recorded in history.
     await page.evaluate(() => {
       localStorage.removeItem('hookah_active_session');
+      localStorage.setItem('hookah_warmup_minutes_v1', '5');
       localStorage.setItem('hookah_sessions', JSON.stringify([{
         id: 1, bowl: 'Test bowl', actualWarmupDuration: 540,
         smokeDuration: 3600, mix: [], rating: 4
@@ -335,8 +336,8 @@ test('e2e: URL actions start preheat once and open roulette', { skip, timeout: 6
     await page.goto(`${base}?action=preheat`);
     await page.waitForFunction(() => getActiveStage() === 'warmup');
     const customized = await active();
-    assert.equal(await page.inputValue('#warmup-min'), '9');
-    assert.equal(customized.targetTimestamp - customized.stepStartTime, 9 * 60000);
+    assert.equal(await page.inputValue('#warmup-min'), '5');
+    assert.equal(customized.targetTimestamp - customized.stepStartTime, 5 * 60000);
     assert.deepEqual(errors, []);
   } finally {
     await browser.close();
@@ -434,7 +435,7 @@ test('e2e: навигация PWA, каталог, каскадные фильт
     });
     if (swState) {
       assert.equal(swState.active, true);
-      assert.equal(swState.caches.some((name) => name.includes('dimhookah-pwa-v22-experience')), true);
+      assert.equal(swState.caches.some((name) => name.includes('dimhookah-pwa-v24-icon')), true);
     }
 
     fs.mkdirSync(path.join(ROOT, 'debug'), { recursive: true });
@@ -446,15 +447,15 @@ test('e2e: навигация PWA, каталог, каскадные фильт
     assert.equal(await page.locator('#solo-tobacco-flavor').inputValue(), 'Earl Grey');
     assert.equal(await page.locator('#solo-tobacco-weight').inputValue(), '');
 
-    assert.match(await page.getAttribute('#app-logo', 'src'), /app-icon-v20-192\.png$/);
+    assert.match(await page.getAttribute('#app-logo', 'src'), /app-icon-v24-192\.png$/);
     assert.equal(await page.getAttribute('#app-manifest', 'href'), 'manifest-light.json');
     await page.evaluate(() => setThemeMode('light'));
-    assert.match(await page.getAttribute('#app-logo', 'src'), /app-icon-v20-192\.png$/);
+    assert.match(await page.getAttribute('#app-logo', 'src'), /app-icon-v24-192\.png$/);
     assert.equal(await page.getAttribute('#app-manifest', 'href'), 'manifest-light.json');
-    assert.equal(await page.getAttribute('#app-touch-icon', 'href'), 'assets/icons/app-icon-v20-192.png');
+    assert.equal(await page.getAttribute('#app-touch-icon', 'href'), 'assets/icons/app-icon-v24-192.png');
     assert.equal(await page.getAttribute('#theme-color-meta', 'content'), '#f8f5ec');
     await page.evaluate(() => setThemeMode('dark'));
-    assert.match(await page.getAttribute('#app-logo', 'src'), /app-icon-v20-192\.png$/);
+    assert.match(await page.getAttribute('#app-logo', 'src'), /app-icon-v24-192\.png$/);
 
     await page.evaluate(() => DimHookahUI.showTab('history'));
     await page.fill('#search-input', 'Old Flavor 1');

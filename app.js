@@ -167,9 +167,7 @@ function applySessionDefaultsFromLast(sessionsList) {
     if (last.coalsUsed && document.getElementById('start-coals-input')) {
         document.getElementById('start-coals-input').value = last.coalsUsed;
     }
-    if (last.actualWarmupDuration > 0 && document.getElementById('warmup-min')) {
-        document.getElementById('warmup-min').value = Math.max(1, Math.round(last.actualWarmupDuration / 60));
-    }
+    if (!getActiveStage()) document.getElementById('warmup-min').value = getPreferredWarmupMinutes();
 
     const mix = getNormalizedMix(last);
     if (mix.length > 0) {
@@ -356,7 +354,7 @@ function isDarkTheme() {
 }
 
 function getThemeIconPath(size = 192) {
-    return `assets/icons/app-icon-v20-${size}.png`;
+    return `assets/icons/app-icon-v24-${size}.png`;
 }
 
 function updateThemeAssets() {
@@ -1477,8 +1475,16 @@ function formatMixPlainText(mixArray) {
     }).join(' + ');
 }
 
+function getPreferredWarmupMinutes() {
+    const value = Number(localStorage.getItem('hookah_warmup_minutes_v1'));
+    return Number.isInteger(value) && value >= 1 && value <= 59 ? value : 7;
+}
+
 function setWarmupPreset(min) {
-    document.getElementById('warmup-min').value = min;
+    const value = Math.max(1, Math.min(59, Math.round(Number(min) || 7)));
+    localStorage.setItem('hookah_warmup_minutes_v1', String(value));
+    document.getElementById('warmup-min').value = value;
+    window.dispatchEvent(new CustomEvent('dimhookah:warmup-preference', { detail: { minutes: value } }));
 }
 
 // --- СОХРАНЕНИЕ И ВОССТАНОВЛЕНИЕ АКТИВНОЙ СЕССИИ ---
@@ -1761,6 +1767,7 @@ function startWarmupSession({ allowEmptyBowl = false } = {}) {
         showIosNotice("Время прогрева", "Укажи количество минут для прогрева чаши!");
         return;
     }
+    setWarmupPreset(mins);
 
     const mix = getDraftMixFromForm();
     populateSelects();
@@ -2902,8 +2909,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initPwaViewport();
     initTheme();
     initCatalogs();
-    const defaultDuration = window.DimHookahPreheatConfig?.defaultDurationSeconds;
-    if (defaultDuration) byId('warmup-min').value = defaultDuration / 60;
+    byId('warmup-min').value = getPreferredWarmupMinutes();
     restoreActiveSessionIfAny();
     handleLaunchAction();
     syncRemotePreheat();
